@@ -1,0 +1,413 @@
+{
+  "users": [
+    {
+      "id": "admin_1",
+      "name": "System Admin",
+      "email": "admin@school.edu",
+      "password": "admin",
+      "role": "ADMIN",
+      "mobile": "+91 9876543210"
+    },
+    {
+      "id": "teacher_1",
+      "name": "Dr. Rajesh Sharma",
+      "email": "teacher@school.edu",
+      "password": "teacher",
+      "role": "TEACHER",
+      "department": "Computer Science",
+      "mobile": "+91 9876543211"
+    },
+    {
+      "id": "student_1",
+      "name": "Aarav Kumar",
+      "rollNo": "CS202601",
+      "email": "student@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "CSE - 3rd Year (Sec A)",
+      "mobile": "+91 9876543212",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%236366f1\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_2",
+      "name": "Priya Singh",
+      "rollNo": "CS202602",
+      "email": "priya@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "CSE - 3rd Year (Sec A)",
+      "mobile": "+91 9876543213",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23ec4899\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_3",
+      "name": "Rohan Mehta",
+      "rollNo": "CS202603",
+      "email": "rohan@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "CSE - 3rd Year (Sec A)",
+      "mobile": "+91 9876543214",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2310b981\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_4",
+      "name": "Ananya Sharma",
+      "rollNo": "CS202604",
+      "email": "ananya@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "CSE - 3rd Year (Sec A)",
+      "mobile": "+91 9876543215",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%238b5cf6\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_5",
+      "name": "Vikramaditya Verma",
+      "rollNo": "CS202605",
+      "email": "vikram@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "CSE - 3rd Year (Sec B)",
+      "mobile": "+91 9876543216",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23f59e0b\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_6",
+      "name": "Sneha Gupta",
+      "rollNo": "CS202606",
+      "email": "sneha@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "CSE - 3rd Year (Sec B)",
+      "mobile": "+91 9876543217",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2306b6d4\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_7",
+      "name": "Ishaan Patel",
+      "rollNo": "CS202607",
+      "email": "ishaan@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "IT - 3rd Year (Sec A)",
+      "mobile": "+91 9876543218",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23ef4444\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_8",
+      "name": "Kavya Deshmukh",
+      "rollNo": "CS202608",
+      "email": "kavya@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "IT - 3rd Year (Sec A)",
+      "mobile": "+91 9876543219",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2310b981\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_9",
+      "name": "Aditya Reddy",
+      "rollNo": "CS202609",
+      "email": "aditya@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "AI & DS - 2nd Year",
+      "mobile": "+91 9876543220",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%233b82f6\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_10",
+      "name": "Diya Roy",
+      "rollNo": "CS202610",
+      "email": "diya@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "AI & DS - 2nd Year",
+      "mobile": "+91 9876543221",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23ec4899\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_11",
+      "name": "Rahul Nair",
+      "rollNo": "CS202611",
+      "email": "rahul@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "CSE - 3rd Year (Sec B)",
+      "mobile": "+91 9876543222",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23f97316\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_12",
+      "name": "Tanvi Joshi",
+      "rollNo": "CS202612",
+      "email": "tanvi@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "CSE - 3rd Year (Sec A)",
+      "mobile": "+91 9876543223",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%238b5cf6\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    }
+  ],
+  "classes": [
+    {
+      "id": "class_101",
+      "subject": "Data Structures & Algorithms",
+      "code": "CS301",
+      "section": "Sec A",
+      "room": "Lab 402",
+      "teacherId": "teacher_1",
+      "latitude": 28.6139,
+      "longitude": 77.209,
+      "radiusMeters": 50
+    },
+    {
+      "id": "class_102",
+      "subject": "Database Management Systems",
+      "code": "CS302",
+      "section": "Sec A",
+      "room": "Hall 105",
+      "teacherId": "teacher_1",
+      "latitude": 28.614,
+      "longitude": 77.2092,
+      "radiusMeters": 50
+    },
+    {
+      "id": "class_103",
+      "subject": "Advanced Artificial Intelligence",
+      "code": "CS401",
+      "section": "Sec A & B",
+      "room": "AI Research Lab 201",
+      "teacherId": "teacher_1",
+      "latitude": 28.6139,
+      "longitude": 77.209,
+      "radiusMeters": 50
+    }
+  ],
+  "qrSessions": [
+    {
+      "sessionId": "qr_1787173199228_ne3cl",
+      "classId": "class_101",
+      "subject": "Data Structures & Algorithms",
+      "code": "CS301",
+      "section": "Sec A",
+      "room": "Lab 402",
+      "latitude": 28.6139,
+      "longitude": 77.209,
+      "createdAt": 1787173199270,
+      "expiresAt": 1787173499270
+    }
+  ],
+  "attendance": [
+    {
+      "id": "att_1787175807687",
+      "studentId": "student_1",
+      "studentName": "Aarav Kumar",
+      "rollNo": "CS202601",
+      "classId": "class_101",
+      "subject": "Advanced AI",
+      "sessionId": "qr_1787175806977",
+      "timestamp": "2026-08-19T21:43:27.753Z",
+      "location": {
+        "lat": 28.6139,
+        "lng": 77.209,
+        "distanceMeters": 0
+      },
+      "faceSnapshot": "data:image/png;base64,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",
+      "status": "PRESENT"
+    },
+    {
+      "id": "att_1",
+      "studentId": "student_1",
+      "studentName": "Aarav Kumar",
+      "rollNo": "CS202601",
+      "classId": "class_101",
+      "subject": "Data Structures & Algorithms",
+      "sessionId": "qr_1787173199228_ne3cl",
+      "timestamp": "2026-08-20T02:30:00.000Z",
+      "location": {
+        "lat": 28.6139,
+        "lng": 77.209,
+        "distanceMeters": 12
+      },
+      "faceSnapshot": "/student_profile_avatar.png",
+      "status": "PRESENT"
+    },
+    {
+      "id": "att_2",
+      "studentId": "student_2",
+      "studentName": "Priya Singh",
+      "rollNo": "CS202602",
+      "classId": "class_101",
+      "subject": "Data Structures & Algorithms",
+      "sessionId": "qr_1787173199228_ne3cl",
+      "timestamp": "2026-08-20T02:30:15.000Z",
+      "location": {
+        "lat": 28.6139,
+        "lng": 77.209,
+        "distanceMeters": 18
+      },
+      "faceSnapshot": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"200\" height=\"200\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2300C853\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>",
+      "status": "PRESENT"
+    },
+    {
+      "id": "att_3",
+      "studentId": "student_3",
+      "studentName": "Rohan Mehta",
+      "rollNo": "CS202603",
+      "classId": "class_101",
+      "subject": "Data Structures & Algorithms",
+      "sessionId": "qr_1787173199228_ne3cl",
+      "timestamp": "2026-08-20T02:31:00.000Z",
+      "location": {
+        "lat": 28.6139,
+        "lng": 77.209,
+        "distanceMeters": 24
+      },
+      "faceSnapshot": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"200\" height=\"200\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2300C853\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>",
+      "status": "PRESENT"
+    },
+    {
+      "id": "att_4",
+      "studentId": "student_4",
+      "studentName": "Ananya Sharma",
+      "rollNo": "CS202604",
+      "classId": "class_101",
+      "subject": "Data Structures & Algorithms",
+      "sessionId": "qr_1787173199228_ne3cl",
+      "timestamp": "2026-08-20T02:31:20.000Z",
+      "location": {
+        "lat": 28.6139,
+        "lng": 77.209,
+        "distanceMeters": 8
+      },
+      "faceSnapshot": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"200\" height=\"200\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2300C853\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>",
+      "status": "PRESENT"
+    },
+    {
+      "id": "att_5",
+      "studentId": "student_5",
+      "studentName": "Vikramaditya Verma",
+      "rollNo": "CS202605",
+      "classId": "class_101",
+      "subject": "Data Structures & Algorithms",
+      "sessionId": "qr_1787173199228_ne3cl",
+      "timestamp": "2026-08-20T02:32:05.000Z",
+      "location": {
+        "lat": 28.6139,
+        "lng": 77.209,
+        "distanceMeters": 35
+      },
+      "faceSnapshot": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"200\" height=\"200\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2300C853\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>",
+      "status": "PRESENT"
+    },
+    {
+      "id": "att_6",
+      "studentId": "student_6",
+      "studentName": "Sneha Gupta",
+      "rollNo": "CS202606",
+      "classId": "class_101",
+      "subject": "Data Structures & Algorithms",
+      "sessionId": "qr_1787173199228_ne3cl",
+      "timestamp": "2026-08-20T02:32:40.000Z",
+      "location": {
+        "lat": 28.6139,
+        "lng": 77.209,
+        "distanceMeters": 15
+      },
+      "faceSnapshot": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"200\" height=\"200\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2300C853\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>",
+      "status": "PRESENT"
+    },
+    {
+      "id": "att_7",
+      "studentId": "student_7",
+      "studentName": "Ishaan Patel",
+      "rollNo": "CS202607",
+      "classId": "class_101",
+      "subject": "Data Structures & Algorithms",
+      "sessionId": "qr_1787173199228_ne3cl",
+      "timestamp": "2026-08-20T02:34:10.000Z",
+      "location": {
+        "lat": 28.6139,
+        "lng": 77.209,
+        "distanceMeters": 42
+      },
+      "faceSnapshot": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"200\" height=\"200\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23FF9100\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>",
+      "status": "LATE"
+    },
+    {
+      "id": "att_8",
+      "studentId": "student_8",
+      "studentName": "Kavya Deshmukh",
+      "rollNo": "CS202608",
+      "classId": "class_101",
+      "subject": "Data Structures & Algorithms",
+      "sessionId": "qr_1787173199228_ne3cl",
+      "timestamp": "2026-08-20T02:30:45.000Z",
+      "location": {
+        "lat": 28.6139,
+        "lng": 77.209,
+        "distanceMeters": 19
+      },
+      "faceSnapshot": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"200\" height=\"200\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2300C853\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>",
+      "status": "PRESENT"
+    }
+  ],
+  "smsLogs": [
+    {
+      "id": "sms_risk_1787175807844",
+      "recipientName": "Aarav Kumar",
+      "mobile": "+91 9876543212",
+      "type": "LOW_ATTENDANCE_WARNING",
+      "message": "Warning: Low Attendance Alert for Aarav Kumar. Please ensure regular attendance.",
+      "status": "DELIVERED",
+      "timestamp": "2026-08-19T21:43:27.844Z"
+    },
+    {
+      "id": "sms_1787175807753",
+      "recipientName": "Aarav Kumar",
+      "mobile": "+91 9876543212",
+      "type": "ATTENDANCE_CONFIRMATION",
+      "message": "Attendance Marked PRESENT for Advanced AI on 3:13:27 am. Distance: 0m.",
+      "status": "DELIVERED",
+      "timestamp": "2026-08-19T21:43:27.844Z"
+    },
+    {
+      "id": "sms_101",
+      "recipientName": "Aarav Kumar",
+      "mobile": "+91 9876543212",
+      "type": "ATTENDANCE_CONFIRMATION",
+      "message": "Attendance Marked PRESENT for Data Structures & Algorithms. Distance: 12m.",
+      "status": "DELIVERED",
+      "timestamp": "2026-08-20T02:30:01.000Z"
+    },
+    {
+      "id": "sms_102",
+      "recipientName": "Priya Singh",
+      "mobile": "+91 9876543213",
+      "type": "ATTENDANCE_CONFIRMATION",
+      "message": "Attendance Marked PRESENT for Data Structures & Algorithms. Distance: 18m.",
+      "status": "DELIVERED",
+      "timestamp": "2026-08-20T02:30:16.000Z"
+    },
+    {
+      "id": "sms_103",
+      "recipientName": "Ishaan Patel",
+      "mobile": "+91 9876543218",
+      "type": "LOW_ATTENDANCE_WARNING",
+      "message": "Warning: Attendance for Ishaan Patel is below 75% threshold (71.5%). Parent notified.",
+      "status": "DELIVERED",
+      "timestamp": "2026-08-20T02:34:11.000Z"
+    },
+    {
+      "id": "sms_104",
+      "recipientName": "Rahul Nair",
+      "mobile": "+91 9876543222",
+      "type": "CRITICAL_ABSENCE_ALERT",
+      "message": "Alert: Rahul Nair was absent in Data Structures lecture. Current attendance: 68.4%.",
+      "status": "DELIVERED",
+      "timestamp": "2026-08-20T02:35:00.000Z"
+    }
+  ]
+}
