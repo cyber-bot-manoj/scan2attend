@@ -24,13 +24,13 @@ const initialData = {
     },
     {
       id: 'student_1',
-      name: 'Aarav Kumar',
+      name: 'Manoj Sharma',
       rollNo: 'CS202601',
       email: 'student@school.edu',
       password: 'student',
       role: 'STUDENT',
       classSection: 'CSE - 3rd Year (Sec A)',
-      mobile: '+91 9876543212',
+      mobile: '8840034446',
       faceProfile: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%236366f1" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>'
     },
     {

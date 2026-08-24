@@ -13,6 +13,51 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [pipelineResults, setPipelineResults] = useState(null);
+  const [voiceAlertPlaying, setVoiceAlertPlaying] = useState(false);
+  const lastVoiceRef = useRef(null);
+  const expiredSessionRef = useRef(null);
+
+  const playVoiceAlertNotification = () => {
+    setVoiceAlertPlaying(true);
+    try {
+      const AudioContext = window.AudioContext || window.webkitAudioContext;
+      const audioContext = AudioContext ? new AudioContext() : null;
+      if (audioContext) {
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(659.25, audioContext.currentTime);
+        gain.gain.setValueAtTime(0.35, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.35);
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.35);
+        window.setTimeout(() => audioContext.close(), 500);
+      }
+
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance('New class QR code generated. Please mark attendance now.');
+        utterance.rate = 1.1;
+        utterance.volume = 1;
+        window.speechSynthesis.speak(utterance);
+        window.setTimeout(() => window.speechSynthesis.cancel(), 2000);
+      }
+    } catch (error) {
+      console.warn('Voice alert failed:', error);
+    }
+    window.setTimeout(() => setVoiceAlertPlaying(false), 2000);
+  };
+
+  useEffect(() => {
+    if (!activeSession?.generatedAt || activeSession.expiresAt <= Date.now()) return;
+    if (lastVoiceRef.current === activeSession.generatedAt) return;
+    lastVoiceRef.current = activeSession.generatedAt;
+    if (localStorage.getItem(`voiceAlertPlayed:${activeSession.generatedAt}`)) return;
+    localStorage.setItem(`voiceAlertPlayed:${activeSession.generatedAt}`, 'true');
+    playVoiceAlertNotification();
+  }, [activeSession?.generatedAt]);
 
   // Webcam states & refs
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -21,7 +66,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   const canvasRef = useRef(null);
 
   // Live Timer State (5 minutes)
-  const [timeLeft, setTimeLeft] = useState(300);
+  const [timeLeft, setTimeLeft] = useState(0);
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsStatus, setGpsStatus] = useState('LIVE_GPS'); // LIVE_GPS, DENIED, SIMULATED
   const [gpsMessage, setGpsMessage] = useState('');
@@ -92,11 +137,29 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   };
 
   useEffect(() => {
-    if (!activeSession) return;
+    if (!activeSession) {
+      setTimeLeft(0);
+      return;
+    }
+    setTimeLeft(Math.max(0, Math.floor((activeSession.expiresAt - Date.now()) / 1000)));
     const interval = setInterval(() => {
       const remaining = Math.max(0, Math.floor((activeSession.expiresAt - Date.now()) / 1000));
       setTimeLeft(remaining);
-      if (remaining === 0) clearInterval(interval);
+      if (remaining === 0) {
+        clearInterval(interval);
+        if (expiredSessionRef.current !== activeSession.sessionId) {
+          expiredSessionRef.current = activeSession.sessionId;
+          const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          setPipelineResults({
+            success: true,
+            status: 'ABSENT',
+            reason: 'QR expired before attendance was marked',
+            timestamp
+          });
+          setStep(3);
+        }
+        setActiveSession?.(null);
+      }
     }, 1000);
     return () => clearInterval(interval);
   }, [activeSession]);
@@ -151,12 +214,16 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
 
   // Fallback simulated snapshot
   const useSimulatedSnapshot = () => {
-    setFaceSnapshot('/student_profile_avatar.png');
+    setFaceSnapshot('/manoj_sharma_profile.jpg');
     setLivenessChecked(true);
     stopCamera();
   };
 
   const handleStartAttendance = async () => {
+    if (!activeSession || activeSession.expiresAt <= Date.now()) {
+      setErrorMessage('No live QR session is available. Please wait for the teacher to generate one.');
+      return;
+    }
     setStep(2);
     setErrorMessage('');
     startCamera(); // Automatically initiate camera permission request
@@ -166,15 +233,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
     setSubmitting(true);
     setErrorMessage('');
     try {
-      const validQrPayload = scannedQrString || JSON.stringify({
-        sessionId: 'qr_' + Date.now(),
-        classId: 'class_101',
-        subject: 'Advanced AI',
-        code: 'CS401',
-        latitude: 28.6139,
-        longitude: 77.2090,
-        expiresAt: Date.now() + 600000
-      });
+      const validQrPayload = scannedQrString || JSON.stringify(activeSession);
 
       const res = await fetch('/api/attendance/mark', {
         method: 'POST',
@@ -184,7 +243,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           qrDataString: validQrPayload,
           studentLat,
           studentLng,
-          faceSnapshot: faceSnapshot || '/student_profile_avatar.png',
+          faceSnapshot: faceSnapshot || '/manoj_sharma_profile.jpg',
           livenessChecked: true
         })
       });
@@ -224,8 +283,9 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           <div className="flex items-center gap-5 w-full lg:w-auto">
             <div className="relative flex-shrink-0">
               <img 
-                src="/student_profile_avatar.png" 
+                src="/manoj_sharma_profile.jpg" 
                 alt="Student Profile Photo" 
+                onError={(event) => { event.currentTarget.src = '/student_profile_avatar.png'; }}
                 className="w-20 h-20 rounded-2xl object-cover border-2 border-[#2979FF] shadow-md ring-4 ring-[#2979FF]/10"
               />
               <span className="absolute -bottom-1 -right-1 bg-[#00C853] text-white p-1 rounded-full border-2 border-white shadow-xs">
@@ -236,7 +296,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
             <div>
               <div className="flex items-center gap-2.5 flex-wrap">
                 <h2 className="text-xl font-black text-[#0F172A] tracking-tight">
-                  {user ? user.name : 'Aarav Kumar'}
+                  {user ? user.name : 'Manoj Sharma'}
                 </h2>
                 <span className="bg-[#2979FF]/10 text-[#2979FF] border border-[#2979FF]/20 text-[11px] font-extrabold px-2.5 py-0.5 rounded-full">
                   ID: {user ? (user.rollNo || 'CS202601') : 'CS202601'}
@@ -245,15 +305,15 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               </div>
 
               <p className="text-xs text-[#64748B] font-bold mt-1">
-                B.Tech Computer Science & Engineering • Semester 6
+                B.C.A • Semester 5
               </p>
 
               <div className="flex items-center gap-4 mt-2 text-xs text-[#64748B] font-medium flex-wrap">
                 <span className="flex items-center gap-1.5">
-                  <Smartphone className="w-3.5 h-3.5 text-[#2979FF]" /> +91 9876543212
+                  <Smartphone className="w-3.5 h-3.5 text-[#2979FF]" /> 8840034446
                 </span>
                 <span>•</span>
-                <span>aarav.kumar@university.edu</span>
+                <span>manojs082007@gmail.com</span>
               </div>
             </div>
           </div>
@@ -543,7 +603,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
 
             <button
               onClick={() => {
-                alert('📲 Test SMS Triggered! Message delivered to +91 9876543212');
+                alert('📲 Test SMS Triggered! Message delivered to 8840034446');
               }}
               className="w-full btn-secondary text-xs py-2 justify-center font-extrabold"
             >
@@ -755,7 +815,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               <div className="p-4 bg-[#DD2C00]/5 rounded-xl border border-[#DD2C00]/20 text-xs space-y-2 text-left font-medium">
                 <div className="flex justify-between">
                   <span className="text-[#64748B]">Student ID:</span>
-                  <span className="font-bold text-[#0F172A]">{user ? user.name : 'Aarav Kumar'} ({user ? user.rollNo : 'CS202601'})</span>
+                  <span className="font-bold text-[#0F172A]">{user ? user.name : 'Manoj Sharma'} ({user ? user.rollNo : 'CS202601'})</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#64748B]">Geofence Perimeter:</span>
@@ -767,7 +827,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#64748B]">SMS Warning Dispatched:</span>
-                  <span className="font-bold text-[#2979FF]">Sent to {user ? user.mobile : '+91 9876543212'}</span>
+                  <span className="font-bold text-[#2979FF]">Sent to {user ? user.mobile : '8840034446'}</span>
                 </div>
               </div>
             </>
@@ -788,7 +848,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               <div className="p-4 bg-[#FAF8F5] rounded-xl border border-[#E2E8F0] text-xs space-y-2 text-left font-medium">
                 <div className="flex justify-between">
                   <span className="text-[#64748B]">Student ID:</span>
-                  <span className="font-bold text-[#0F172A]">{user ? user.name : 'Aarav Kumar'} ({user ? user.rollNo : 'CS202601'})</span>
+                  <span className="font-bold text-[#0F172A]">{user ? user.name : 'Manoj Sharma'} ({user ? user.rollNo : 'CS202601'})</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#64748B]">Geofence Perimeter:</span>
@@ -800,7 +860,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[#64748B]">SMS Confirmation:</span>
-                  <span className="font-bold text-[#2979FF]">Sent to {user ? user.mobile : '+91 9876543212'}</span>
+                  <span className="font-bold text-[#2979FF]">Sent to {user ? user.mobile : '8840034446'}</span>
                 </div>
               </div>
             </>

@@ -42,14 +42,12 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
 
-            {/* TOP LEFT: Professional App Logo ('A+') & System Title */}
+            {/* TOP LEFT: Scan2Attend branding */}
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#2979FF] to-[#1565C0] flex items-center justify-center text-white font-black text-xl shadow-md shadow-[#2979FF]/20 transform transition-transform hover:scale-105">
-                A+
-              </div>
+              <img src="/scan2attend-logo.svg" alt="Scan2Attend" className="h-11 w-11 object-contain transition-transform hover:scale-105" />
               <div>
                 <h1 className="text-base font-black text-[#212121] tracking-tight">
-                  Unified Campus Attendance
+                  Scan2Attend
                 </h1>
                 <p className="text-[11px] text-[#757575] font-semibold">
                   Smart Geofence & QR System
@@ -57,197 +55,253 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
               </div>
             </div>
 
-            {/* CENTER TOP: Clean Portal Switcher Navigation */}
-            <nav className="hidden md:flex items-center gap-1.5 bg-[#FAF8F5] p-1.5 rounded-xl border border-[#E2E8F0] shadow-inner">
-              <button
-                onClick={() => setActiveTab('STUDENT')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${
-                  activeTab === 'STUDENT'
-                    ? 'bg-white text-[#2979FF] shadow-sm border border-[#E2E8F0] scale-102'
-                    : 'text-[#757575] hover:text-[#212121] hover:bg-white/50'
-                }`}
-              >
-                <GraduationCap className="w-4 h-4" />
-                My Dashboard
-              </button>
+            {/* CENTER TOP: Role-Based Single Dashboard View (Strictly filtered by logged-in role) */}
+            {user && activeTab !== 'LOGIN' ? (
+              <>
+                <nav className="hidden md:flex items-center gap-1.5 bg-[#FAF8F5] p-1.5 rounded-xl border border-[#E2E8F0] shadow-inner">
+                  {user.role === 'STUDENT' && (
+                    <button
+                      onClick={() => setActiveTab('STUDENT')}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black bg-white text-[#2979FF] shadow-xs border border-[#E2E8F0]"
+                    >
+                      <GraduationCap className="w-4 h-4" />
+                      Student Dashboard
+                    </button>
+                  )}
 
-              <button
-                onClick={() => setActiveTab('TEACHER')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${
-                  activeTab === 'TEACHER'
-                    ? 'bg-white text-[#2979FF] shadow-sm border border-[#E2E8F0] scale-102'
-                    : 'text-[#757575] hover:text-[#212121] hover:bg-white/50'
-                }`}
-              >
-                <Users className="w-4 h-4" />
-                Teacher Overview
-              </button>
+                  {user.role === 'TEACHER' && (
+                    <button
+                      onClick={() => setActiveTab('TEACHER')}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black bg-white text-[#2979FF] shadow-xs border border-[#E2E8F0]"
+                    >
+                      <Users className="w-4 h-4" />
+                      Teacher Overview
+                    </button>
+                  )}
 
-              <button
-                onClick={() => setActiveTab('ADMIN')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${
-                  activeTab === 'ADMIN'
-                    ? 'bg-white text-[#2979FF] shadow-sm border border-[#E2E8F0] scale-102'
-                    : 'text-[#757575] hover:text-[#212121] hover:bg-white/50'
-                }`}
-              >
-                <ShieldCheck className="w-4 h-4" />
-                Admin Panel
-              </button>
-            </nav>
+                  {user.role === 'ADMIN' && (
+                    <button
+                      onClick={() => setActiveTab('ADMIN')}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black bg-white text-[#2979FF] shadow-xs border border-[#E2E8F0]"
+                    >
+                      <ShieldCheck className="w-4 h-4" />
+                      Admin Panel
+                    </button>
+                  )}
+                </nav>
+
+                <nav className="md:hidden absolute left-0 right-0 top-16 flex items-center gap-1 overflow-x-auto border-t border-[#E2E8F0] bg-white px-4 py-2">
+                  {user.role === 'STUDENT' && (
+                    <button
+                      onClick={() => setActiveTab('STUDENT')}
+                      className="flex min-w-max items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-black bg-[#2979FF] text-white"
+                    >
+                      <GraduationCap className="h-3.5 w-3.5" />
+                      Student Dashboard
+                    </button>
+                  )}
+                  {user.role === 'TEACHER' && (
+                    <button
+                      onClick={() => setActiveTab('TEACHER')}
+                      className="flex min-w-max items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-black bg-[#2979FF] text-white"
+                    >
+                      <Users className="h-3.5 w-3.5" />
+                      Teacher Overview
+                    </button>
+                  )}
+                  {user.role === 'ADMIN' && (
+                    <button
+                      onClick={() => setActiveTab('ADMIN')}
+                      className="flex min-w-max items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-black bg-[#2979FF] text-white"
+                    >
+                      <ShieldCheck className="h-3.5 w-3.5" />
+                      Admin Panel
+                    </button>
+                  )}
+                </nav>
+              </>
+            ) : (
+              <div className="hidden sm:flex items-center gap-2">
+                <span className="text-xs font-extrabold text-[#2979FF] bg-[#2979FF]/10 px-3 py-1.5 rounded-full border border-[#2979FF]/20">
+                  🔒 System Portal Authentication Required
+                </span>
+              </div>
+            )}
 
             {/* TOP RIGHT: Search Bar, Notifications, Settings, User Profile */}
             <div className="flex items-center gap-3">
-              {/* Search Bar */}
-              <div className="relative hidden lg:block">
-                <Search className="w-4 h-4 text-[#757575] absolute left-3 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search classes, roll no..."
-                  className="w-48 pl-9 pr-3 py-1.5 bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl text-xs text-[#212121] focus:outline-none focus:border-[#2979FF] focus:bg-white transition-all font-medium"
-                />
-              </div>
-
-              {/* Notification Bell Icon with Alert Ping & Dropdown */}
-              <div className="relative">
-                <button 
-                  onClick={() => setShowNotifications(!showNotifications)}
-                  className="p-2 rounded-xl text-[#757575] hover:text-[#212121] hover:bg-[#FAF8F5] transition-colors relative"
-                >
-                  <Bell className="w-4 h-4" />
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF9100] rounded-full ring-2 ring-white animate-pulse"></span>
-                </button>
-
-                {showNotifications && (
-                  <>
-                    {/* Transparent Click-Outside Backdrop */}
-                    <div 
-                      className="fixed inset-0 z-40" 
-                      onClick={() => setShowNotifications(false)} 
+              {user && activeTab !== 'LOGIN' ? (
+                <>
+                  {/* Search Bar */}
+                  <div className="relative hidden lg:block">
+                    <Search className="w-4 h-4 text-[#757575] absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      placeholder="Search classes, roll no..."
+                      className="w-48 pl-9 pr-3 py-1.5 bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl text-xs text-[#212121] focus:outline-none focus:border-[#2979FF] focus:bg-white transition-all font-medium"
                     />
+                  </div>
 
-                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl p-4 space-y-3 z-50 shadow-2xl border border-[#E2E8F0] text-xs animate-fadeIn">
-                      <div className="flex justify-between items-center pb-2 border-b border-[#E2E8F0]">
-                        <span className="font-extrabold text-[#212121] flex items-center gap-1.5">
-                          <Bell className="w-4 h-4 text-[#2979FF]" /> Live Notifications
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <span className="badge-orange text-[10px]">2 New</span>
+                  {/* Notification Bell Icon */}
+                  <div className="relative">
+                    <button 
+                      onClick={() => setShowNotifications(!showNotifications)}
+                      className="p-2 rounded-xl text-[#757575] hover:text-[#212121] hover:bg-[#FAF8F5] transition-colors relative"
+                    >
+                      <Bell className="w-4 h-4" />
+                      <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF9100] rounded-full ring-2 ring-white animate-pulse"></span>
+                    </button>
+
+                    {showNotifications && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)} />
+                        <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl p-4 space-y-3 z-50 shadow-2xl border border-[#E2E8F0] text-xs animate-fadeIn">
+                          <div className="flex justify-between items-center pb-2 border-b border-[#E2E8F0]">
+                            <span className="font-extrabold text-[#212121] flex items-center gap-1.5">
+                              <Bell className="w-4 h-4 text-[#2979FF]" /> Live Notifications
+                            </span>
+                            <div className="flex items-center gap-2">
+                              <span className="badge-orange text-[10px]">2 New</span>
+                              <button 
+                                onClick={() => setShowNotifications(false)}
+                                className="text-gray-400 hover:text-gray-600 p-0.5 rounded-full"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="space-y-2.5 text-xs">
+                            <div 
+                              onClick={() => { alert('📲 Class Alert: Advanced AI starts in 2 minutes.'); setShowNotifications(false); }}
+                              className="p-3 rounded-xl bg-[#2979FF]/5 border border-[#2979FF]/20 cursor-pointer hover:bg-[#2979FF]/10 transition-all space-y-1"
+                            >
+                              <div className="flex justify-between font-extrabold text-[#212121]">
+                                <span>Class QR Session Active</span>
+                                <span className="text-[10px] text-[#2979FF] font-mono">Just Now</span>
+                              </div>
+                              <p className="text-[11px] text-[#64748B] font-medium">
+                                Teacher generated a 5-minute QR for Advanced AI (CS401). Mark attendance now.
+                              </p>
+                            </div>
+
+                            <div 
+                              onClick={() => { alert('📲 SMS Alert: Attendance marked Present.'); setShowNotifications(false); }}
+                              className="p-3 rounded-xl bg-[#FAF8F5] border border-[#E2E8F0] cursor-pointer hover:bg-white transition-all space-y-1"
+                            >
+                              <div className="flex justify-between font-extrabold text-[#212121]">
+                                <span>SMS Dispatch Delivered</span>
+                                <span className="text-[10px] text-[#757575] font-mono">10m ago</span>
+                              </div>
+                              <p className="text-[11px] text-[#64748B] font-medium">
+                                Confirmation SMS delivered to {user.mobile || '8840034446'}.
+                              </p>
+                            </div>
+                          </div>
+
                           <button 
                             onClick={() => setShowNotifications(false)}
-                            className="text-gray-400 hover:text-gray-600 p-0.5 rounded-full"
+                            className="w-full text-center text-[11px] font-bold text-[#2979FF] hover:underline pt-1"
                           >
-                            <X className="w-3.5 h-3.5" />
+                            Dismiss All Notifications
                           </button>
                         </div>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Settings Gear Icon */}
+                  <button 
+                    onClick={() => setShowSettings(true)}
+                    className="p-2 rounded-xl text-[#757575] hover:text-[#212121] hover:bg-[#FAF8F5] transition-colors"
+                    title="System Settings & Preferences"
+                  >
+                    <Settings className="w-4 h-4" />
+                  </button>
+
+                  {/* User Profile Dropdown */}
+                  <div className="relative">
+                    <button
+                      onClick={() => setShowProfileMenu(!showProfileMenu)}
+                      className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-[#FAF8F5] border border-transparent hover:border-[#E2E8F0] transition-all"
+                    >
+                      <div className="w-8 h-8 rounded-full overflow-hidden border border-[#2979FF] shadow-xs flex-shrink-0 bg-[#2979FF]/10 flex items-center justify-center text-white font-bold text-xs">
+                        <img 
+                          src="/manoj_sharma_profile.jpg" 
+                          alt="Profile" 
+                          className="w-full h-full object-cover object-[center_top]"
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                        />
+                        <span className="text-[#2979FF] font-black">{user.name.charAt(0)}</span>
                       </div>
-
-                      <div className="space-y-2.5 text-xs">
-                        <div 
-                          onClick={() => { alert('📲 Class Alert: Advanced AI starts in 2 minutes.'); setShowNotifications(false); }}
-                          className="p-3 rounded-xl bg-[#2979FF]/5 border border-[#2979FF]/20 cursor-pointer hover:bg-[#2979FF]/10 transition-all space-y-1"
-                        >
-                          <div className="flex justify-between font-extrabold text-[#212121]">
-                            <span>Class QR Session Active</span>
-                            <span className="text-[10px] text-[#2979FF] font-mono">Just Now</span>
-                          </div>
-                          <p className="text-[11px] text-[#64748B] font-medium">
-                            Teacher generated a 5-minute QR for Advanced AI (CS401). Mark attendance now.
-                          </p>
-                        </div>
-
-                        <div 
-                          onClick={() => { alert('📲 SMS Alert: Attendance marked Present.'); setShowNotifications(false); }}
-                          className="p-3 rounded-xl bg-[#FAF8F5] border border-[#E2E8F0] cursor-pointer hover:bg-white transition-all space-y-1"
-                        >
-                          <div className="flex justify-between font-extrabold text-[#212121]">
-                            <span>SMS Dispatch Delivered</span>
-                            <span className="text-[10px] text-[#757575] font-mono">10m ago</span>
-                          </div>
-                          <p className="text-[11px] text-[#64748B] font-medium">
-                            Confirmation SMS delivered to +91 9876543212 for Data Structures lecture.
-                          </p>
-                        </div>
+                      <div className="hidden xl:block text-left">
+                        <span className="block text-xs font-extrabold text-[#212121] leading-tight">
+                          {user.name}
+                        </span>
+                        <span className="block text-[10px] font-bold text-[#00C853]">
+                          {user.role}
+                        </span>
                       </div>
+                    </button>
 
-                      <button 
-                        onClick={() => setShowNotifications(false)}
-                        className="w-full text-center text-[11px] font-bold text-[#2979FF] hover:underline pt-1"
-                      >
-                        Dismiss All Notifications
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
-
-              {/* Settings Gear Icon (Opens System Settings Modal instead of Admin Panel) */}
-              <button 
-                onClick={() => setShowSettings(true)}
-                className="p-2 rounded-xl text-[#757575] hover:text-[#212121] hover:bg-[#FAF8F5] transition-colors"
-                title="System Settings & Preferences"
-              >
-                <Settings className="w-4 h-4" />
-              </button>
-
-              {/* User Profile Dropdown */}
-              <div className="relative">
+                    {showProfileMenu && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setShowProfileMenu(false)} />
+                        <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-[#E2E8F0] py-2 z-50 text-xs">
+                          <div className="px-4 py-2 border-b border-[#E2E8F0]">
+                            <p className="font-bold text-[#212121]">{user.name}</p>
+                            <p className="text-[10px] text-[#757575]">{user.email}</p>
+                          </div>
+                          {user.role === 'STUDENT' && (
+                            <button
+                              onClick={() => { setActiveTab('STUDENT'); setShowProfileMenu(false); }}
+                              className="w-full text-left px-4 py-2 text-[#212121] hover:bg-[#FAF8F5] font-semibold"
+                            >
+                              Student Portal
+                            </button>
+                          )}
+                          {user.role === 'TEACHER' && (
+                            <button
+                              onClick={() => { setActiveTab('TEACHER'); setShowProfileMenu(false); }}
+                              className="w-full text-left px-4 py-2 text-[#212121] hover:bg-[#FAF8F5] font-semibold"
+                            >
+                              Teacher Portal
+                            </button>
+                          )}
+                          {user.role === 'ADMIN' && (
+                            <button
+                              onClick={() => { setActiveTab('ADMIN'); setShowProfileMenu(false); }}
+                              className="w-full text-left px-4 py-2 text-[#212121] hover:bg-[#FAF8F5] font-semibold"
+                            >
+                              Admin System
+                            </button>
+                          )}
+                          <div className="border-t border-[#E2E8F0] mt-1 pt-1">
+                            <button
+                              onClick={() => { 
+                                setUser(null); 
+                                setActiveTab('LOGIN'); 
+                                setShowProfileMenu(false); 
+                              }}
+                              className="w-full text-left px-4 py-2 text-[#DD2C00] hover:bg-red-50 font-bold flex items-center justify-between"
+                            >
+                              <span>Sign Out</span>
+                              <LogOut className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </>
+              ) : (
                 <button
-                  onClick={() => setShowProfileMenu(!showProfileMenu)}
-                  className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-[#FAF8F5] border border-transparent hover:border-[#E2E8F0] transition-all"
+                  onClick={() => setActiveTab('LOGIN')}
+                  className="btn-blue py-2 px-4 text-xs font-bold shadow-sm flex items-center gap-1.5"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#00C853] to-[#2979FF] flex items-center justify-center text-white font-bold text-xs shadow-xs">
-                    {user ? user.name.charAt(0) : 'A'}
-                  </div>
-                  <div className="hidden xl:block text-left">
-                    <span className="block text-xs font-extrabold text-[#212121] leading-tight">
-                      {user ? user.name : 'Aarav Kumar'}
-                    </span>
-                    <span className="block text-[10px] font-bold text-[#00C853]">
-                      {user ? user.role : 'STUDENT'}
-                    </span>
-                  </div>
+                  <User className="w-3.5 h-3.5" /> Sign In / Portal Login
                 </button>
-
-                {showProfileMenu && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setShowProfileMenu(false)} />
-                    <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-[#E2E8F0] py-2 z-50 text-xs">
-                      <div className="px-4 py-2 border-b border-[#E2E8F0]">
-                        <p className="font-bold text-[#212121]">{user ? user.name : 'Aarav Kumar'}</p>
-                        <p className="text-[10px] text-[#757575]">{user ? user.email : 'student@school.edu'}</p>
-                      </div>
-                      <button
-                        onClick={() => { setActiveTab('STUDENT'); setShowProfileMenu(false); }}
-                        className="w-full text-left px-4 py-2 text-[#212121] hover:bg-[#FAF8F5] font-semibold"
-                      >
-                        Student Portal
-                      </button>
-                      <button
-                        onClick={() => { setActiveTab('TEACHER'); setShowProfileMenu(false); }}
-                        className="w-full text-left px-4 py-2 text-[#212121] hover:bg-[#FAF8F5] font-semibold"
-                      >
-                        Teacher Portal
-                      </button>
-                      <button
-                        onClick={() => { setActiveTab('ADMIN'); setShowProfileMenu(false); }}
-                        className="w-full text-left px-4 py-2 text-[#212121] hover:bg-[#FAF8F5] font-semibold"
-                      >
-                        Admin System
-                      </button>
-                      <div className="border-t border-[#E2E8F0] mt-1 pt-1">
-                        <button
-                          onClick={() => { setActiveTab('LOGIN'); setShowProfileMenu(false); }}
-                          className="w-full text-left px-4 py-2 text-[#DD2C00] hover:bg-red-50 font-bold flex items-center justify-between"
-                        >
-                          <span>Switch Account</span>
-                          <LogOut className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  </>
-                )}
-              </div>
+              )}
             </div>
 
           </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from './components/Navbar';
 import StudentPanel from './components/StudentPanel';
 import TeacherPanel from './components/TeacherPanel';
@@ -8,21 +8,44 @@ import LoginModal from './components/LoginModal';
 export default function App() {
   const [user, setUser] = useState({
     id: 'student_1',
-    name: 'Aarav Kumar',
+    name: 'Manoj Sharma',
     rollNo: 'CS202601',
-    email: 'aarav.kumar@university.edu',
+    email: 'manojs082007@gmail.com',
     role: 'STUDENT',
-    mobile: '+91 9876543212'
+    mobile: '8840034446'
   });
 
   // Shared active QR session state for real-time notification & 5-min timer
-  const [activeSession, setActiveSession] = useState({
-    sessionId: 'session_demo_cs401',
-    className: 'Advanced AI (CS401)',
-    room: 'Lab 402',
-    expiresAt: Date.now() + 300000, // 5 minutes from now
-    qrDataUrl: ''
+  const [activeSession, setActiveSession] = useState(() => {
+    try {
+      const savedSession = JSON.parse(localStorage.getItem('activeQrSession'));
+      return savedSession?.expiresAt > Date.now() ? savedSession : null;
+    } catch {
+      return null;
+    }
   });
+
+  useEffect(() => {
+    if (activeSession?.expiresAt > Date.now()) {
+      localStorage.setItem('activeQrSession', JSON.stringify(activeSession));
+    } else {
+      localStorage.removeItem('activeQrSession');
+    }
+  }, [activeSession]);
+
+  useEffect(() => {
+    const handleStorageChange = (event) => {
+      if (event.key !== 'activeQrSession') return;
+      try {
+        const nextSession = event.newValue ? JSON.parse(event.newValue) : null;
+        setActiveSession(nextSession?.expiresAt > Date.now() ? nextSession : null);
+      } catch {
+        setActiveSession(null);
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, []);
 
   // activeTab state: 'STUDENT', 'TEACHER', 'ADMIN', 'LOGIN'
   const [activeTab, setActiveTab] = useState('STUDENT');

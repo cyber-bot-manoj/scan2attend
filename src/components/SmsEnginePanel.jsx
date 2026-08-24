@@ -4,8 +4,8 @@ import { Smartphone, Send, Bell, ShieldAlert, CheckCircle2, Clock, Filter } from
 export default function SmsEnginePanel() {
   const [logs, setLogs] = useState([]);
   const [filterType, setFilterType] = useState('ALL');
-  const [broadcastRecipient, setBroadcastRecipient] = useState('Aarav Kumar');
-  const [broadcastMobile, setBroadcastMobile] = useState('+91 9876543212');
+  const [broadcastRecipient, setBroadcastRecipient] = useState('Manoj Sharma');
+  const [broadcastMobile, setBroadcastMobile] = useState('8840034446');
   const [broadcastType, setBroadcastType] = useState('CLASS_REMINDER');
   const [broadcastMessage, setBroadcastMessage] = useState('Reminder: Data Structures class starts in 2 minutes in Lab 402.');
   const [sending, setSending] = useState(false);

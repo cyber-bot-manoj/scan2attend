@@ -165,7 +165,7 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
                             <span className="text-[10px] text-[#757575] font-mono">10m ago</span>
                           </div>
                           <p className="text-[11px] text-[#64748B] font-medium">
-                            Confirmation SMS delivered to +91 9876543212 for Data Structures lecture.
+                            Confirmation SMS delivered to 8840034446 for Data Structures lecture.
                           </p>
                         </div>
                       </div>
@@ -201,7 +201,7 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
                   </div>
                   <div className="hidden xl:block text-left">
                     <span className="block text-xs font-extrabold text-[#212121] leading-tight">
-                      {user ? user.name : 'Aarav Kumar'}
+                      {user ? user.name : 'Manoj Sharma'}
                     </span>
                     <span className="block text-[10px] font-bold text-[#00C853]">
                       {user ? user.role : 'STUDENT'}
@@ -214,7 +214,7 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
                     <div className="fixed inset-0 z-40" onClick={() => setShowProfileMenu(false)} />
                     <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl border border-[#E2E8F0] py-2 z-50 text-xs">
                       <div className="px-4 py-2 border-b border-[#E2E8F0]">
-                        <p className="font-bold text-[#212121]">{user ? user.name : 'Aarav Kumar'}</p>
+                        <p className="font-bold text-[#212121]">{user ? user.name : 'Manoj Sharma'}</p>
                         <p className="text-[10px] text-[#757575]">{user ? user.email : 'student@school.edu'}</p>
                       </div>
                       <button

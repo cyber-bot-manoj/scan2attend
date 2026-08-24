@@ -4,7 +4,7 @@ import { QrCode, Clock, Users, Download, Play, RefreshCw, AlertTriangle, CheckCi
 export default function TeacherPanel({ user, activeSession, setActiveSession }) {
   const [classes, setClasses] = useState([]);
   const [selectedClassId, setSelectedClassId] = useState('');
-  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
+  const [timeLeft, setTimeLeft] = useState(0); // 5 minutes
   const [liveAttendance, setLiveAttendance] = useState([]);
   const [showStudentList, setShowStudentList] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -27,11 +27,18 @@ export default function TeacherPanel({ user, activeSession, setActiveSession }) 
   };
 
   useEffect(() => {
-    if (!activeSession) return;
+    if (!activeSession) {
+      setTimeLeft(0);
+      return;
+    }
+    setTimeLeft(Math.max(0, Math.floor((activeSession.expiresAt - Date.now()) / 1000)));
     const interval = setInterval(() => {
       const remaining = Math.max(0, Math.floor((activeSession.expiresAt - Date.now()) / 1000));
       setTimeLeft(remaining);
-      if (remaining === 0) clearInterval(interval);
+      if (remaining === 0) {
+        clearInterval(interval);
+        setActiveSession?.(null);
+      }
     }, 1000);
     return () => clearInterval(interval);
   }, [activeSession]);
@@ -54,6 +61,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession }) 
           setActiveSession({
             ...data.qrSession,
             expiresAt: Date.now() + 300000,
+            generatedAt: Date.now(),
             className: 'Advanced AI (CS401)'
           });
         }
@@ -180,7 +188,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession }) 
                 <span>Status</span>
               </div>
               <div className="flex justify-between text-[11px] font-medium">
-                <span>Aarav Kumar (CS202601)</span>
+                <span>Manoj Sharma (CS202601)</span>
                 <span className="badge-green">Present (18m)</span>
               </div>
               <div className="flex justify-between text-[11px] font-medium">

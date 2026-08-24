@@ -249,7 +249,7 @@ export default function AdminPanel() {
               </thead>
               <tbody className="divide-y divide-[#E2E8F0] text-[11px]">
                 <tr>
-                  <td className="py-2 font-bold text-[#212121]">Aarav Kumar</td>
+                  <td className="py-2 font-bold text-[#212121]">Manoj Sharma</td>
                   <td className="py-2 text-[#757575] font-medium">Student</td>
                   <td className="py-2 text-right"><span className="badge-green">Active</span></td>
                 </tr>

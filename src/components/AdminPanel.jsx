@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Activity, Users, MapPin, FileText, Settings, BarChart2, CheckCircle2, Download, Plus, RefreshCw } from 'lucide-react';
 
-export default function AdminPanel() {
+export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
   const [data, setData] = useState({
     students: [],
     teachers: [],
@@ -249,7 +249,7 @@ export default function AdminPanel() {
               </thead>
               <tbody className="divide-y divide-[#E2E8F0] text-[11px]">
                 <tr>
-                  <td className="py-2 font-bold text-[#212121]">Aarav Kumar</td>
+                  <td className="py-2 font-bold text-[#212121]">Manoj Sharma</td>
                   <td className="py-2 text-[#757575] font-medium">Student</td>
                   <td className="py-2 text-right"><span className="badge-green">Active</span></td>
                 </tr>
@@ -338,6 +338,89 @@ export default function AdminPanel() {
               </div>
               <span className="text-[11px] font-extrabold text-[#212121]">Aug - Dec 2024</span>
             </div>
+          </div>
+        </div>
+
+        {/* FULL-WIDTH CARD: REAL-TIME CAMPUS MASTER ATTENDANCE DATABASE AUDIT STREAM (ADMIN & TEACHER EXCLUSIVE) */}
+        <div className="card-3d p-6 space-y-4 col-span-full">
+          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E2E8F0] pb-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#00C853] animate-pulse"></span>
+                <h3 className="text-base font-black text-[#0F172A]">
+                  Live Campus Master Attendance Audit Stream
+                </h3>
+                <span className="bg-[#2979FF]/10 text-[#2979FF] font-mono text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  ADMIN & TEACHER EXCLUSIVE ACCESS
+                </span>
+              </div>
+              <p className="text-xs text-[#64748B] font-medium mt-1">
+                Real-time live database records of all student attendance submissions (PRESENT / ABSENT) with GPS & liveness verification.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={fetchAdminDashboard}
+                className="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-xs font-bold text-gray-700 flex items-center gap-1.5 transition-all"
+              >
+                <RefreshCw className="w-3.5 h-3.5" /> Sync Database
+              </button>
+              <button
+                onClick={exportComprehensiveReport}
+                className="btn-blue text-xs font-bold py-1.5 px-3"
+              >
+                <Download className="w-3.5 h-3.5" /> Export Audit CSV
+              </button>
+            </div>
+          </div>
+
+          {/* Live Attendance Records Table */}
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="bg-[#FAF8F5] border-b border-[#E2E8F0] text-[10px] text-[#64748B] uppercase tracking-wider font-extrabold">
+                  <th className="py-2.5 px-3">Student Name</th>
+                  <th className="py-2.5 px-3">Roll No</th>
+                  <th className="py-2.5 px-3">Subject / Course</th>
+                  <th className="py-2.5 px-3">Verification Time</th>
+                  <th className="py-2.5 px-3">GPS Fence Distance</th>
+                  <th className="py-2.5 px-3">Status</th>
+                  <th className="py-2.5 px-3 text-right">Audit Record Hash</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#E2E8F0]">
+                {globalAttendanceRecords.map((rec, idx) => (
+                  <tr key={rec.id || idx} className="hover:bg-[#F8FAFC] transition-colors">
+                    <td className="py-3 px-3 font-bold text-[#0F172A]">
+                      {rec.studentName}
+                    </td>
+                    <td className="py-3 px-3 font-mono text-[11px] text-[#475569]">
+                      {rec.rollNo}
+                    </td>
+                    <td className="py-3 px-3 font-semibold text-[#1E293B]">
+                      {rec.subject}
+                    </td>
+                    <td className="py-3 px-3 text-[#64748B] text-[11px]">
+                      {rec.timestamp}
+                    </td>
+                    <td className="py-3 px-3 font-medium">
+                      <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 font-mono text-[10px] font-bold">
+                        {rec.distanceMeters ? `${rec.distanceMeters}m` : rec.distance || '18m'}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3">
+                      <span className={rec.status === 'PRESENT' ? 'badge-green font-extrabold text-[10px]' : 'badge-orange font-extrabold text-[10px]'}>
+                        {rec.status === 'PRESENT' ? 'PRESENT 🟢' : 'ABSENT 🔴'}
+                      </span>
+                    </td>
+                    <td className="py-3 px-3 text-right font-mono text-[10px] text-[#2979FF] font-bold">
+                      {rec.hash || rec.id}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
