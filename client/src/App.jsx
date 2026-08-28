@@ -4,6 +4,7 @@ import StudentPanel from './components/StudentPanel';
 import TeacherPanel from './components/TeacherPanel';
 import AdminPanel from './components/AdminPanel';
 import LoginModal from './components/LoginModal';
+import Footer from './components/Footer';
 
 export default function App() {
   const [user, setUser] = useState({
@@ -61,7 +62,7 @@ export default function App() {
       />
 
       {/* Main Content View Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 z-10">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {activeTab === 'STUDENT' && (
           <StudentPanel 
             user={user} 
@@ -88,19 +89,10 @@ export default function App() {
         )}
       </main>
 
-      {/* Modern Footer matching branding specifications */}
-      <footer className="bg-white/80 backdrop-blur-md border-t border-[#E2E8F0] py-4 text-center text-xs text-[#757575] font-semibold mt-auto z-10">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
-          <span>© 2026 Unified Campus Attendance System. All rights reserved.</span>
-          <div className="flex gap-4 text-[11px] font-bold text-[#2979FF]">
-            <span>Privacy Policy</span>
-            <span>•</span>
-            <span>Terms of Service</span>
-            <span>•</span>
-            <span>Support</span>
-          </div>
-        </div>
-      </footer>
+      {/* Modern High-End Footer for Scan2Attend */}
+      {user && activeTab !== 'LOGIN' && (
+        <Footer setActiveTab={setActiveTab} user={user} />
+      )}
     </div>
   );
 }

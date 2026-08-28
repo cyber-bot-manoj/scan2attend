@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="50%" stop-color="#1e1b4b"/>
+      <stop offset="100%" stop-color="#312e81"/>
+    </linearGradient>
+    <linearGradient id="suitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="skinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e0a96d"/>
+      <stop offset="100%" stop-color="#c98a4b"/>
+    </linearGradient>
+    <linearGradient id="tieGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" rx="40" fill="url(#bgGrad)"/>
+  
+  <!-- Subtle Glowing Tech Circles -->
+  <circle cx="200" cy="200" r="160" fill="none" stroke="#6366f1" stroke-width="2" opacity="0.2" stroke-dasharray="10 10"/>
+  <circle cx="200" cy="200" r="140" fill="none" stroke="#3b82f6" stroke-width="1.5" opacity="0.3"/>
+
+  <!-- Shoulders / Suit Coat -->
+  <path d="M70,380 C70,300 130,260 200,260 C270,260 330,300 330,380 Z" fill="url(#suitGrad)" stroke="#475569" stroke-width="2"/>
+  
+  <!-- Shirt & Tie -->
+  <polygon points="175,260 225,260 215,380 185,380" fill="#ffffff"/>
+  <polygon points="192,265 208,265 204,360 196,360" fill="url(#tieGrad)"/>
+  <polygon points="190,265 210,265 200,280" fill="#1d4ed8"/>
+
+  <!-- Suit Lapels -->
+  <polygon points="120,275 165,340 175,260" fill="#334155"/>
+  <polygon points="280,275 235,340 225,260" fill="#334155"/>
+
+  <!-- Neck -->
+  <rect x="175" y="210" width="50" height="60" rx="8" fill="#c98a4b"/>
+
+  <!-- Head / Face -->
+  <path d="M135,140 C135,85 160,65 200,65 C240,65 265,85 265,140 C265,200 240,225 200,225 C160,225 135,200 135,140 Z" fill="url(#skinGrad)"/>
+
+  <!-- Hair (Professional Male Cut with Side Part) -->
+  <path d="M130,135 C130,80 155,55 200,55 C245,55 270,75 270,135 C270,120 260,75 230,70 C195,65 145,85 130,135 Z" fill="#1e1e24"/>
+  <path d="M135,120 C140,80 180,65 235,70 C250,71 265,85 265,115 C265,100 250,75 230,72 C185,65 145,95 135,120 Z" fill="#2d2d3a"/>
+
+  <!-- Eyebrows -->
+  <path d="M155,125 Q172,120 185,125" fill="none" stroke="#1e1e24" stroke-width="4" stroke-linecap="round"/>
+  <path d="M215,125 Q228,120 245,125" fill="none" stroke="#1e1e24" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Eyes -->
+  <ellipse cx="170" cy="138" rx="8" ry="6" fill="#ffffff"/>
+  <ellipse cx="230" cy="138" rx="8" ry="6" fill="#ffffff"/>
+  <circle cx="170" cy="138" r="4" fill="#0f172a"/>
+  <circle cx="230" cy="138" r="4" fill="#0f172a"/>
+
+  <!-- Glasses Frame (Faculty Look) -->
+  <rect x="150" y="126" width="38" height="24" rx="6" fill="none" stroke="#f59e0b" stroke-width="3"/>
+  <rect x="212" y="126" width="38" height="24" rx="6" fill="none" stroke="#f59e0b" stroke-width="3"/>
+  <line x1="188" y1="135" x2="212" y2="135" stroke="#f59e0b" stroke-width="3"/>
+  <line x1="135" y1="133" x2="150" y2="133" stroke="#f59e0b" stroke-width="3"/>
+  <line x1="250" y1="133" x2="265" y2="133" stroke="#f59e0b" stroke-width="3"/>
+
+  <!-- Nose -->
+  <path d="M197,140 L203,165 L194,168" fill="none" stroke="#b4783c" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Moustache / Smile -->
+  <path d="M175,190 Q200,205 225,190" fill="none" stroke="#1e1e24" stroke-width="3" stroke-linecap="round"/>
+  <path d="M185,192 Q200,200 215,192" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Ears -->
+  <path d="M135,135 Q125,145 135,160" fill="#c98a4b" stroke="#b4783c" stroke-width="2"/>
+  <path d="M265,135 Q275,145 265,160" fill="#c98a4b" stroke="#b4783c" stroke-width="2"/>
+
+  <!-- Faculty Gold Shield Badge -->
+  <g transform="translate(310, 40)">
+    <polygon points="25,5 45,15 45,35 25,45 5,35 5,15" fill="#f59e0b" stroke="#fef08a" stroke-width="2"/>
+    <text x="25" y="30" font-family="sans-serif" font-size="16" font-weight="bold" fill="#0f172a" text-anchor="middle">★</text>
+  </g>
+</svg>

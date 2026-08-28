@@ -49,9 +49,6 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
                 <h1 className="text-base font-black text-[#212121] tracking-tight">
                   Scan2Attend
                 </h1>
-                <p className="text-[11px] text-[#757575] font-semibold">
-                  Smart Geofence & QR System
-                </p>
               </div>
             </div>
 
@@ -75,7 +72,7 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
                       className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black bg-white text-[#2979FF] shadow-xs border border-[#E2E8F0]"
                     >
                       <Users className="w-4 h-4" />
-                      Teacher Overview
+                      Faculty Dashboard
                     </button>
                   )}
 
@@ -106,7 +103,7 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
                       className="flex min-w-max items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-black bg-[#2979FF] text-white"
                     >
                       <Users className="h-3.5 w-3.5" />
-                      Teacher Overview
+                      Faculty Dashboard
                     </button>
                   )}
                   {user.role === 'ADMIN' && (
@@ -142,74 +139,6 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
                     />
                   </div>
 
-                  {/* Notification Bell Icon */}
-                  <div className="relative">
-                    <button 
-                      onClick={() => setShowNotifications(!showNotifications)}
-                      className="p-2 rounded-xl text-[#757575] hover:text-[#212121] hover:bg-[#FAF8F5] transition-colors relative"
-                    >
-                      <Bell className="w-4 h-4" />
-                      <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#FF9100] rounded-full ring-2 ring-white animate-pulse"></span>
-                    </button>
-
-                    {showNotifications && (
-                      <>
-                        <div className="fixed inset-0 z-40" onClick={() => setShowNotifications(false)} />
-                        <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl p-4 space-y-3 z-50 shadow-2xl border border-[#E2E8F0] text-xs animate-fadeIn">
-                          <div className="flex justify-between items-center pb-2 border-b border-[#E2E8F0]">
-                            <span className="font-extrabold text-[#212121] flex items-center gap-1.5">
-                              <Bell className="w-4 h-4 text-[#2979FF]" /> Live Notifications
-                            </span>
-                            <div className="flex items-center gap-2">
-                              <span className="badge-orange text-[10px]">2 New</span>
-                              <button 
-                                onClick={() => setShowNotifications(false)}
-                                className="text-gray-400 hover:text-gray-600 p-0.5 rounded-full"
-                              >
-                                <X className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-                          </div>
-
-                          <div className="space-y-2.5 text-xs">
-                            <div 
-                              onClick={() => { alert('📲 Class Alert: Advanced AI starts in 2 minutes.'); setShowNotifications(false); }}
-                              className="p-3 rounded-xl bg-[#2979FF]/5 border border-[#2979FF]/20 cursor-pointer hover:bg-[#2979FF]/10 transition-all space-y-1"
-                            >
-                              <div className="flex justify-between font-extrabold text-[#212121]">
-                                <span>Class QR Session Active</span>
-                                <span className="text-[10px] text-[#2979FF] font-mono">Just Now</span>
-                              </div>
-                              <p className="text-[11px] text-[#64748B] font-medium">
-                                Teacher generated a 5-minute QR for Advanced AI (CS401). Mark attendance now.
-                              </p>
-                            </div>
-
-                            <div 
-                              onClick={() => { alert('📲 SMS Alert: Attendance marked Present.'); setShowNotifications(false); }}
-                              className="p-3 rounded-xl bg-[#FAF8F5] border border-[#E2E8F0] cursor-pointer hover:bg-white transition-all space-y-1"
-                            >
-                              <div className="flex justify-between font-extrabold text-[#212121]">
-                                <span>SMS Dispatch Delivered</span>
-                                <span className="text-[10px] text-[#757575] font-mono">10m ago</span>
-                              </div>
-                              <p className="text-[11px] text-[#64748B] font-medium">
-                                Confirmation SMS delivered to {user.mobile || '8840034446'}.
-                              </p>
-                            </div>
-                          </div>
-
-                          <button 
-                            onClick={() => setShowNotifications(false)}
-                            className="w-full text-center text-[11px] font-bold text-[#2979FF] hover:underline pt-1"
-                          >
-                            Dismiss All Notifications
-                          </button>
-                        </div>
-                      </>
-                    )}
-                  </div>
-
                   {/* Settings Gear Icon */}
                   <button 
                     onClick={() => setShowSettings(true)}
@@ -227,10 +156,16 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
                     >
                       <div className="w-8 h-8 rounded-full overflow-hidden border border-[#2979FF] shadow-xs flex-shrink-0 bg-[#2979FF]/10 flex items-center justify-center text-white font-bold text-xs">
                         <img 
-                          src="/manoj_sharma_profile.jpg" 
+                          src={user.role === 'TEACHER' ? '/faculty_rajesh_sharma.jpg' : '/manoj_sharma_profile.jpg'} 
                           alt="Profile" 
                           className="w-full h-full object-cover object-[center_top]"
-                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                          onError={(e) => { 
+                            if (user.role === 'TEACHER') {
+                              e.currentTarget.src = 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80';
+                            } else {
+                              e.currentTarget.style.display = 'none'; 
+                            }
+                          }}
                         />
                         <span className="text-[#2979FF] font-black">{user.name.charAt(0)}</span>
                       </div>
@@ -265,7 +200,7 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
                               onClick={() => { setActiveTab('TEACHER'); setShowProfileMenu(false); }}
                               className="w-full text-left px-4 py-2 text-[#212121] hover:bg-[#FAF8F5] font-semibold"
                             >
-                              Teacher Portal
+                              Faculty Portal
                             </button>
                           )}
                           {user.role === 'ADMIN' && (

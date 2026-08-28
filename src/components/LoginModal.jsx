@@ -116,7 +116,6 @@ export default function LoginModal({ setUser, setActiveTab }) {
               <img src="/scan2attend-logo.svg" alt="Scan2Attend" className="h-12 w-12 object-contain" />
               <div>
                 <h1 className="text-xl font-black tracking-tight text-white">Scan2Attend</h1>
-                <p className="text-xs text-blue-300 font-semibold">Smart Geofence & QR System</p>
               </div>
             </div>
 
@@ -138,9 +137,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
             </div>
           </div>
 
-          <div className="relative z-10 pt-6 border-t border-slate-700/60 text-[11px] text-slate-400">
-            <span>© 2026 Unified Campus System • Protected by 256-bit SSL</span>
-          </div>
+
         </div>
 
         {/* RIGHT LOGIN FORM PANEL */}
@@ -178,7 +175,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
               }`}
             >
               <UserCheck className="w-5 h-5" />
-              Teacher
+              Faculty
             </button>
 
             <button
@@ -236,7 +233,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
               disabled={loading}
               className="w-full btn-blue justify-center py-3.5 text-xs font-black shadow-lg hover:shadow-indigo-500/30 mt-2 gap-2"
             >
-              {loading ? 'Authenticating...' : `Enter ${selectedRole} Portal`}
+              {loading ? 'Authenticating...' : selectedRole === 'TEACHER' ? 'Enter Faculty Portal' : selectedRole === 'STUDENT' ? 'Enter Student Portal' : 'Enter Admin Portal'}
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>

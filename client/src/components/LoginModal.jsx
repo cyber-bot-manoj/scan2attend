@@ -53,8 +53,12 @@ export default function LoginModal({ setUser, setActiveTab }) {
       <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
       <div className="text-center mb-6">
-        <div className="w-12 h-12 mx-auto mb-3 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-          <LogIn className="w-6 h-6" />
+        <div className="relative group w-full mb-4 overflow-hidden rounded-2xl border border-indigo-500/30 shadow-xl bg-slate-900/50">
+          <img 
+            src="/campus_attendance_hero.png" 
+            alt="Smart Campus Attendance System" 
+            className="w-full h-48 sm:h-56 object-cover object-center transform transition-transform duration-500 group-hover:scale-105"
+          />
         </div>
         <h2 className="text-2xl font-bold text-white">System Portal Login</h2>
         <p className="text-xs text-gray-400 mt-1">Select role or enter your credentials</p>
@@ -72,7 +76,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
           }`}
         >
           <UserCheck className="w-5 h-5 text-indigo-400" />
-          Teacher
+          Faculty
         </button>
 
         <button
@@ -142,7 +146,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
           disabled={loading}
           className="w-full btn-primary justify-center py-3 text-sm mt-2"
         >
-          {loading ? 'Authenticating...' : 'Sign In to Portal'}
+          {loading ? 'Authenticating...' : email.includes('teacher') ? 'Enter Faculty Portal' : email.includes('student') ? 'Enter Student Portal' : 'Enter Admin Portal'}
         </button>
       </form>
     </div>
