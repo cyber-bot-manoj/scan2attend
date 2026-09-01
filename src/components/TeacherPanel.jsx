@@ -156,42 +156,36 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
 
   // Default demo records if globalAttendanceRecords is empty
   const attendanceList = globalAttendanceRecords.length > 0 ? globalAttendanceRecords : [
-    {
-      id: 'att_demo_1',
-      studentName: 'Manoj Sharma',
-      rollNo: 'CS202601',
-      timestamp: '10:14:22 AM',
-      distanceMeters: 14,
-      status: 'PRESENT',
-      livenessScore: '99.4%'
-    },
-    {
-      id: 'att_demo_2',
-      studentName: 'Priya Sharma',
-      rollNo: 'CS202602',
-      timestamp: '10:13:05 AM',
-      distanceMeters: 18,
-      status: 'PRESENT',
-      livenessScore: '98.8%'
-    },
-    {
-      id: 'att_demo_3',
-      studentName: 'Rohan Mehta',
-      rollNo: 'CS202603',
-      timestamp: '10:12:40 AM',
-      distanceMeters: 62,
-      status: 'ABSENT',
-      livenessScore: 'Geofence Exceeded (62m)'
-    },
-    {
-      id: 'att_demo_4',
-      studentName: 'Ananya Verma',
-      rollNo: 'CS202604',
-      timestamp: '10:11:18 AM',
-      distanceMeters: 9,
-      status: 'PRESENT',
-      livenessScore: '99.7%'
-    }
+    { id: 'att_demo_01', studentName: 'Manoj Sharma', rollNo: 'CS202601', timestamp: '10:14:22 AM', distanceMeters: 14, status: 'PRESENT', livenessScore: '99.4%' },
+    { id: 'att_demo_02', studentName: 'Priya Singh', rollNo: 'CS202602', timestamp: '10:13:05 AM', distanceMeters: 12, status: 'PRESENT', livenessScore: '98.8%' },
+    { id: 'att_demo_03', studentName: 'Rohan Mehta', rollNo: 'CS202603', timestamp: '10:12:40 AM', distanceMeters: 68, status: 'ABSENT', livenessScore: 'Geofence Exceeded (68m)' },
+    { id: 'att_demo_04', studentName: 'Ananya Sharma', rollNo: 'CS202604', timestamp: '10:11:18 AM', distanceMeters: 9, status: 'PRESENT', livenessScore: '99.7%' },
+    { id: 'att_demo_05', studentName: 'Vikramaditya Verma', rollNo: 'CS202605', timestamp: '10:10:45 AM', distanceMeters: 15, status: 'PRESENT', livenessScore: '99.1%' },
+    { id: 'att_demo_06', studentName: 'Sneha Gupta', rollNo: 'CS202606', timestamp: '10:10:12 AM', distanceMeters: 11, status: 'PRESENT', livenessScore: '98.5%' },
+    { id: 'att_demo_07', studentName: 'Ishaan Patel', rollNo: 'CS202607', timestamp: '10:09:30 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '99.3%' },
+    { id: 'att_demo_08', studentName: 'Kavya Deshmukh', rollNo: 'CS202608', timestamp: '10:09:02 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '97.9%' },
+    { id: 'att_demo_09', studentName: 'Aditya Reddy', rollNo: 'CS202609', timestamp: '10:08:20 AM', distanceMeters: 74, status: 'ABSENT', livenessScore: 'Geofence Exceeded (74m)' },
+    { id: 'att_demo_10', studentName: 'Diya Roy', rollNo: 'CS202610', timestamp: '10:07:50 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '99.6%' },
+    { id: 'att_demo_11', studentName: 'Rahul Nair', rollNo: 'CS202611', timestamp: '10:07:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '98.7%' },
+    { id: 'att_demo_12', studentName: 'Tanvi Joshi', rollNo: 'CS202612', timestamp: '10:06:40 AM', distanceMeters: 8, status: 'PRESENT', livenessScore: '99.8%' },
+    { id: 'att_demo_13', studentName: 'Amit Kumar', rollNo: 'CS202613', timestamp: '10:06:10 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '99.0%' },
+    { id: 'att_demo_14', studentName: 'Neha Agarwal', rollNo: 'CS202614', timestamp: '10:05:35 AM', distanceMeters: 14, status: 'PRESENT', livenessScore: '98.9%' },
+    { id: 'att_demo_15', studentName: 'Harsh Vardhan', rollNo: 'CS202615', timestamp: '10:05:00 AM', distanceMeters: 82, status: 'ABSENT', livenessScore: 'Geofence Exceeded (82m)' },
+    { id: 'att_demo_16', studentName: 'Pooja Mishra', rollNo: 'CS202616', timestamp: '10:04:30 AM', distanceMeters: 17, status: 'PRESENT', livenessScore: '99.2%' },
+    { id: 'att_demo_17', studentName: 'Siddharth Rao', rollNo: 'CS202617', timestamp: '10:04:00 AM', distanceMeters: 12, status: 'PRESENT', livenessScore: '99.5%' },
+    { id: 'att_demo_18', studentName: 'Shreya Pandey', rollNo: 'CS202618', timestamp: '10:03:25 AM', distanceMeters: 15, status: 'PRESENT', livenessScore: '98.4%' },
+    { id: 'att_demo_19', studentName: 'Arjun Kapoor', rollNo: 'CS202619', timestamp: '10:02:50 AM', distanceMeters: 21, status: 'PRESENT', livenessScore: '99.1%' },
+    { id: 'att_demo_20', studentName: 'Riya Sen', rollNo: 'CS202620', timestamp: '10:02:15 AM', distanceMeters: 11, status: 'PRESENT', livenessScore: '99.6%' },
+    { id: 'att_demo_21', studentName: 'Yash Malhotra', rollNo: 'CS202621', timestamp: '10:01:40 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '98.2%' },
+    { id: 'att_demo_22', studentName: 'Anjali Yadav', rollNo: 'CS202622', timestamp: '10:01:05 AM', distanceMeters: 9, status: 'PRESENT', livenessScore: '99.9%' },
+    { id: 'att_demo_23', studentName: 'Karan Sharma', rollNo: 'CS202623', timestamp: '10:00:30 AM', distanceMeters: 18, status: 'PRESENT', livenessScore: '98.6%' },
+    { id: 'att_demo_24', studentName: 'Meera Rajput', rollNo: 'CS202624', timestamp: '09:59:55 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '99.3%' },
+    { id: 'att_demo_25', studentName: 'Abhinav Saxena', rollNo: 'CS202625', timestamp: '09:59:20 AM', distanceMeters: 55, status: 'ABSENT', livenessScore: 'Geofence Exceeded (55m)' },
+    { id: 'att_demo_26', studentName: 'Swati Tripathi', rollNo: 'CS202626', timestamp: '09:58:45 AM', distanceMeters: 14, status: 'PRESENT', livenessScore: '99.0%' },
+    { id: 'att_demo_27', studentName: 'Vivek Choudhary', rollNo: 'CS202627', timestamp: '09:58:10 AM', distanceMeters: 12, status: 'PRESENT', livenessScore: '99.4%' },
+    { id: 'att_demo_28', studentName: 'Divya Thakur', rollNo: 'CS202628', timestamp: '09:57:35 AM', distanceMeters: 17, status: 'PRESENT', livenessScore: '98.7%' },
+    { id: 'att_demo_29', studentName: 'Gaurav Bhatia', rollNo: 'CS202629', timestamp: '09:57:00 AM', distanceMeters: 20, status: 'PRESENT', livenessScore: '99.1%' },
+    { id: 'att_demo_30', studentName: 'Simran Kaur', rollNo: 'CS202630', timestamp: '09:56:25 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '99.8%' }
   ];
 
   const presentCount = attendanceList.filter(r => r.status === 'PRESENT').length;

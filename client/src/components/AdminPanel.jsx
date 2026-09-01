@@ -85,13 +85,42 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
     }
   };
 
+  const master30StudentAuditRecords = [
+    { id: 'REC-01', studentName: 'Manoj Sharma', rollNo: 'CS202601', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:19:46 AM', distanceMeters: 14, status: 'PRESENT', hash: 'AUDIT-2026-REC-469063' },
+    { id: 'REC-02', studentName: 'Priya Singh', rollNo: 'CS202602', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:18:10 AM', distanceMeters: 12, status: 'PRESENT', hash: 'AUDIT-2026-REC-112934' },
+    { id: 'REC-03', studentName: 'Rohan Mehta', rollNo: 'CS202603', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:17:55 AM', distanceMeters: 68, status: 'ABSENT', hash: 'AUDIT-2026-REC-992381' },
+    { id: 'REC-04', studentName: 'Ananya Sharma', rollNo: 'CS202604', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:17:02 AM', distanceMeters: 9, status: 'PRESENT', hash: 'AUDIT-2026-REC-584920' },
+    { id: 'REC-05', studentName: 'Vikramaditya Verma', rollNo: 'CS202605', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:16:30 AM', distanceMeters: 15, status: 'PRESENT', hash: 'AUDIT-2026-REC-392019' },
+    { id: 'REC-06', studentName: 'Sneha Gupta', rollNo: 'CS202606', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:15:45 AM', distanceMeters: 11, status: 'PRESENT', hash: 'AUDIT-2026-REC-884012' },
+    { id: 'REC-07', studentName: 'Ishaan Patel', rollNo: 'CS202607', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:15:10 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-739201' },
+    { id: 'REC-08', studentName: 'Kavya Deshmukh', rollNo: 'CS202608', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:14:35 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-483920' },
+    { id: 'REC-09', studentName: 'Aditya Reddy', rollNo: 'CS202609', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:14:00 AM', distanceMeters: 74, status: 'ABSENT', hash: 'AUDIT-2026-REC-294018' },
+    { id: 'REC-10', studentName: 'Diya Roy', rollNo: 'CS202610', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:13:20 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-673029' },
+    { id: 'REC-11', studentName: 'Rahul Nair', rollNo: 'CS202611', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:12:50 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-940281' },
+    { id: 'REC-12', studentName: 'Tanvi Joshi', rollNo: 'CS202612', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:12:15 AM', distanceMeters: 8, status: 'PRESENT', hash: 'AUDIT-2026-REC-184029' },
+    { id: 'REC-13', studentName: 'Amit Kumar', rollNo: 'CS202613', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:11:40 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-592018' },
+    { id: 'REC-14', studentName: 'Neha Agarwal', rollNo: 'CS202614', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:11:05 AM', distanceMeters: 14, status: 'PRESENT', hash: 'AUDIT-2026-REC-830291' },
+    { id: 'REC-15', studentName: 'Harsh Vardhan', rollNo: 'CS202615', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:10:30 AM', distanceMeters: 82, status: 'ABSENT', hash: 'AUDIT-2026-REC-492018' },
+    { id: 'REC-16', studentName: 'Pooja Mishra', rollNo: 'CS202616', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:10:00 AM', distanceMeters: 17, status: 'PRESENT', hash: 'AUDIT-2026-REC-382019' },
+    { id: 'REC-17', studentName: 'Siddharth Rao', rollNo: 'CS202617', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:09:20 AM', distanceMeters: 12, status: 'PRESENT', hash: 'AUDIT-2026-REC-749201' },
+    { id: 'REC-18', studentName: 'Shreya Pandey', rollNo: 'CS202618', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:08:50 AM', distanceMeters: 15, status: 'PRESENT', hash: 'AUDIT-2026-REC-194028' },
+    { id: 'REC-19', studentName: 'Arjun Kapoor', rollNo: 'CS202619', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:08:15 AM', distanceMeters: 21, status: 'PRESENT', hash: 'AUDIT-2026-REC-683029' },
+    { id: 'REC-20', studentName: 'Riya Sen', rollNo: 'CS202620', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:07:40 AM', distanceMeters: 11, status: 'PRESENT', hash: 'AUDIT-2026-REC-492810' },
+    { id: 'REC-21', studentName: 'Yash Malhotra', rollNo: 'CS202621', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:07:05 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-839201' },
+    { id: 'REC-22', studentName: 'Anjali Yadav', rollNo: 'CS202622', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:06:30 AM', distanceMeters: 9, status: 'PRESENT', hash: 'AUDIT-2026-REC-284019' },
+    { id: 'REC-23', studentName: 'Karan Sharma', rollNo: 'CS202623', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:05:55 AM', distanceMeters: 18, status: 'PRESENT', hash: 'AUDIT-2026-REC-739281' },
+    { id: 'REC-24', studentName: 'Meera Rajput', rollNo: 'CS202624', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:05:20 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-592810' },
+    { id: 'REC-25', studentName: 'Abhinav Saxena', rollNo: 'CS202625', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:04:45 AM', distanceMeters: 55, status: 'ABSENT', hash: 'AUDIT-2026-REC-184920' },
+    { id: 'REC-26', studentName: 'Swati Tripathi', rollNo: 'CS202626', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:04:10 AM', distanceMeters: 14, status: 'PRESENT', hash: 'AUDIT-2026-REC-839102' },
+    { id: 'REC-27', studentName: 'Vivek Choudhary', rollNo: 'CS202627', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:03:35 AM', distanceMeters: 12, status: 'PRESENT', hash: 'AUDIT-2026-REC-492019' },
+    { id: 'REC-28', studentName: 'Divya Thakur', rollNo: 'CS202628', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:03:00 AM', distanceMeters: 17, status: 'PRESENT', hash: 'AUDIT-2026-REC-284910' },
+    { id: 'REC-29', studentName: 'Gaurav Bhatia', rollNo: 'CS202629', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:02:25 AM', distanceMeters: 20, status: 'PRESENT', hash: 'AUDIT-2026-REC-739182' },
+    { id: 'REC-30', studentName: 'Simran Kaur', rollNo: 'CS202630', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:01:50 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-392810' }
+  ];
+
   const exportComprehensiveReport = () => {
     let csvHeader = "Record ID,Student Name,Roll No,Subject,Timestamp,Distance (m),Status,Audit Hash\n";
-    const recordsToExport = globalAttendanceRecords.length > 0 ? globalAttendanceRecords : [
-      { id: 'REC-1', studentName: 'Manoj Sharma', rollNo: 'CS202601', subject: 'Advanced AI (CS401)', timestamp: '10:14:22 AM', distanceMeters: 14, status: 'PRESENT', hash: 'AUDIT-REC-771' },
-      { id: 'REC-2', studentName: 'Priya Sharma', rollNo: 'CS202602', subject: 'Advanced AI (CS401)', timestamp: '10:13:05 AM', distanceMeters: 18, status: 'PRESENT', hash: 'AUDIT-REC-551' },
-      { id: 'REC-3', studentName: 'Rohan Mehta', rollNo: 'CS202603', subject: 'Advanced AI (CS401)', timestamp: '10:12:40 AM', distanceMeters: 62, status: 'ABSENT', hash: 'AUDIT-REC-332' }
-    ];
+    const recordsToExport = (globalAttendanceRecords && globalAttendanceRecords.length > 0) ? globalAttendanceRecords : ((data.attendance && data.attendance.length > 0) ? data.attendance : master30StudentAuditRecords);
 
     let csvRows = recordsToExport.map(r => 
       `"${r.id}","${r.studentName}","${r.rollNo}","${r.subject}","${r.timestamp}","${r.distanceMeters || 15}","${r.status}","${r.hash || 'AUDIT-HASH'}"`
@@ -551,11 +580,7 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {(globalAttendanceRecords.length > 0 ? globalAttendanceRecords : [
-                  { id: 'att_demo_1', studentName: 'Manoj Sharma', rollNo: 'CS202601', subject: 'Advanced AI (CS401)', timestamp: '10:14:22 AM', distanceMeters: 14, status: 'PRESENT', hash: 'AUDIT-2026-REC-469063' },
-                  { id: 'att_demo_2', studentName: 'Priya Sharma', rollNo: 'CS202602', subject: 'Advanced AI (CS401)', timestamp: '10:13:05 AM', distanceMeters: 18, status: 'PRESENT', hash: 'AUDIT-2026-REC-112934' },
-                  { id: 'att_demo_3', studentName: 'Rohan Mehta', rollNo: 'CS202603', subject: 'Advanced AI (CS401)', timestamp: '10:12:40 AM', distanceMeters: 62, status: 'ABSENT', hash: 'AUDIT-2026-REC-992381' }
-                ]).map((rec, idx) => (
+                {((globalAttendanceRecords && globalAttendanceRecords.length > 0) ? globalAttendanceRecords : ((data.attendance && data.attendance.length > 0) ? data.attendance : master30StudentAuditRecords)).map((rec, idx) => (
                   <tr key={rec.id || idx} className="hover:bg-slate-50 transition-colors">
                     <td className="py-3 px-3 font-bold text-slate-900">
                       {rec.studentName}
