@@ -143,9 +143,6 @@ export default function LoginModal({ setUser, setActiveTab }) {
         {/* RIGHT LOGIN FORM PANEL */}
         <div className="md:col-span-7 p-8 sm:p-10 flex flex-col justify-center bg-white">
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 border border-indigo-100 text-[#2979FF] rounded-full text-xs font-bold mb-3">
-              <Lock className="w-3.5 h-3.5" /> Portal Authentication
-            </div>
             <h2 className="text-2xl font-black text-[#212121]">Sign In to Your Account</h2>
             <p className="text-xs text-[#757575] mt-1 font-medium">Select your portal role or enter custom credentials</p>
           </div>
