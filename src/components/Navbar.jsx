@@ -118,11 +118,7 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
                 </nav>
               </>
             ) : (
-              <div className="hidden sm:flex items-center gap-2">
-                <span className="text-xs font-extrabold text-[#2979FF] bg-[#2979FF]/10 px-3 py-1.5 rounded-full border border-[#2979FF]/20">
-                  🔒 System Portal Authentication Required
-                </span>
-              </div>
+              null
             )}
 
             {/* TOP RIGHT: Search Bar, Notifications, Settings, User Profile */}
