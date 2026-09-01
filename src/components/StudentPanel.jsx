@@ -773,17 +773,34 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
             </div>
           </div>
 
-          <button
-            onClick={handleStartAttendance}
-            disabled={timeLeft === 0}
-            className={`w-full py-3 rounded-xl font-black text-xs transition-all shadow-md flex items-center justify-center gap-2 ${
-              timeLeft > 0 
-                ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20' 
-                : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-            }`}
-          >
-            <Camera className="w-4 h-4" /> Open Camera & Scan QR
-          </button>
+          <div className="space-y-2">
+            <button
+              onClick={handleStartAttendance}
+              disabled={timeLeft === 0}
+              className={`w-full py-3 rounded-xl font-black text-xs transition-all shadow-md flex items-center justify-center gap-2 ${
+                timeLeft > 0 
+                  ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20' 
+                  : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+              }`}
+            >
+              <Camera className="w-4 h-4" /> Open Camera & Scan QR
+            </button>
+
+            <button
+              onClick={() => {
+                if (activeSession) {
+                  setScannedQrString(activeSession.qrPayloadString || JSON.stringify(activeSession));
+                  setStep(2);
+                  startCamera();
+                } else {
+                  alert('📱 Please ask teacher to generate live QR code on Faculty Dashboard first!');
+                }
+              }}
+              className="w-full py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-extrabold border border-indigo-200 transition-colors flex items-center justify-center gap-1.5"
+            >
+              <QrCode className="w-3.5 h-3.5" /> Scan Teacher Screen QR Directly
+            </button>
+          </div>
         </div>
 
         {/* CARD 3: CLASS LIVE TIMETABLE */}

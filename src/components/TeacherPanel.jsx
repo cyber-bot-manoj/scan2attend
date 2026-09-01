@@ -75,12 +75,25 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
     return () => clearInterval(interval);
   }, [activeSession]);
 
-  // Generate 5-Minute Class QR Code
+  // Generate 5-Minute Class QR Code (Real 2D Matrix Scannable QR)
   const generateQrCode = async () => {
     if (!selectedClassId) return;
     setLoading(true);
     const generatedAt = Date.now();
     const expiresAt = generatedAt + 300000; // Exactly 5 minutes (300s)
+    const className = selectedClassId === 'cs401' ? 'Advanced AI (CS401)' : selectedClassId === 'cs301' ? 'Data Structures (CS301)' : 'Database Systems (CS302)';
+
+    const payloadObj = {
+      classId: selectedClassId,
+      className,
+      subject: className,
+      sessionId: `qr_${generatedAt}`,
+      expiresAt: expiresAt,
+      secretHash: `SEC_${generatedAt}_${selectedClassId.toUpperCase()}`
+    };
+
+    const qrJsonString = JSON.stringify(payloadObj);
+    const scannableQrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(qrJsonString)}&size=400&margin=1`;
 
     try {
       const res = await fetch('/api/teacher/generate-qr', {
@@ -95,14 +108,15 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
 
       const newSession = {
         ...(data.success ? data.qrSession : {}),
-        sessionId: data.qrSession?.sessionId || `qr_${generatedAt}`,
+        sessionId: data.qrSession?.sessionId || payloadObj.sessionId,
         classId: selectedClassId,
-        className: selectedClassId === 'cs401' ? 'Advanced AI (CS401)' : selectedClassId === 'cs301' ? 'Data Structures (CS301)' : 'Database Systems (CS302)',
-        subject: 'Advanced AI (CS401)',
+        className,
+        subject: className,
         code: selectedClassId.toUpperCase(),
         expiresAt,
         generatedAt,
-        qrDataUrl: data.qrSession?.qrDataUrl || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 24 24" fill="none" stroke="%232979ff" stroke-width="2"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h6v6h-6zM7 7h.01M19 7h.01M7 19h.01M17 17h2v2h-2zM12 7v10M7 12h10"/></svg>'
+        qrPayloadString: qrJsonString,
+        qrDataUrl: scannableQrUrl
       };
 
       if (setActiveSession) {
@@ -110,23 +124,26 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
       }
       localStorage.setItem('activeQrSession', JSON.stringify(newSession));
       setTimeLeft(300);
+      setShowQrModal(true);
     } catch (err) {
-      console.error(err);
+      console.error('API call fallback, generating real scannable QR locally:', err);
       const fallbackSession = {
-        sessionId: `qr_${generatedAt}`,
+        sessionId: payloadObj.sessionId,
         classId: selectedClassId,
-        className: 'Advanced AI (CS401)',
-        subject: 'Advanced AI (CS401)',
-        code: 'CS401',
+        className,
+        subject: className,
+        code: selectedClassId.toUpperCase(),
         expiresAt,
         generatedAt,
-        qrDataUrl: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 24 24" fill="none" stroke="%232979ff" stroke-width="2"><path d="M3 3h6v6H3zM15 3h6v6h-6zM3 15h6v6H3zM15 15h6v6h-6zM7 7h.01M19 7h.01M7 19h.01M17 17h2v2h-2zM12 7v10M7 12h10"/></svg>'
+        qrPayloadString: qrJsonString,
+        qrDataUrl: scannableQrUrl
       };
       if (setActiveSession) {
         setActiveSession(fallbackSession);
       }
       localStorage.setItem('activeQrSession', JSON.stringify(fallbackSession));
       setTimeLeft(300);
+      setShowQrModal(true);
     } finally {
       setLoading(false);
     }
