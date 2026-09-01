@@ -195,7 +195,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
   ];
 
   const presentCount = attendanceList.filter(r => r.status === 'PRESENT').length;
-  const totalEnrolled = 50;
+  const totalEnrolled = 30;
   const attendancePercentage = Math.round((presentCount / totalEnrolled) * 100);
 
   const handleSendSms = () => {

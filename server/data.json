@@ -36,7 +36,7 @@
       "password": "student",
       "role": "STUDENT",
       "classSection": "CSE - 3rd Year (Sec A)",
-      "mobile": "+91 9876543213",
+      "mobile": "+91 9876543202",
       "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23ec4899\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
     },
     {
@@ -46,8 +46,8 @@
       "email": "rohan@school.edu",
       "password": "student",
       "role": "STUDENT",
-      "classSection": "CSE - 3rd Year (Sec A)",
-      "mobile": "+91 9876543214",
+      "classSection": "CSE - 3rd Year (Sec B)",
+      "mobile": "+91 9876543203",
       "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2310b981\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
     },
     {
@@ -57,19 +57,19 @@
       "email": "ananya@school.edu",
       "password": "student",
       "role": "STUDENT",
-      "classSection": "CSE - 3rd Year (Sec A)",
-      "mobile": "+91 9876543215",
+      "classSection": "IT - 3rd Year (Sec A)",
+      "mobile": "+91 9876543204",
       "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%238b5cf6\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
     },
     {
       "id": "student_5",
       "name": "Vikramaditya Verma",
       "rollNo": "CS202605",
-      "email": "vikram@school.edu",
+      "email": "vikramaditya@school.edu",
       "password": "student",
       "role": "STUDENT",
-      "classSection": "CSE - 3rd Year (Sec B)",
-      "mobile": "+91 9876543216",
+      "classSection": "AI & DS - 2nd Year",
+      "mobile": "+91 9876543205",
       "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23f59e0b\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
     },
     {
@@ -79,8 +79,8 @@
       "email": "sneha@school.edu",
       "password": "student",
       "role": "STUDENT",
-      "classSection": "CSE - 3rd Year (Sec B)",
-      "mobile": "+91 9876543217",
+      "classSection": "B.C.A - Semester 5",
+      "mobile": "+91 9876543206",
       "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2306b6d4\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
     },
     {
@@ -90,8 +90,8 @@
       "email": "ishaan@school.edu",
       "password": "student",
       "role": "STUDENT",
-      "classSection": "IT - 3rd Year (Sec A)",
-      "mobile": "+91 9876543218",
+      "classSection": "CSE - 3rd Year (Sec A)",
+      "mobile": "+91 9876543207",
       "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23ef4444\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
     },
     {
@@ -101,9 +101,9 @@
       "email": "kavya@school.edu",
       "password": "student",
       "role": "STUDENT",
-      "classSection": "IT - 3rd Year (Sec A)",
-      "mobile": "+91 9876543219",
-      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2310b981\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+      "classSection": "CSE - 3rd Year (Sec B)",
+      "mobile": "+91 9876543208",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%233b82f6\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
     },
     {
       "id": "student_9",
@@ -112,9 +112,9 @@
       "email": "aditya@school.edu",
       "password": "student",
       "role": "STUDENT",
-      "classSection": "AI & DS - 2nd Year",
-      "mobile": "+91 9876543220",
-      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%233b82f6\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+      "classSection": "IT - 3rd Year (Sec A)",
+      "mobile": "+91 9876543209",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%236366f1\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
     },
     {
       "id": "student_10",
@@ -124,7 +124,7 @@
       "password": "student",
       "role": "STUDENT",
       "classSection": "AI & DS - 2nd Year",
-      "mobile": "+91 9876543221",
+      "mobile": "+91 9876543210",
       "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23ec4899\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
     },
     {
@@ -134,9 +134,9 @@
       "email": "rahul@school.edu",
       "password": "student",
       "role": "STUDENT",
-      "classSection": "CSE - 3rd Year (Sec B)",
-      "mobile": "+91 9876543222",
-      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23f97316\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+      "classSection": "B.C.A - Semester 5",
+      "mobile": "+91 9876543211",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2310b981\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
     },
     {
       "id": "student_12",
@@ -146,8 +146,206 @@
       "password": "student",
       "role": "STUDENT",
       "classSection": "CSE - 3rd Year (Sec A)",
-      "mobile": "+91 9876543223",
+      "mobile": "+91 9876543212",
       "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%238b5cf6\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_13",
+      "name": "Amit Kumar",
+      "rollNo": "CS202613",
+      "email": "amit@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "CSE - 3rd Year (Sec B)",
+      "mobile": "+91 9876543213",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23f59e0b\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_14",
+      "name": "Neha Agarwal",
+      "rollNo": "CS202614",
+      "email": "neha@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "IT - 3rd Year (Sec A)",
+      "mobile": "+91 9876543214",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2306b6d4\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_15",
+      "name": "Harsh Vardhan",
+      "rollNo": "CS202615",
+      "email": "harsh@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "AI & DS - 2nd Year",
+      "mobile": "+91 9876543215",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23ef4444\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_16",
+      "name": "Pooja Mishra",
+      "rollNo": "CS202616",
+      "email": "pooja@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "B.C.A - Semester 5",
+      "mobile": "+91 9876543216",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%233b82f6\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_17",
+      "name": "Siddharth Rao",
+      "rollNo": "CS202617",
+      "email": "siddharth@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "CSE - 3rd Year (Sec A)",
+      "mobile": "+91 9876543217",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%236366f1\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_18",
+      "name": "Shreya Pandey",
+      "rollNo": "CS202618",
+      "email": "shreya@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "CSE - 3rd Year (Sec B)",
+      "mobile": "+91 9876543218",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23ec4899\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_19",
+      "name": "Arjun Kapoor",
+      "rollNo": "CS202619",
+      "email": "arjun@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "IT - 3rd Year (Sec A)",
+      "mobile": "+91 9876543219",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2310b981\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_20",
+      "name": "Riya Sen",
+      "rollNo": "CS202620",
+      "email": "riya@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "AI & DS - 2nd Year",
+      "mobile": "+91 9876543220",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%238b5cf6\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_21",
+      "name": "Yash Malhotra",
+      "rollNo": "CS202621",
+      "email": "yash@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "B.C.A - Semester 5",
+      "mobile": "+91 9876543221",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23f59e0b\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_22",
+      "name": "Anjali Yadav",
+      "rollNo": "CS202622",
+      "email": "anjali@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "CSE - 3rd Year (Sec A)",
+      "mobile": "+91 9876543222",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2306b6d4\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_23",
+      "name": "Karan Sharma",
+      "rollNo": "CS202623",
+      "email": "karan@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "CSE - 3rd Year (Sec B)",
+      "mobile": "+91 9876543223",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23ef4444\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_24",
+      "name": "Meera Rajput",
+      "rollNo": "CS202624",
+      "email": "meera@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "IT - 3rd Year (Sec A)",
+      "mobile": "+91 9876543224",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%233b82f6\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_25",
+      "name": "Abhinav Saxena",
+      "rollNo": "CS202625",
+      "email": "abhinav@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "AI & DS - 2nd Year",
+      "mobile": "+91 9876543225",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%236366f1\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_26",
+      "name": "Swati Tripathi",
+      "rollNo": "CS202626",
+      "email": "swati@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "B.C.A - Semester 5",
+      "mobile": "+91 9876543226",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23ec4899\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_27",
+      "name": "Vivek Choudhary",
+      "rollNo": "CS202627",
+      "email": "vivek@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "CSE - 3rd Year (Sec A)",
+      "mobile": "+91 9876543227",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2310b981\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_28",
+      "name": "Divya Thakur",
+      "rollNo": "CS202628",
+      "email": "divya@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "CSE - 3rd Year (Sec B)",
+      "mobile": "+91 9876543228",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%238b5cf6\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_29",
+      "name": "Gaurav Bhatia",
+      "rollNo": "CS202629",
+      "email": "gaurav@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "IT - 3rd Year (Sec A)",
+      "mobile": "+91 9876543229",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%23f59e0b\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_30",
+      "name": "Simran Kaur",
+      "rollNo": "CS202630",
+      "email": "simran@school.edu",
+      "password": "student",
+      "role": "STUDENT",
+      "classSection": "AI & DS - 2nd Year",
+      "mobile": "+91 9876543230",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%2306b6d4\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
     }
   ],
   "classes": [
