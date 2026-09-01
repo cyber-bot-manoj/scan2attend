@@ -235,13 +235,6 @@ export default function LoginModal({ setUser, setActiveTab }) {
             </button>
           </form>
 
-          {/* DEMO ACCOUNTS HELPER FOOTER */}
-          <div className="mt-6 pt-4 border-t border-[#E2E8F0] text-center">
-            <p className="text-[11px] text-[#757575] font-semibold">
-              Demo Credentials Loaded: <span className="text-[#212121] font-mono font-bold">{email}</span>
-            </p>
-          </div>
-
         </div>
 
       </div>
