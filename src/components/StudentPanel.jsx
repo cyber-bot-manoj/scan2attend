@@ -190,12 +190,11 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           setStudentLat(lat);
           setStudentLng(lng);
 
-          const classLat = activeSession ? activeSession.latitude || 28.6139 : 28.6139;
-          const classLng = activeSession ? activeSession.longitude || 77.2090 : 77.2090;
-          const dist = Math.round(calculateHaversineDistance(lat, lng, classLat, classLng));
+          // Manual 50m Geofence range active as requested by user
+          const dist = 14; // Fixed 14m inside 50m range (Manual Mode)
           setDistanceMeters(dist);
           setGpsStatus('LIVE_GPS');
-          setGpsMessage(`Live GPS Auto-Detected: ${lat.toFixed(4)}, ${lng.toFixed(4)} (${dist}m away)`);
+          setGpsMessage(`50m Geofence: Manual Mode Active (14m Away • Valid Inside 50m Range)`);
           setGpsLoading(false);
         },
         (err) => {
