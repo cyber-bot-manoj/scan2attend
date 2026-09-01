@@ -163,9 +163,6 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                   <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
                     System Administration Panel
                   </h1>
-                  <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/30 text-amber-300 text-[10px] font-extrabold flex items-center gap-1">
-                    <Sparkles className="w-3 h-3 text-amber-400" /> Master Admin Control
-                  </span>
                 </div>
                 <p className="text-xs text-slate-300 font-medium">
                   Unified Campus Attendance Engine • Server Cluster ID: <span className="font-mono text-amber-200 font-bold">NODE-2026-ADM</span>
@@ -540,9 +537,6 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                 <h3 className="text-base font-black text-slate-900">
                   Live Campus Master Attendance Audit Stream
                 </h3>
-                <span className="bg-blue-50 text-blue-700 border border-blue-200 font-mono text-[10px] font-extrabold px-2.5 py-0.5 rounded-full">
-                  ADMIN MASTER EXCLUSIVE ACCESS
-                </span>
               </div>
               <p className="text-xs text-slate-500 font-medium mt-1">
                 Real-time cryptographic database audit records of all student attendance submissions with GPS & AI face verification.
