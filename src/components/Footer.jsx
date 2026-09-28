@@ -35,9 +35,6 @@ export default function Footer({ setActiveTab, user }) {
               <div>
                 <div className="flex items-center gap-2">
                   <h2 className="text-xl font-black text-white tracking-tight">Scan2Attend</h2>
-                  <span className="px-2 py-0.5 text-[10px] font-extrabold bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full">
-                    v2.5 PRO
-                  </span>
                 </div>
               </div>
             </div>
@@ -45,19 +42,6 @@ export default function Footer({ setActiveTab, user }) {
             <p className="text-xs text-slate-400 leading-relaxed pr-4 font-normal">
               Next-generation unified campus attendance ecosystem. Empowering educational institutions with real-time GPS Geofencing, dynamic QR code verification, AI face liveness detection, and instant SMS alerts.
             </p>
-
-            {/* Badges */}
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-[11px] font-medium">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                System Operational (99.9% Uptime)
-              </span>
-
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-900 text-slate-300 border border-slate-800 rounded-full text-[11px] font-medium">
-                <Lock className="w-3 h-3 text-indigo-400" />
-                256-Bit SSL Encrypted
-              </span>
-            </div>
           </div>
 
           {/* Quick Links Columns */}

@@ -334,9 +334,6 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <Sliders className="w-4 h-4 text-blue-600" /> Class & Geofence Config
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[10px] font-bold">
-                GPS LOCKED
-              </span>
             </div>
 
             <div>
@@ -529,9 +526,6 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
             <div className="flex justify-between items-center">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <LineChart className="w-4 h-4 text-blue-600" /> Semester Analytics
-              </span>
-              <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200 text-[10px] font-bold">
-                +3.1% GROWTH
               </span>
             </div>
 

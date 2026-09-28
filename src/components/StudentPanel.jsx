@@ -627,9 +627,6 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                 <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-[11px] font-mono font-extrabold">
                   ID: {user ? (user.rollNo || 'CS202601') : 'CS202601'}
                 </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-black">
-                  VERIFIED STUDENT
-                </span>
               </div>
 
               <p className="text-xs text-slate-300 font-medium">
@@ -890,9 +887,6 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <Award className="w-4 h-4 text-amber-500" /> Digital Student ID Card
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-black">
-                MUIT OFFICIAL • VALID
-              </span>
             </div>
 
             {/* MUIT Professional Smart Digital ID Card Box */}
@@ -995,9 +989,6 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
             <div className="flex justify-between items-center">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <Bell className="w-4 h-4 text-amber-500" /> Recent Live Notifications & SMS
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold">
-                2 NEW ALERTS
               </span>
             </div>
 

@@ -217,9 +217,6 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <Activity className="w-4 h-4 text-emerald-500" /> System Health & Uptime
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[10px] font-black">
-                99.9% ONLINE
-              </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 text-center">
@@ -311,9 +308,6 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
             <div className="flex justify-between items-center">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <MapPin className="w-4 h-4 text-amber-500" /> Manage Geofence Perimeters
-              </span>
-              <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 text-[10px] font-bold">
-                RADAR CONFIG
               </span>
             </div>
 
@@ -436,9 +430,6 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <FileText className="w-4 h-4 text-emerald-600" /> System SMS Gateway
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 text-[10px] font-bold">
-                2,498 SENT
-              </span>
             </div>
 
             <p className="text-xs text-slate-500 font-medium">
@@ -475,9 +466,6 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
             <div className="flex justify-between items-center">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <Settings className="w-4 h-4 text-slate-600" /> Global System Config
-              </span>
-              <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-200">
-                CONFIG LOCKED
               </span>
             </div>
 
