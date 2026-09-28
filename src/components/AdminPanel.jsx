@@ -165,7 +165,7 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                   </h1>
                 </div>
                 <p className="text-xs text-slate-300 font-medium">
-                  Unified Campus Attendance Engine • Server Cluster ID: <span className="font-mono text-amber-200 font-bold">NODE-2026-ADM</span>
+                  Server Cluster ID: <span className="font-mono text-amber-200 font-bold">NODE-2026-ADM</span>
                 </p>
               </div>
             </div>

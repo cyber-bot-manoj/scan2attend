@@ -139,7 +139,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
         <div className="md:col-span-7 p-8 sm:p-10 flex flex-col justify-center bg-white">
           <div className="mb-6">
             <h2 className="text-2xl font-black text-[#212121]">Sign In to Your Account</h2>
-            <p className="text-xs text-[#757575] mt-1 font-medium">Select your portal role or enter custom credentials</p>
+            <p className="text-xs text-[#757575] mt-1 font-medium">Select your portal role</p>
           </div>
 
           {/* QUICK ROLE SELECTOR TABS */}
