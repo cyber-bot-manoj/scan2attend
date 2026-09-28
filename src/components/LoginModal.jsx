@@ -116,6 +116,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
               <img src="/scan2attend-logo.svg" alt="Scan2Attend" className="h-12 w-12 object-contain" />
               <div>
                 <h1 className="text-xl font-black tracking-tight text-white">Scan2Attend</h1>
+                <p className="text-[11px] font-semibold text-blue-200/90 tracking-wide mt-0.5">Smart Geofence & Campus Operations Portal</p>
               </div>
             </div>
 
@@ -229,6 +230,16 @@ export default function LoginModal({ setUser, setActiveTab }) {
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
+
+          {/* SECURITY & COMPLIANCE FOOTER BADGE */}
+          <div className="mt-6 pt-4 border-t border-[#E2E8F0] flex items-center justify-between text-[11px] text-[#757575] font-medium">
+            <span className="flex items-center gap-1.5 text-emerald-600 font-semibold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> 256-Bit Encrypted
+            </span>
+            <span className="flex items-center gap-1.5 text-slate-500">
+              <MapPin className="w-3.5 h-3.5 text-blue-500" /> GPS & Liveness Active
+            </span>
+          </div>
 
         </div>
 
