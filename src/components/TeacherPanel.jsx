@@ -36,6 +36,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
   const [showQrModal, setShowQrModal] = useState(false);
   const [customSmsText, setCustomSmsText] = useState('Reminder: BCA V-B lecture starts now in Room B-302. Please scan class QR code.');
   const [smsSentNotice, setSmsSentNotice] = useState(false);
+  const [showAllFeedModal, setShowAllFeedModal] = useState(false);
 
   // Initial classes setup
   useEffect(() => {
@@ -475,10 +476,11 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               </button>
             </div>
 
-            {/* Real-time Feed Scroll Box */}
-            <div className="space-y-2 max-h-[550px] overflow-y-auto pr-1">
+            {/* Real-time Feed Scroll Box (Fixed Height Equal to Side Cards) */}
+            <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
               {attendanceList
                 .filter(r => filterStatus === 'ALL' ? true : r.status === filterStatus)
+                .slice(0, 6)
                 .map((rec, i) => (
                   <div key={rec.id || i} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-2 hover:bg-white transition-colors">
                     <div>
@@ -504,8 +506,16 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
 
           </div>
 
-          <div className="pt-1 text-[11px] text-slate-500 text-center font-semibold border-t border-slate-100">
-            Total Class Strength: <strong className="text-slate-900">{totalEnrolled} Students</strong>
+          <div className="space-y-2 pt-1 border-t border-slate-100">
+            <button
+              onClick={() => setShowAllFeedModal(true)}
+              className="w-full py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-black transition-all border border-blue-200 flex items-center justify-center gap-1.5 shadow-xs"
+            >
+              <Maximize2 className="w-3.5 h-3.5" /> Show More / View All 65 Students
+            </button>
+            <div className="text-[11px] text-slate-500 text-center font-semibold">
+              Total Class Strength: <strong className="text-slate-900">{totalEnrolled} Students</strong>
+            </div>
           </div>
         </div>
 
@@ -702,6 +712,93 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
         </div>
 
       </div>
+
+      
+      {/* SHOW MORE FULL MODAL — ALL 65 STUDENTS LIVE FEED */}
+      {showAllFeedModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="max-w-3xl w-full bg-white rounded-3xl p-6 space-y-4 shadow-2xl border border-slate-200 max-h-[90vh] flex flex-col">
+            
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <div>
+                <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                  <UserCheck className="w-5 h-5 text-emerald-600" />
+                  Complete Class Roster — All 65 Students
+                </h3>
+                <p className="text-xs text-slate-500 font-bold mt-0.5">
+                  <span className="text-blue-600 font-sans">{activeSelectedSubjectName}</span> • Room B-302 • Section B
+                </p>
+              </div>
+              <button
+                onClick={() => setShowAllFeedModal(false)}
+                className="p-2 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Filter Pills inside Modal */}
+            <div className="grid grid-cols-3 gap-2 bg-slate-100 p-1.5 rounded-xl text-xs font-extrabold">
+              <button
+                onClick={() => setFilterStatus('ALL')}
+                className={`py-2 rounded-lg transition-all ${filterStatus === 'ALL' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+              >
+                All ({attendanceList.length})
+              </button>
+              <button
+                onClick={() => setFilterStatus('PRESENT')}
+                className={`py-2 rounded-lg transition-all ${filterStatus === 'PRESENT' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+              >
+                Present ({presentCount})
+              </button>
+              <button
+                onClick={() => setFilterStatus('ABSENT')}
+                className={`py-2 rounded-lg transition-all ${filterStatus === 'ABSENT' ? 'bg-red-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+              >
+                Absent ({attendanceList.length - presentCount})
+              </button>
+            </div>
+
+            {/* Scrollable List of All 65 Students */}
+            <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+              {attendanceList
+                .filter(r => filterStatus === 'ALL' ? true : r.status === filterStatus)
+                .map((rec, i) => (
+                  <div key={rec.id || i} className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3 hover:bg-blue-50/50 transition-colors">
+                    <div>
+                      <p className="font-black text-slate-900 text-xs flex items-center gap-2">
+                        {i + 1}. {rec.studentName}
+                        <span className="text-[11px] text-blue-600 font-mono font-bold">({rec.rollNo})</span>
+                      </p>
+                      <p className="text-[10px] text-slate-500 font-medium mt-0.5">
+                        <strong className="text-slate-700 font-sans">{activeSelectedSubjectName}</strong> • {rec.timestamp} • {rec.distanceMeters || 14}m away
+                      </p>
+                    </div>
+
+                    <span className={`px-3 py-1 rounded-full text-xs font-black border ${
+                      rec.status === 'PRESENT' 
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                        : 'bg-red-50 text-red-700 border-red-200'
+                    }`}>
+                      {rec.status === 'PRESENT' ? 'PRESENT 🟢' : 'ABSENT 🔴'}
+                    </span>
+                  </div>
+                ))}
+            </div>
+
+            <div className="pt-3 border-t border-slate-200 flex justify-between items-center text-xs font-bold">
+              <span>Total Enrolled: <strong className="text-slate-900 font-mono text-sm">{totalEnrolled} Students</strong></span>
+              <button
+                onClick={() => setShowAllFeedModal(false)}
+                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-950 text-white rounded-xl font-black text-xs transition-colors shadow-md"
+              >
+                Close Roster
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
 
       {/* FULLSCREEN SMARTBOARD PROJECTION MODAL FOR CLASSROOMS */}
       {showQrModal && (
