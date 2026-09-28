@@ -432,10 +432,6 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                 </svg>
                 <div style="font-size: 8px; color: #94a3b8; margin-top: 2px;">MUIT-GATE-2026-SCAN</div>
               </div>
-
-              <div style="background: rgba(16,185,129,0.2); color: #6ee7b7; padding: 3px 8px; border-radius: 99px; font-weight: bold;">
-                VALID TILL 2026
-              </div>
             </div>
           </div>
           <script>
@@ -648,13 +644,6 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               </span>
             </div>
 
-            <div className="p-3 bg-slate-800/80 rounded-2xl border border-slate-700/80 text-center px-4 shadow-sm">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Geofence Status</span>
-              <span className={`text-xs font-extrabold flex items-center justify-center gap-1 mt-0.5 ${isWithinGeofence ? 'text-emerald-400' : 'text-red-400'}`}>
-                <span className={`w-2 h-2 rounded-full ${isWithinGeofence ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`}></span> 
-                {isWithinGeofence ? `${distanceMeters}m Radius Active` : `Outside Range (${distanceMeters}m)`}
-              </span>
-            </div>
           </div>
 
         </div>
@@ -710,11 +699,6 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <MapPin className="w-4 h-4 text-blue-600" /> GPS Geofence Radar
               </span>
-              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
-                isWithinGeofence ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'
-              }`}>
-                {isWithinGeofence ? 'In Range' : 'Out of Range'}
-              </span>
             </div>
 
             {/* Radar Box */}
@@ -753,9 +737,6 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <QrCode className="w-4 h-4 text-indigo-600" /> QR Verification Gateway
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold">
-                READY
-              </span>
             </div>
 
             <p className="text-xs text-slate-500 font-medium">
@@ -788,9 +769,6 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
             <div className="flex justify-between items-center">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <Calendar className="w-4 h-4 text-purple-600" /> Class Live Timetable
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-bold">
-                TODAY'S SCHEDULE
               </span>
             </div>
 
@@ -852,9 +830,6 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
             <div className="flex justify-between items-center">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <FileText className="w-4 h-4 text-emerald-600" /> Attendance History
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">
-                RECENT LOGS
               </span>
             </div>
 
@@ -966,10 +941,6 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                   </div>
                   <span className="text-[8px]">MUIT GATE PASS</span>
                 </div>
-
-                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9px] font-extrabold px-2 py-0.5 rounded-full">
-                  VALID TILL 2026
-                </span>
               </div>
 
             </div>
