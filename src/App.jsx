@@ -45,7 +45,7 @@ export default function App() {
 
   // Global live attendance records state shared across panels (accessible by Teacher and Admin)
   const [globalAttendanceRecords, setGlobalAttendanceRecords] = useState([
-    { id: 'att_demo_01', studentName: 'Manoj Sharma', rollNo: 'CS202601', subject: 'Computer Graphics (BCA501)', classId: 'bca501', timestamp: 'Sep 02, 2026, 12:19:46 AM', distanceMeters: 14, status: 'PRESENT', livenessScore: '99.4%', hash: 'AUDIT-2026-REC-469063' },
+    { id: 'att_demo_01', studentName: 'MANOJ SHARMA', rollNo: '2401031601137', subject: 'Computer Graphics (BCA501)', classId: 'bca501', timestamp: 'Sep 02, 2026, 12:19:46 AM', distanceMeters: 14, status: 'PRESENT', livenessScore: '99.4%', hash: 'AUDIT-2026-REC-469063' },
     { id: 'att_demo_02', studentName: 'ANSH GUPTA', rollNo: '2401031601046', subject: 'Cryptography & Network Security (BCA502)', classId: 'bca502', timestamp: 'Sep 02, 2026, 12:18:10 AM', distanceMeters: 12, status: 'PRESENT', livenessScore: '98.8%', hash: 'AUDIT-2026-REC-112934' },
     { id: 'att_demo_03', studentName: 'AYUSH SRIVASTAVA', rollNo: '2401031601077', subject: 'Web Technology (BCA503)', classId: 'bca503', timestamp: 'Sep 02, 2026, 12:17:55 AM', distanceMeters: 68, status: 'ABSENT', livenessScore: 'Failed Geofence (68m)', hash: 'AUDIT-2026-REC-992381' },
     { id: 'att_demo_04', studentName: 'ATHARVA KAUSHAL', rollNo: '2401031601068', subject: 'Computer Graphics Lab (BCA511)', classId: 'bca511', timestamp: 'Sep 02, 2026, 12:17:02 AM', distanceMeters: 9, status: 'PRESENT', livenessScore: '99.7%', hash: 'AUDIT-2026-REC-584920' },

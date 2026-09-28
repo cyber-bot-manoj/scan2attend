@@ -89,10 +89,10 @@ export default function LoginModal({ setUser, setActiveTab }) {
     } else {
       mockUser = {
         id: 'student_1',
-        name: 'Manoj Sharma',
-        enrollmentNo: 'MUIT0124031001',
-        rollNo: 'CS202601',
-        fatherName: 'Rajendra Sharma',
+        name: 'MANOJ SHARMA',
+        enrollmentNo: 'MUIT0124031030',
+        rollNo: '2401031601137',
+        fatherName: 'SUBHASH SHARMA',
         email: 'student@school.edu',
         role: 'STUDENT',
         section: 'Section B',

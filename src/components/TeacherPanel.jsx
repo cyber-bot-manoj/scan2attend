@@ -165,7 +165,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
 
   // Default demo records if globalAttendanceRecords is empty
   const attendanceList = globalAttendanceRecords.length > 0 ? globalAttendanceRecords : [
-    { id: 'att_demo_01', studentName: 'Manoj Sharma', rollNo: 'CS202601', timestamp: '10:14:22 AM', distanceMeters: 14, status: 'PRESENT', livenessScore: '99.4%' },
+    { id: 'att_demo_01', studentName: 'MANOJ SHARMA', rollNo: '2401031601137', timestamp: '10:14:22 AM', distanceMeters: 14, status: 'PRESENT', livenessScore: '99.4%' },
     { id: 'att_demo_02', studentName: 'Priya Singh', rollNo: 'CS202602', timestamp: '10:13:05 AM', distanceMeters: 12, status: 'PRESENT', livenessScore: '98.8%' },
     { id: 'att_demo_03', studentName: 'Rohan Mehta', rollNo: 'CS202603', timestamp: '10:12:40 AM', distanceMeters: 68, status: 'ABSENT', livenessScore: 'Geofence Exceeded (68m)' },
     { id: 'att_demo_04', studentName: 'Ananya Sharma', rollNo: 'CS202604', timestamp: '10:11:18 AM', distanceMeters: 9, status: 'PRESENT', livenessScore: '99.7%' },

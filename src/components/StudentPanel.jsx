@@ -281,7 +281,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   // Dedicated Print Function for Digital Student ID Card Only
   const handlePrintDigitalIdCard = () => {
     const studentName = user ? user.name : 'Manoj Sharma';
-    const rollNo = user ? (user.rollNo || 'CS202601') : 'CS202601';
+    const rollNo = user ? (user.rollNo || '2401031601137') : '2401031601137';
     const printWindow = window.open('', '_blank', 'width=600,height=700');
     if (!printWindow) return;
 
@@ -549,7 +549,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
         instructor: 'Mr. Dhananjay Kr. Yadav (DKY)',
         room: 'Room B-302',
         studentName: user ? user.name : 'Manoj Sharma',
-        rollNo: user ? user.rollNo : 'CS202601',
+        rollNo: user ? user.rollNo : '2401031601137',
         course: 'B.C.A • Semester 5',
         timestamp: fullTimestamp,
         timeAgo: 'Just Now',
@@ -621,7 +621,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                   {user ? user.name : 'Manoj Sharma'}
                 </h2>
                 <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-[11px] font-mono font-extrabold">
-                  ID: {user ? (user.rollNo || 'CS202601') : 'CS202601'}
+                  ID: {user ? (user.rollNo || '2401031601137') : '2401031601137'}
                 </span>
               </div>
 
@@ -630,7 +630,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               </p>
 
               <p className="text-xs text-slate-400 font-medium hidden sm:block">
-                Email: manojs082007@gmail.com
+                Email: ssindia10677@gmail.com
               </p>
             </div>
           </div>
@@ -904,7 +904,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                   </div>
                 </div>
                 <span className="text-[9px] font-mono font-bold bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded border border-amber-400/30">
-                  CS202601
+                  2401031601137
                 </span>
               </div>
 
@@ -924,7 +924,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
 
                 <div className="space-y-0.5 text-xs">
                   <h4 className="text-sm font-black text-white tracking-wide uppercase">Manoj Sharma</h4>
-                  <p className="text-[10px] text-amber-300 font-mono font-extrabold">Roll No: CS202601</p>
+                  <p className="text-[10px] text-amber-300 font-mono font-extrabold">Roll No: 2401031601137</p>
                   <p className="text-[10px] text-slate-300 font-medium">B.C.A • Computer Applications</p>
                   <p className="text-[9px] text-slate-400">Semester 5 • Blood Group: O+</p>
                   <p className="text-[9px] text-slate-400 font-mono">Mobile: +91 8840034446</p>
