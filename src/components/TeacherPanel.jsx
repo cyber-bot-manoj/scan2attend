@@ -391,13 +391,6 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <UserCheck className="w-4 h-4 text-emerald-600" /> Live Attendance Feed
               </span>
-              <button 
-                onClick={handleExportCsv}
-                title="Export CSV Report"
-                className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold flex items-center gap-1 hover:bg-emerald-100 transition-colors"
-              >
-                <FileSpreadsheet className="w-3.5 h-3.5" /> CSV
-              </button>
             </div>
 
             {/* Filter Pills */}
@@ -462,11 +455,6 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
             <div className="flex justify-between items-center text-left">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <QrCode className="w-4 h-4 text-indigo-600" /> QR Session Engine
-              </span>
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-extrabold border ${
-                isExpired ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'
-              }`}>
-                {isExpired ? 'EXPIRED' : `${formattedTime}`}
               </span>
             </div>
 
@@ -593,9 +581,6 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <MessageSquare className="w-4 h-4 text-indigo-600" /> Faculty SMS Broadcast
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 text-[10px] font-bold">
-                READY
-              </span>
             </div>
 
             <p className="text-xs text-slate-500 font-medium">
@@ -631,9 +616,6 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
             <div className="flex justify-between items-center">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <BellRing className="w-4 h-4 text-amber-500" /> Academic Notices
-              </span>
-              <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 text-[10px] font-bold">
-                2 NEW
               </span>
             </div>
 
