@@ -1173,9 +1173,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                   </button>
                 ))}
               </div>
-              <span className="text-[10px] font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 shrink-0">
-                {liveNow.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-              </span>
+              
             </div>
 
             {/* Timetable Scroll List (Compact Height) */}
