@@ -77,10 +77,10 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
         })
       });
       const resData = await res.json();
-      setGeoMessage('📍 Geofence coordinates successfully updated for Lab 402!');
+      setGeoMessage('📍 Geofence coordinates successfully updated for Room B-302!');
       setTimeout(() => setGeoMessage(''), 3000);
     } catch (err) {
-      setGeoMessage('📍 Geofence updated locally (Lab 402, 50m radius)');
+      setGeoMessage('📍 Geofence updated locally (Room B-302, 50m radius)');
       setTimeout(() => setGeoMessage(''), 3000);
     }
   };
@@ -227,12 +227,12 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
 
               <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 shadow-inner">
                 <span className="text-[10px] text-slate-500 font-bold block">Students</span>
-                <p className="text-base font-black text-blue-600">2,450</p>
+                <p className="text-base font-black text-blue-600">{data.students ? data.students.length : 65}</p>
               </div>
 
               <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 shadow-inner">
                 <span className="text-[10px] text-slate-500 font-bold block">Faculty</span>
-                <p className="text-base font-black text-slate-900">48</p>
+                <p className="text-base font-black text-slate-900">{data.teachers ? data.teachers.length : 1}</p>
               </div>
             </div>
 
@@ -242,7 +242,7 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                 Active Campus Geofences
               </span>
               <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono text-[10px]">
-                24 Live Zones
+                1 Live Zone (Room B-302)
               </span>
             </div>
           </div>
@@ -322,7 +322,7 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
               <div className="w-16 h-16 rounded-full border-2 border-dashed border-blue-400 bg-blue-500/20 flex items-center justify-center shadow-lg animate-pulse">
                 <span className="font-extrabold text-blue-300 text-[10px]">50m Fence</span>
               </div>
-              <span className="absolute bottom-2 right-2 font-mono text-[10px] text-slate-300">Lab 402 Active</span>
+              <span className="absolute bottom-2 right-2 font-mono text-[10px] text-slate-300">Room B-302 Active</span>
             </div>
 
             <form onSubmit={handleUpdateGeofence} className="space-y-2 text-xs">
@@ -393,27 +393,41 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-[11px]">
-                  <tr>
-                    <td className="py-2 font-bold text-slate-900">MANOJ SHARMA</td>
-                    <td className="py-2 text-slate-500">Student</td>
-                    <td className="py-2 text-right">
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-black border border-emerald-200">Active</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 font-bold text-slate-900">Mr. Dhananjay Kr. Yadav</td>
-                    <td className="py-2 text-slate-500">Faculty</td>
-                    <td className="py-2 text-right">
-                      <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[9px] font-black border border-blue-200">Verified</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 font-bold text-slate-900">ANSH GUPTA</td>
-                    <td className="py-2 text-slate-500">Student</td>
-                    <td className="py-2 text-right">
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-black border border-emerald-200">Active</span>
-                    </td>
-                  </tr>
+                  {data.students && data.students.length > 0 ? (
+                    data.students.slice(0, 10).map((s) => (
+                      <tr key={s.id}>
+                        <td className="py-2 font-bold text-slate-900">{s.name} <span className="text-[10px] text-blue-600 font-mono">({s.rollNo})</span></td>
+                        <td className="py-2 text-slate-500">{s.section || 'Section B'}</td>
+                        <td className="py-2 text-right">
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-black border border-emerald-200">Active</span>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <>
+                      <tr>
+                        <td className="py-2 font-bold text-slate-900">MANOJ SHARMA <span className="text-[10px] text-blue-600 font-mono">(2401031601137)</span></td>
+                        <td className="py-2 text-slate-500">Section B</td>
+                        <td className="py-2 text-right">
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-black border border-emerald-200">Active</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 font-bold text-slate-900">ANSH GUPTA <span className="text-[10px] text-blue-600 font-mono">(2401031601046)</span></td>
+                        <td className="py-2 text-slate-500">Section B</td>
+                        <td className="py-2 text-right">
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-black border border-emerald-200">Active</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 font-bold text-slate-900">AYUSH SRIVASTAVA <span className="text-[10px] text-blue-600 font-mono">(2401031601077)</span></td>
+                        <td className="py-2 text-slate-500">Section B</td>
+                        <td className="py-2 text-right">
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-black border border-emerald-200">Active</span>
+                        </td>
+                      </tr>
+                    </>
+                  )}
                 </tbody>
               </table>
             </div>
