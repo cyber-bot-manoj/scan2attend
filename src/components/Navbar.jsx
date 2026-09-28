@@ -19,7 +19,6 @@ import {
 
 export default function Navbar({ user, setUser, activeTab, setActiveTab, globalAttendanceRecords = [] }) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
   // Settings State
@@ -27,6 +26,7 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
   const [geofenceRadius, setGeofenceRadius] = useState(50);
   const [livenessMode, setLivenessMode] = useState('STRICT');
   const [savedSuccess, setSavedSuccess] = useState(false);
+
   // Global Search Engine across ALL 65 Students of BCA V-B
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
@@ -39,13 +39,84 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
     (s.subject && s.subject.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-
   const handleSaveSettings = () => {
     setSavedSuccess(true);
     setTimeout(() => {
       setSavedSuccess(false);
       setShowSettings(false);
     }, 1200);
+  };
+
+  // Reusable Search Input Component for Desktop & Mobile sub-bar
+  const renderSearchBar = (isMobile = false) => {
+    if (activeTab === 'STUDENT') return null;
+
+    return (
+      <div className={`relative ${isMobile ? 'flex-1 max-w-[210px]' : 'hidden md:block'}`}>
+        <div className="relative">
+          <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setShowSearchResults(true);
+            }}
+            onFocus={() => setShowSearchResults(true)}
+            placeholder="Search student..."
+            className={`${isMobile ? 'w-full pl-8 pr-7 py-1 text-[11px]' : 'w-56 pl-8 pr-7 py-1.5 text-xs'} bg-slate-100 border border-slate-200 rounded-xl text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all font-medium`}
+          />
+          {searchQuery && (
+            <button
+              onClick={() => { setSearchQuery(''); setShowSearchResults(false); }}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
+        </div>
+
+        {/* Live Search Results Dropdown */}
+        {showSearchResults && searchQuery.trim() !== '' && (
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setShowSearchResults(false)} />
+            <div className={`absolute right-0 top-9 w-72 max-w-[calc(100vw-1.5rem)] bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-50 text-xs animate-fadeIn max-h-72 overflow-y-auto`}>
+              <div className="px-3 py-1.5 border-b border-slate-100 flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase">
+                <span>Search Results ({searchResults.length})</span>
+                <span>BCA V-B</span>
+              </div>
+
+              {searchResults.length > 0 ? (
+                searchResults.map((st, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setSelectedResultModal(st);
+                      setShowSearchResults(false);
+                    }}
+                    className="w-full text-left px-3 py-2 hover:bg-slate-50 transition-colors flex items-center justify-between border-b border-slate-50 last:border-b-0"
+                  >
+                    <div>
+                      <p className="font-extrabold text-slate-900 leading-tight">{st.studentName}</p>
+                      <p className="text-[10px] text-slate-500 font-mono">Roll: {st.rollNo} • {st.subject}</p>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-black border ${
+                      st.status === 'PRESENT' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'
+                    }`}>
+                      {st.status}
+                    </span>
+                  </button>
+                ))
+              ) : (
+                <div className="p-3 text-center text-xs text-slate-400 font-medium">
+                  No student matching "{searchQuery}"
+                </div>
+              )}
+            </div>
+          </>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -56,7 +127,7 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
 
             {/* TOP LEFT: Scan2Attend branding */}
             <div className="flex items-center gap-3">
-              <img src="/scan2attend-logo.svg" alt="Scan2Attend" className="h-11 w-11 object-contain transition-transform hover:scale-105" />
+              <img src="/scan2attend-logo.svg" alt="Scan2Attend" className="h-10 w-10 sm:h-11 sm:w-11 object-contain transition-transform hover:scale-105" />
               <div>
                 <h1 className="text-base font-black text-[#212121] tracking-tight">
                   Scan2Attend
@@ -64,245 +135,47 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
               </div>
             </div>
 
-            {/* CENTER TOP: Role-Based Single Dashboard View (Strictly filtered by logged-in role) */}
-            {user && activeTab !== 'LOGIN' ? (
-              <>
-                <nav className="hidden md:flex items-center gap-1.5 bg-[#FAF8F5] p-1.5 rounded-xl border border-[#E2E8F0] shadow-inner">
-                  {user.role === 'STUDENT' && (
-                    <button
-                      onClick={() => setActiveTab('STUDENT')}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black bg-white text-[#2979FF] shadow-xs border border-[#E2E8F0]"
-                    >
-                      <GraduationCap className="w-4 h-4" />
-                      Student Dashboard
-                    </button>
-                  )}
+            {/* CENTER TOP: Role-Based Single Dashboard View (Desktop) */}
+            {user && activeTab !== 'LOGIN' && (
+              <nav className="hidden md:flex items-center gap-1.5 bg-[#FAF8F5] p-1.5 rounded-xl border border-[#E2E8F0] shadow-inner">
+                {user.role === 'STUDENT' && (
+                  <button
+                    onClick={() => setActiveTab('STUDENT')}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black bg-white text-[#2979FF] shadow-xs border border-[#E2E8F0]"
+                  >
+                    <GraduationCap className="w-4 h-4" />
+                    Student Dashboard
+                  </button>
+                )}
 
-                  {user.role === 'TEACHER' && (
-                    <button
-                      onClick={() => setActiveTab('TEACHER')}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black bg-white text-[#2979FF] shadow-xs border border-[#E2E8F0]"
-                    >
-                      <Users className="w-4 h-4" />
-                      Faculty Dashboard
-                    </button>
-                  )}
+                {user.role === 'TEACHER' && (
+                  <button
+                    onClick={() => setActiveTab('TEACHER')}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black bg-white text-[#2979FF] shadow-xs border border-[#E2E8F0]"
+                  >
+                    <Users className="w-4 h-4" />
+                    Faculty Dashboard
+                  </button>
+                )}
 
-                  {user.role === 'ADMIN' && (
-                    <button
-                      onClick={() => setActiveTab('ADMIN')}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black bg-white text-[#2979FF] shadow-xs border border-[#E2E8F0]"
-                    >
-                      <ShieldCheck className="w-4 h-4" />
-                      Admin Panel
-                    </button>
-                  )}
-                </nav>
-
-                <nav className="md:hidden absolute left-0 right-0 top-16 flex items-center gap-1 overflow-x-auto border-t border-[#E2E8F0] bg-white px-4 py-2">
-                  {user.role === 'STUDENT' && (
-                    <button
-                      onClick={() => setActiveTab('STUDENT')}
-                      className="flex min-w-max items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-black bg-[#2979FF] text-white"
-                    >
-                      <GraduationCap className="h-3.5 w-3.5" />
-                      Student Dashboard
-                    </button>
-                  )}
-                  {user.role === 'TEACHER' && (
-                    <button
-                      onClick={() => setActiveTab('TEACHER')}
-                      className="flex min-w-max items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-black bg-[#2979FF] text-white"
-                    >
-                      <Users className="h-3.5 w-3.5" />
-                      Faculty Dashboard
-                    </button>
-                  )}
-                  {user.role === 'ADMIN' && (
-                    <button
-                      onClick={() => setActiveTab('ADMIN')}
-                      className="flex min-w-max items-center gap-1.5 rounded-lg px-3 py-2 text-[11px] font-black bg-[#2979FF] text-white"
-                    >
-                      <ShieldCheck className="h-3.5 w-3.5" />
-                      Admin Panel
-                    </button>
-                  )}
-                </nav>
-          
-      {/* Search Result Detail Modal for All 65 Students */}
-      {selectedResultModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-[99999]">
-          <div className="bg-white text-slate-900 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200 animate-scaleUp">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-blue-600" />
-                <h3 className="text-base font-black text-slate-900">Student Profile & Attendance Record</h3>
-              </div>
-              <button
-                onClick={() => setSelectedResultModal(null)}
-                className="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
-                <div className="flex justify-between items-center">
-                  <h4 className="text-base font-black text-slate-900">{selectedResultModal.studentName}</h4>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
-                    selectedResultModal.status === 'PRESENT' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-red-100 text-red-800 border-red-300'
-                  }`}>
-                    {selectedResultModal.status}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 font-medium pt-2 border-t border-slate-200">
-                  <div>Roll No: <strong className="text-slate-900 block font-mono">{selectedResultModal.rollNo}</strong></div>
-                  <div>Distance: <strong className="text-slate-900 block font-mono">{selectedResultModal.distanceMeters || '14'}m Away</strong></div>
-                  <div className="col-span-2">Subject: <strong className="text-slate-900 block font-mono">{selectedResultModal.subject}</strong></div>
-                  <div className="col-span-2">Class Section: <strong className="text-slate-900 block">B.C.A • Semester V-B • Room B-302</strong></div>
-                  <div className="col-span-2">Audit Verification Hash: <strong className="text-slate-900 block font-mono text-[10px] text-blue-600">{selectedResultModal.hash || 'AUDIT-2026-REC-771829'}</strong></div>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setSelectedResultModal(null)}
-              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md"
-            >
-              Close Record View
-            </button>
-          </div>
-        </div>
-      )}
-    </>
-
-            ) : (
-              null
+                {user.role === 'ADMIN' && (
+                  <button
+                    onClick={() => setActiveTab('ADMIN')}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-black bg-white text-[#2979FF] shadow-xs border border-[#E2E8F0]"
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    Admin Panel
+                  </button>
+                )}
+              </nav>
             )}
 
-            {/* TOP RIGHT: Search Bar, Notifications, Settings, User Profile */}
-            <div className="flex items-center gap-3">
+            {/* TOP RIGHT: Search Bar (Desktop), Settings, User Profile */}
+            <div className="flex items-center gap-2.5">
               {user && activeTab !== 'LOGIN' ? (
                 <>
-
-                  {/* Interactive Search Bar (Hidden on Student Dashboard) */}
-                  {activeTab !== 'STUDENT' && (
-                    <div className="relative block">
-                    <div className="relative">
-                      <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                      <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => {
-                          setSearchQuery(e.target.value);
-                          setShowSearchResults(true);
-                        }}
-                        onFocus={() => setShowSearchResults(true)}
-                        placeholder="Search student..."
-                        className="w-28 sm:w-48 lg:w-56 pl-8 sm:pl-9 pr-3 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all font-medium"
-                      />
-                      {searchQuery && (
-                        <button
-                          onClick={() => { setSearchQuery(''); setShowSearchResults(false); }}
-                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                        >
-                          <X className="w-3.5 h-3.5" />
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Live Search Results Dropdown */}
-                    {showSearchResults && searchQuery.trim() !== '' && (
-                      <>
-                        <div className="fixed inset-0 z-40" onClick={() => setShowSearchResults(false)} />
-                        <div className="absolute right-0 top-10 w-72 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-50 text-xs animate-fadeIn max-h-72 overflow-y-auto">
-                          <div className="px-3 py-1.5 border-b border-slate-100 flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase">
-                            <span>Search Results ({searchResults.length})</span>
-                            <span>BCA V-B</span>
-                          </div>
-
-                          {searchResults.length > 0 ? (
-                            searchResults.map((st, idx) => (
-                              <button
-                                key={idx}
-                                onClick={() => {
-                                  setSelectedResultModal(st);
-                                  setShowSearchResults(false);
-                                }}
-                                className="w-full text-left px-3 py-2 hover:bg-slate-50 transition-colors flex items-center justify-between border-b border-slate-50 last:border-b-0"
-                              >
-                                <div>
-                                  <p className="font-extrabold text-slate-900 leading-tight">{st.studentName}</p>
-                                  <p className="text-[10px] text-slate-500 font-mono">Roll: {st.rollNo} • {st.subject}</p>
-                                </div>
-                                <span className={`px-2 py-0.5 rounded-full text-[9px] font-black border ${
-                                  st.status === 'PRESENT' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'
-                                }`}>
-                                  {st.status}
-                                </span>
-                              </button>
-                            ))
-                          ) : (
-                            <div className="p-3 text-center text-xs text-slate-400 font-medium">
-                              No student matching "{searchQuery}"
-                            </div>
-                          )}
-                        </div>
-                  
-      {/* Search Result Detail Modal for All 65 Students */}
-      {selectedResultModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-[99999]">
-          <div className="bg-white text-slate-900 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200 animate-scaleUp">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-blue-600" />
-                <h3 className="text-base font-black text-slate-900">Student Profile & Attendance Record</h3>
-              </div>
-              <button
-                onClick={() => setSelectedResultModal(null)}
-                className="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
-                <div className="flex justify-between items-center">
-                  <h4 className="text-base font-black text-slate-900">{selectedResultModal.studentName}</h4>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
-                    selectedResultModal.status === 'PRESENT' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-red-100 text-red-800 border-red-300'
-                  }`}>
-                    {selectedResultModal.status}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 font-medium pt-2 border-t border-slate-200">
-                  <div>Roll No: <strong className="text-slate-900 block font-mono">{selectedResultModal.rollNo}</strong></div>
-                  <div>Distance: <strong className="text-slate-900 block font-mono">{selectedResultModal.distanceMeters || '14'}m Away</strong></div>
-                  <div className="col-span-2">Subject: <strong className="text-slate-900 block font-mono">{selectedResultModal.subject}</strong></div>
-                  <div className="col-span-2">Class Section: <strong className="text-slate-900 block">B.C.A • Semester V-B • Room B-302</strong></div>
-                  <div className="col-span-2">Audit Verification Hash: <strong className="text-slate-900 block font-mono text-[10px] text-blue-600">{selectedResultModal.hash || 'AUDIT-2026-REC-771829'}</strong></div>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setSelectedResultModal(null)}
-              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md"
-            >
-              Close Record View
-            </button>
-          </div>
-        </div>
-      )}
-    </>
-
-                    )}
-                    </div>
-                  )}
+                  {/* Desktop Search Bar */}
+                  {renderSearchBar(false)}
 
                   {/* Settings Gear Icon */}
                   <button 
@@ -317,7 +190,7 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
                   <div className="relative">
                     <button
                       onClick={() => setShowProfileMenu(!showProfileMenu)}
-                      className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-[#FAF8F5] border border-transparent hover:border-[#E2E8F0] transition-all"
+                      className="flex items-center gap-2 p-1 rounded-xl hover:bg-[#FAF8F5] border border-transparent hover:border-[#E2E8F0] transition-all"
                     >
                       <div className="w-8 h-8 rounded-full overflow-hidden border border-[#2979FF] shadow-xs flex-shrink-0 bg-[#2979FF]/10 flex items-center justify-center text-white font-bold text-xs">
                         <img 
@@ -390,108 +263,10 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
                             </button>
                           </div>
                         </div>
-                  
-      {/* Search Result Detail Modal for All 65 Students */}
-      {selectedResultModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-[99999]">
-          <div className="bg-white text-slate-900 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200 animate-scaleUp">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-blue-600" />
-                <h3 className="text-base font-black text-slate-900">Student Profile & Attendance Record</h3>
-              </div>
-              <button
-                onClick={() => setSelectedResultModal(null)}
-                className="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
-                <div className="flex justify-between items-center">
-                  <h4 className="text-base font-black text-slate-900">{selectedResultModal.studentName}</h4>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
-                    selectedResultModal.status === 'PRESENT' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-red-100 text-red-800 border-red-300'
-                  }`}>
-                    {selectedResultModal.status}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 font-medium pt-2 border-t border-slate-200">
-                  <div>Roll No: <strong className="text-slate-900 block font-mono">{selectedResultModal.rollNo}</strong></div>
-                  <div>Distance: <strong className="text-slate-900 block font-mono">{selectedResultModal.distanceMeters || '14'}m Away</strong></div>
-                  <div className="col-span-2">Subject: <strong className="text-slate-900 block font-mono">{selectedResultModal.subject}</strong></div>
-                  <div className="col-span-2">Class Section: <strong className="text-slate-900 block">B.C.A • Semester V-B • Room B-302</strong></div>
-                  <div className="col-span-2">Audit Verification Hash: <strong className="text-slate-900 block font-mono text-[10px] text-blue-600">{selectedResultModal.hash || 'AUDIT-2026-REC-771829'}</strong></div>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setSelectedResultModal(null)}
-              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md"
-            >
-              Close Record View
-            </button>
-          </div>
-        </div>
-      )}
-    </>
-
+                      </>
                     )}
                   </div>
-            
-      {/* Search Result Detail Modal for All 65 Students */}
-      {selectedResultModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-[99999]">
-          <div className="bg-white text-slate-900 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200 animate-scaleUp">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-blue-600" />
-                <h3 className="text-base font-black text-slate-900">Student Profile & Attendance Record</h3>
-              </div>
-              <button
-                onClick={() => setSelectedResultModal(null)}
-                className="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-3">
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
-                <div className="flex justify-between items-center">
-                  <h4 className="text-base font-black text-slate-900">{selectedResultModal.studentName}</h4>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
-                    selectedResultModal.status === 'PRESENT' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-red-100 text-red-800 border-red-300'
-                  }`}>
-                    {selectedResultModal.status}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 font-medium pt-2 border-t border-slate-200">
-                  <div>Roll No: <strong className="text-slate-900 block font-mono">{selectedResultModal.rollNo}</strong></div>
-                  <div>Distance: <strong className="text-slate-900 block font-mono">{selectedResultModal.distanceMeters || '14'}m Away</strong></div>
-                  <div className="col-span-2">Subject: <strong className="text-slate-900 block font-mono">{selectedResultModal.subject}</strong></div>
-                  <div className="col-span-2">Class Section: <strong className="text-slate-900 block">B.C.A • Semester V-B • Room B-302</strong></div>
-                  <div className="col-span-2">Audit Verification Hash: <strong className="text-slate-900 block font-mono text-[10px] text-blue-600">{selectedResultModal.hash || 'AUDIT-2026-REC-771829'}</strong></div>
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setSelectedResultModal(null)}
-              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md"
-            >
-              Close Record View
-            </button>
-          </div>
-        </div>
-      )}
-    </>
-
+                </>
               ) : (
                 <button
                   onClick={() => setActiveTab('LOGIN')}
@@ -504,6 +279,44 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
 
           </div>
         </div>
+
+        {/* MOBILE SUB-BAR (md:hidden): Left: Faculty/Admin Tab Button, Right: Search Bar */}
+        {user && activeTab !== 'LOGIN' && (
+          <nav className="md:hidden border-t border-[#E2E8F0] bg-white px-4 py-2 flex items-center justify-between gap-2 shadow-xs">
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              {user.role === 'STUDENT' && (
+                <button
+                  onClick={() => setActiveTab('STUDENT')}
+                  className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-black bg-[#2979FF] text-white shadow-xs"
+                >
+                  <GraduationCap className="h-3.5 w-3.5" />
+                  Student Dashboard
+                </button>
+              )}
+              {user.role === 'TEACHER' && (
+                <button
+                  onClick={() => setActiveTab('TEACHER')}
+                  className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-black bg-[#2979FF] text-white shadow-xs"
+                >
+                  <Users className="h-3.5 w-3.5" />
+                  Faculty Dashboard
+                </button>
+              )}
+              {user.role === 'ADMIN' && (
+                <button
+                  onClick={() => setActiveTab('ADMIN')}
+                  className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-black bg-[#2979FF] text-white shadow-xs"
+                >
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  Admin Panel
+                </button>
+              )}
+            </div>
+
+            {/* Search Bar on Mobile Phone right next to Faculty/Admin Dashboard button */}
+            {renderSearchBar(true)}
+          </nav>
+        )}
       </header>
 
       {/* SYSTEM PREFERENCES & SETTINGS MODAL */}
@@ -694,6 +507,5 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
         </div>
       )}
     </>
-
   );
 }
