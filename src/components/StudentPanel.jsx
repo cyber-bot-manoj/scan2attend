@@ -32,6 +32,110 @@ import confetti from 'canvas-confetti';
 
 export default function StudentPanel({ user, activeSession, setActiveSession, setActiveTab, onNewAttendance }) {
   const [step, setStep] = useState(1); // 1: Main Dashboard, 2: Verification Flow, 3: Success Confirmation
+  // Live Real-Time Timetable Clock State
+  const [liveNow, setLiveNow] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setLiveNow(new Date());
+    }, 2000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const masterTimetable = [
+    {
+      id: 'BCA501',
+      subject: 'Computer Graphics (BCA501)',
+      startHours: 9, startMins: 35,
+      endHours: 10, endMins: 15,
+      timeSlot: '09:35 AM - 10:15 AM',
+      room: 'Room B-302',
+      teacher: 'Mr. Dhananjay Kr. Yadav (DKY)'
+    },
+    {
+      id: 'BCA502',
+      subject: 'Cryptography & Network Security (BCA502)',
+      startHours: 10, startMins: 35,
+      endHours: 11, endMins: 15,
+      timeSlot: '10:35 AM - 11:15 AM',
+      room: 'Room B-302',
+      teacher: 'Dr. Gouri Shukla (GS)'
+    },
+    {
+      id: 'BCA503',
+      subject: 'Web Technology (BCA503)',
+      startHours: 11, startMins: 15,
+      endHours: 12, endMins: 5,
+      timeSlot: '11:15 AM - 12:05 PM',
+      room: 'Room B-302',
+      teacher: 'Mr. Rishi Mohan Awasthi (RMA)'
+    },
+    {
+      id: 'BCA511',
+      subject: 'Computer Graphics Lab (BCA511) / Web Tech Lab (BCA512)',
+      startHours: 12, startMins: 55,
+      endHours: 13, endMins: 45,
+      timeSlot: '12:55 PM - 01:45 PM',
+      room: 'Lab CCL1 / B-108',
+      teacher: 'Dr. Gouri Shukla & Mr. Rishi Mohan Awasthi'
+    },
+    {
+      id: 'BCA504',
+      subject: 'Minor Project (BCA504)',
+      startHours: 14, startMins: 35,
+      endHours: 15, endMins: 25,
+      timeSlot: '02:35 PM - 03:25 PM',
+      room: 'Room B-302',
+      teacher: 'Dr. Peeyush Pathak (PP)'
+    },
+    {
+      id: 'ACE511',
+      subject: 'Industrial Internship (ACE511)',
+      startHours: 15, startMins: 25,
+      endHours: 16, endMins: 15,
+      timeSlot: '03:25 PM - 04:15 PM',
+      room: 'Room B-302',
+      teacher: 'Mr. Imtiyaz Haq (IH)'
+    }
+  ];
+
+  const currentMinutes = liveNow.getHours() * 60 + liveNow.getMinutes();
+  let nextFound = false;
+  const processedTimetable = masterTimetable.map(item => {
+    const slotStart = item.startHours * 60 + item.startMins;
+    const slotEnd = item.endHours * 60 + item.endMins;
+
+    let status = 'UPCOMING';
+    let badgeText = 'UPCOMING 📅';
+    let badgeClass = 'bg-slate-100 text-slate-600 border-slate-200';
+    let cardBg = 'bg-slate-50 border-slate-200';
+
+    if (currentMinutes >= slotEnd) {
+      status = 'DONE';
+      badgeText = 'DONE 🟢';
+      badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200 font-bold';
+      cardBg = 'bg-slate-50/80 border-slate-200 opacity-80';
+    } else if (currentMinutes >= slotStart && currentMinutes < slotEnd) {
+      status = 'ONGOING';
+      badgeText = 'ONGOING ⏱️';
+      badgeClass = 'bg-blue-600 text-white shadow-xs animate-pulse font-black';
+      cardBg = 'bg-blue-50/90 border-blue-300 ring-2 ring-blue-400/50';
+    } else if (currentMinutes < slotStart) {
+      if (!nextFound) {
+        nextFound = true;
+        status = 'NEXT';
+        badgeText = 'NEXT ⏳';
+        badgeClass = 'bg-amber-100 text-amber-800 border-amber-300 font-bold';
+        cardBg = 'bg-amber-50/50 border-amber-200';
+      }
+    }
+
+    return { ...item, status, badgeText, badgeClass, cardBg };
+  });
+
+  const ongoingClass = processedTimetable.find(c => c.status === 'ONGOING');
+  const nextClass = processedTimetable.find(c => c.status === 'NEXT');
+
   const [selectedNotification, setSelectedNotification] = useState(null);
 
   const noticeItems = [
@@ -814,77 +918,60 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <Calendar className="w-4 h-4 text-purple-600" /> Class Live Timetable
               </span>
+              <span className="text-[10px] font-mono font-bold bg-purple-100 text-purple-800 px-2.5 py-0.5 rounded-full border border-purple-200 shadow-2xs">
+                Today • {liveNow.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}
+              </span>
+            </div>
+
+            {/* Live Clock Bar */}
+            <div className="flex items-center justify-between bg-slate-100/90 p-2 rounded-xl border border-slate-200/80 text-[11px] font-mono">
+              <span className="text-slate-600 font-semibold flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-blue-600 animate-spin" style={{ animationDuration: '6s' }} /> Dynamic System Clock:
+              </span>
+              <span className="font-black text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-300 shadow-2xs">
+                {liveNow.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+              </span>
             </div>
 
             <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                <div>
-                  <p className="font-extrabold text-slate-900">Computer Graphics (BCA501)</p>
-                  <p className="text-[10px] text-slate-500 font-medium">09:35 AM - 10:15 AM • Room B-302 • Mr. Dhananjay Kr. Yadav (DKY)</p>
+              {processedTimetable.map(item => (
+                <div key={item.id} className={`p-2.5 rounded-xl border flex items-center justify-between text-xs transition-all ${item.cardBg}`}>
+                  <div>
+                    <p className={`font-extrabold flex items-center gap-1.5 ${item.status === 'ONGOING' ? 'text-blue-950' : 'text-slate-900'}`}>
+                      {item.subject}
+                      {item.status === 'ONGOING' && <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping"></span>}
+                    </p>
+                    <p className="text-[10px] text-slate-500 font-medium">
+                      {item.timeSlot} • {item.room} • {item.teacher}
+                    </p>
+                  </div>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[9px] border ${item.badgeClass}`}>
+                    {item.badgeText}
+                  </span>
                 </div>
-                <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  DONE 🟢
-                </span>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-blue-50/80 border border-blue-200 flex items-center justify-between text-xs">
-                <div>
-                  <p className="font-extrabold text-blue-950 flex items-center gap-1.5">
-                    Cryptography & Network Security (BCA502)
-                    <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping"></span>
-                  </p>
-                  <p className="text-[10px] text-blue-700 font-medium">10:35 AM - 11:15 AM • Room B-302 • Dr. Gouri Shukla (GS)</p>
-                </div>
-                <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-600 text-white shadow-xs animate-pulse">
-                  ONGOING ⏱️
-                </span>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                <div>
-                  <p className="font-extrabold text-slate-800">Web Technology (BCA503)</p>
-                  <p className="text-[10px] text-slate-500 font-medium">11:15 AM - 12:05 PM • Room B-302 • Mr. Rishi Mohan Awasthi (RMA)</p>
-                </div>
-                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
-                  NEXT
-                </span>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                <div>
-                  <p className="font-extrabold text-slate-800">Computer Graphics Lab (BCA511) / Web Tech Lab (BCA512)</p>
-                  <p className="text-[10px] text-slate-500 font-medium">12:55 PM - 01:45 PM • Lab CCL1 / B-108 • Dr. Gouri Shukla & Mr. Rishi Mohan Awasthi</p>
-                </div>
-                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
-                  UPCOMING
-                </span>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                <div>
-                  <p className="font-extrabold text-slate-800">Minor Project (BCA504)</p>
-                  <p className="text-[10px] text-slate-500 font-medium">02:35 PM - 03:25 PM • Room B-302 • Dr. Peeyush Pathak (PP)</p>
-                </div>
-                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
-                  UPCOMING
-                </span>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                <div>
-                  <p className="font-extrabold text-slate-800">Industrial Internship (ACE511)</p>
-                  <p className="text-[10px] text-slate-500 font-medium">03:25 PM - 04:15 PM • Room B-302 • Mr. Imtiyaz Haq (IH)</p>
-                </div>
-                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
-                  UPCOMING
-                </span>
-              </div>
+              ))}
             </div>
           </div>
 
+          {/* Dynamic Footer */}
           <div className="p-2.5 bg-slate-900 text-white rounded-xl text-[11px] font-bold text-center flex items-center justify-between px-3 border border-slate-800 shadow-md">
-            <span>Current Class: <strong className="text-yellow-300 font-mono">Computer Graphics (BCA501)</strong></span>
-            <span className="text-[10px] text-blue-300 font-mono">Room B-302</span>
+            {ongoingClass ? (
+              <>
+                <span className="truncate pr-2">Current Class: <strong className="text-yellow-300 font-mono">{ongoingClass.subject}</strong></span>
+                <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30 shrink-0">
+                  LIVE • {ongoingClass.room}
+                </span>
+              </>
+            ) : nextClass ? (
+              <>
+                <span className="truncate pr-2">Next Class: <strong className="text-indigo-300 font-mono">{nextClass.subject}</strong></span>
+                <span className="text-[10px] text-amber-300 font-mono shrink-0">Starts {nextClass.startHours > 12 ? `${nextClass.startHours - 12}:${String(nextClass.startMins).padStart(2, '0')} PM` : `${nextClass.startHours}:${String(nextClass.startMins).padStart(2, '0')} AM`}</span>
+              </>
+            ) : (
+              <span className="w-full text-center text-emerald-400 font-bold">
+                🎉 All Classes Completed for Today ({liveNow.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })})
+              </span>
+            )}
           </div>
         </div>
 
