@@ -382,11 +382,51 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   const [errorMessage, setErrorMessage] = useState('');
   const [pipelineResults, setPipelineResults] = useState(null);
   const [liveRecord, setLiveRecord] = useState(null);
+    // Full Semester Attendance History Log (w.e.f. 27 July 2026 Semester Commencement)
+  const [semesterFilterSubject, setSemesterFilterSubject] = useState('ALL');
+  const [showFullReportModal, setShowFullReportModal] = useState(false);
+  const [selectedAuditRecord, setSelectedAuditRecord] = useState(null);
+
   const [attendanceLogs, setAttendanceLogs] = useState([
-    { id: '1', subject: 'Computer Graphics (BCA501)', time: 'Today • 09:30 AM', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-771829' },
-    { id: '2', subject: 'Cryptography and Network Security (BCA502)', time: 'Yesterday • 10:30 AM', status: 'LATE', distance: '32m', hash: 'AUDIT-2026-REC-551940' },
-    { id: '3', subject: 'Web Technology (BCA503)', time: '18 Aug • 11:30 AM', status: 'PRESENT', distance: '18m', hash: 'AUDIT-2026-REC-332910' }
+    { id: 'REC-901', subject: 'Computer Graphics (BCA501)', date: '29 Sep 2026', time: '09:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-901827' },
+    { id: 'REC-902', subject: 'Cryptography and Network Security (BCA502)', date: '28 Sep 2026', time: '11:15 AM', teacher: 'Dr. Gouri Shukla', room: 'Room B-302', status: 'PRESENT', distance: '12m', hash: 'AUDIT-2026-REC-891920' },
+    { id: 'REC-903', subject: 'Computer Graphics Lab (BCA511)', date: '28 Sep 2026', time: '12:55 PM', teacher: 'Dr. Gouri Shukla', room: 'Lab CCL1', status: 'PRESENT', distance: '10m', hash: 'AUDIT-2026-REC-882910' },
+    { id: 'REC-904', subject: 'Web Technology (BCA503)', date: '26 Sep 2026', time: '10:35 AM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-302', status: 'PRESENT', distance: '16m', hash: 'AUDIT-2026-REC-871239' },
+    { id: 'REC-905', subject: 'Computer Graphics (BCA501)', date: '25 Sep 2026', time: '10:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '18m', hash: 'AUDIT-2026-REC-861029' },
+    { id: 'REC-906', subject: 'Cryptography and Network Security (BCA502)', date: '25 Sep 2026', time: '11:15 AM', teacher: 'Dr. Gouri Shukla', room: 'Room B-302', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-851940' },
+    { id: 'REC-907', subject: 'Industrial Internship (ACE511)', date: '24 Sep 2026', time: '02:35 PM', teacher: 'Mr. Imtiyaz Haq', room: 'Room B-302', status: 'PRESENT', distance: '12m', hash: 'AUDIT-2026-REC-841920' },
+    { id: 'REC-908', subject: 'Web Technology (BCA503)', date: '23 Sep 2026', time: '11:15 AM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-302', status: 'PRESENT', distance: '10m', hash: 'AUDIT-2026-REC-831920' },
+    { id: 'REC-909', subject: 'Minor Project (BCA504)', date: '22 Sep 2026', time: '02:35 PM', teacher: 'Dr. Peeyush Pathak', room: 'Room B-302', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-821940' },
+    { id: 'REC-910', subject: 'Computer Graphics (BCA501)', date: '21 Sep 2026', time: '10:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '11m', hash: 'AUDIT-2026-REC-811029' },
+    { id: 'REC-911', subject: 'Cryptography and Network Security (BCA502)', date: '19 Sep 2026', time: '11:15 AM', teacher: 'Dr. Gouri Shukla', room: 'Room B-302', status: 'PRESENT', distance: '15m', hash: 'AUDIT-2026-REC-801940' },
+    { id: 'REC-912', subject: 'Web Technology Lab (BCA512)', date: '18 Sep 2026', time: '12:55 PM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-108', status: 'PRESENT', distance: '10m', hash: 'AUDIT-2026-REC-791920' },
+    { id: 'REC-913', subject: 'Computer Graphics (BCA501)', date: '17 Sep 2026', time: '09:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-781029' },
+    { id: 'REC-914', subject: 'Web Technology (BCA503)', date: '16 Sep 2026', time: '11:15 AM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-302', status: 'PRESENT', distance: '13m', hash: 'AUDIT-2026-REC-771920' },
+    { id: 'REC-915', subject: 'Cryptography and Network Security (BCA502)', date: '15 Sep 2026', time: '11:15 AM', teacher: 'Dr. Gouri Shukla', room: 'Room B-302', status: 'ABSENT', distance: '68m (Geofence Exceeded)', hash: 'AUDIT-2026-REC-761940' },
+    { id: 'REC-916', subject: 'Computer Graphics Lab (BCA511)', date: '14 Sep 2026', time: '12:55 PM', teacher: 'Dr. Gouri Shukla', room: 'Lab CCL1', status: 'PRESENT', distance: '10m', hash: 'AUDIT-2026-REC-751910' },
+    { id: 'REC-917', subject: 'Computer Graphics (BCA501)', date: '12 Sep 2026', time: '09:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '12m', hash: 'AUDIT-2026-REC-741029' },
+    { id: 'REC-918', subject: 'Web Technology (BCA503)', date: '11 Sep 2026', time: '09:35 AM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-302', status: 'PRESENT', distance: '16m', hash: 'AUDIT-2026-REC-731920' },
+    { id: 'REC-919', subject: 'Minor Project (BCA504)', date: '08 Sep 2026', time: '02:35 PM', teacher: 'Dr. Peeyush Pathak', room: 'Room B-302', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-721940' },
+    { id: 'REC-920', subject: 'Computer Graphics (BCA501)', date: '07 Sep 2026', time: '10:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '11m', hash: 'AUDIT-2026-REC-711029' },
+    { id: 'REC-921', subject: 'Industrial Internship (ACE511)', date: '03 Sep 2026', time: '02:35 PM', teacher: 'Mr. Imtiyaz Haq', room: 'Room B-302', status: 'PRESENT', distance: '12m', hash: 'AUDIT-2026-REC-701920' },
+    { id: 'REC-922', subject: 'Computer Graphics (BCA501)', date: '02 Sep 2026', time: '10:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '10m', hash: 'AUDIT-2026-REC-691029' },
+    { id: 'REC-923', subject: 'Cryptography and Network Security (BCA502)', date: '01 Sep 2026', time: '11:15 AM', teacher: 'Dr. Gouri Shukla', room: 'Room B-302', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-681940' },
+    { id: 'REC-924', subject: 'Web Technology (BCA503)', date: '28 Aug 2026', time: '09:35 AM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-302', status: 'PRESENT', distance: '13m', hash: 'AUDIT-2026-REC-671920' },
+    { id: 'REC-925', subject: 'Computer Graphics Lab (BCA511)', date: '26 Aug 2026', time: '09:35 AM', teacher: 'Dr. Gouri Shukla', room: 'Lab CCL1', status: 'PRESENT', distance: '10m', hash: 'AUDIT-2026-REC-661910' },
+    { id: 'REC-926', subject: 'Computer Graphics (BCA501)', date: '24 Aug 2026', time: '10:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '12m', hash: 'AUDIT-2026-REC-651029' },
+    { id: 'REC-927', subject: 'Cryptography and Network Security (BCA502)', date: '21 Aug 2026', time: '11:15 AM', teacher: 'Dr. Gouri Shukla', room: 'Room B-302', status: 'ABSENT', distance: '72m (Geofence Exceeded)', hash: 'AUDIT-2026-REC-641940' },
+    { id: 'REC-928', subject: 'Web Technology (BCA503)', date: '19 Aug 2026', time: '11:15 AM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-302', status: 'PRESENT', distance: '15m', hash: 'AUDIT-2026-REC-631920' },
+    { id: 'REC-929', subject: 'Computer Graphics (BCA501)', date: '17 Aug 2026', time: '10:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '11m', hash: 'AUDIT-2026-REC-621029' },
+    { id: 'REC-930', subject: 'Computer Graphics (BCA501)', date: '13 Aug 2026', time: '09:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-611029' },
+    { id: 'REC-931', subject: 'Cryptography and Network Security (BCA502)', date: '10 Aug 2026', time: '11:15 AM', teacher: 'Dr. Gouri Shukla', room: 'Room B-302', status: 'PRESENT', distance: '12m', hash: 'AUDIT-2026-REC-601940' },
+    { id: 'REC-932', subject: 'Web Technology (BCA503)', date: '07 Aug 2026', time: '09:35 AM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-302', status: 'PRESENT', distance: '16m', hash: 'AUDIT-2026-REC-591920' },
+    { id: 'REC-933', subject: 'Computer Graphics Lab (BCA511)', date: '05 Aug 2026', time: '09:35 AM', teacher: 'Dr. Gouri Shukla', room: 'Lab CCL1', status: 'PRESENT', distance: '10m', hash: 'AUDIT-2026-REC-581910' },
+    { id: 'REC-934', subject: 'Computer Graphics (BCA501)', date: '03 Aug 2026', time: '10:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '11m', hash: 'AUDIT-2026-REC-571029' },
+    { id: 'REC-935', subject: 'Cryptography and Network Security (BCA502)', date: '31 Jul 2026', time: '11:15 AM', teacher: 'Dr. Gouri Shukla', room: 'Room B-302', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-561940' },
+    { id: 'REC-936', subject: 'Web Technology (BCA503)', date: '29 Jul 2026', time: '11:15 AM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-302', status: 'PRESENT', distance: '15m', hash: 'AUDIT-2026-REC-551920' },
+    { id: 'REC-937', subject: 'Computer Graphics (BCA501)', date: '27 Jul 2026', time: '10:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '12m', hash: 'AUDIT-2026-REC-541029' }
   ]);
+
   const [voiceAlertPlaying, setVoiceAlertPlaying] = useState(false);
   const [hasMarkedAttendance, setHasMarkedAttendance] = useState(false);
   const lastVoiceRef = useRef(null);
@@ -1193,35 +1233,78 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           </div>
         </div>
 
-        {/* CARD 4: ATTENDANCE HISTORY & AUDIT HASH STREAM */}
-        <div className="card-3d p-6 space-y-4 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
-          <div className="space-y-3">
+        {/* CARD 4: SEMESTER LIVE ATTENDANCE HISTORY & AUDIT STREAM */}
+        <div className="card-3d p-5 space-y-3 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
+          <div className="space-y-2.5">
+            
+            {/* Card Header & Semester Attendance Stat */}
             <div className="flex justify-between items-center">
-              <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <FileText className="w-4 h-4 text-emerald-600" /> Attendance History
-              </span>
+              <div>
+                <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <FileText className="w-4 h-4 text-emerald-600" /> Attendance History
+                </span>
+                <span className="text-[10px] text-slate-400 font-medium block">
+                  w.e.f. 27 July 2026 (Semester V-B)
+                </span>
+              </div>
+              <div className="text-right">
+                <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 shadow-2xs font-mono block">
+                  95.8% Attendance
+                </span>
+                <span className="text-[9px] text-slate-400 font-bold block">46/48 Conducted</span>
+              </div>
             </div>
 
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {attendanceLogs.map((log, idx) => (
-                <div key={log.id || idx} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                  <div>
-                    <p className="font-extrabold text-slate-900">{log.subject}</p>
-                    <p className="text-[10px] text-slate-500 font-medium">{log.time} • {log.distance}</p>
-                  </div>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
-                    log.status === 'PRESENT' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'
-                  }`}>
-                    {log.status}
-                  </span>
-                </div>
+            {/* Subject Quick Filter Pills */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b border-slate-200 text-[10px] font-bold">
+              {['ALL', 'BCA501', 'BCA502', 'BCA503', 'BCA511'].map(sub => (
+                <button
+                  key={sub}
+                  onClick={() => setSemesterFilterSubject(sub)}
+                  className={`px-2 py-0.5 rounded-md transition-all shrink-0 ${
+                    semesterFilterSubject === sub
+                      ? 'bg-emerald-600 text-white font-black shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {sub}
+                </button>
               ))}
             </div>
+
+            {/* Attendance Logs List */}
+            <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+              {attendanceLogs
+                .filter(log => semesterFilterSubject === 'ALL' || log.subject.includes(semesterFilterSubject))
+                .map((log, idx) => (
+                  <div
+                    key={log.id || idx}
+                    onClick={() => setSelectedAuditRecord(log)}
+                    className="p-2 rounded-xl bg-slate-50 border border-slate-200/90 flex items-center justify-between text-[11px] hover:border-emerald-400 cursor-pointer transition-all"
+                  >
+                    <div className="pr-2 min-w-0">
+                      <p className="font-extrabold text-slate-900 truncate">{log.subject}</p>
+                      <p className="text-[10px] text-slate-500 font-medium truncate">
+                        {log.date} • {log.time} • {log.distance}
+                      </p>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-black border shrink-0 ${
+                      log.status === 'PRESENT' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'
+                    }`}>
+                      {log.status}
+                    </span>
+                  </div>
+                ))}
+            </div>
           </div>
 
-          <div className="pt-1 text-[11px] text-slate-500 text-center font-semibold border-t border-slate-100">
-            Audit Stream Signed via SHA-256 Hashes
-          </div>
+          {/* Full Report Modal Launcher Button */}
+          <button
+            onClick={() => setShowFullReportModal(true)}
+            className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-[11px] transition-all shadow-md flex items-center justify-center gap-1.5 mt-1"
+          >
+            <BarChart2 className="w-3.5 h-3.5" /> View Official Semester Attendance Report
+          </button>
         </div>
 
         {/* CARD 5: 3D DIGITAL STUDENT ID CARD (MAHARISHI UNIVERSITY OF INFORMATION TECHNOLOGY) */}
@@ -1567,6 +1650,223 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
 
           </div>
 
+        </div>
+      )}
+
+
+      {/* OFFICIAL MUIT SEMESTER ATTENDANCE REPORT MODAL (https://stdlogin.muituniversity.in/Student/AttendanceReport) */}
+      {showFullReportModal && (
+        <div className="fixed inset-0 z-[99999] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="max-w-4xl w-full bg-white text-slate-900 border border-slate-200 rounded-3xl p-6 relative shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+            
+            {/* Header */}
+            <div className="flex justify-between items-start border-b border-slate-200 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-200 shadow-inner">
+                  <BarChart2 className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-900 tracking-tight">
+                    Official Semester Attendance Audit Report
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Maharishi University of Information Technology • BCA Semester V-B (w.e.f. 27 July 2026)
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowFullReportModal(false)}
+                className="p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Student Stats Summary Bar */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-center">
+              <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Total Conducted</span>
+                <span className="text-lg font-black text-slate-900 font-mono">48 Classes</span>
+              </div>
+              <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <span className="text-[10px] text-emerald-600 font-bold uppercase block">Attended (Present)</span>
+                <span className="text-lg font-black text-emerald-600 font-mono">46 Classes</span>
+              </div>
+              <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <span className="text-[10px] text-red-500 font-bold uppercase block">Total Absent</span>
+                <span className="text-lg font-black text-red-600 font-mono">2 Classes</span>
+              </div>
+              <div className="p-2 bg-emerald-600 text-white rounded-xl shadow-md">
+                <span className="text-[10px] text-emerald-100 font-bold uppercase block">Attendance Ratio</span>
+                <span className="text-lg font-black text-white font-mono">95.8% (Eligible)</span>
+              </div>
+            </div>
+
+            {/* Subject-Wise Attendance Percentage Table */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                Subject-Wise Attendance Audit Breakdown
+              </h4>
+              <div className="border border-slate-200 rounded-2xl overflow-hidden text-xs">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 text-[11px]">
+                      <th className="p-3">Course Code</th>
+                      <th className="p-3">Subject Name</th>
+                      <th className="p-3">Faculty</th>
+                      <th className="p-3 text-center">Held</th>
+                      <th className="p-3 text-center">Attended</th>
+                      <th className="p-3 text-right">Percentage</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium text-slate-800">
+                    <tr className="hover:bg-slate-50/80">
+                      <td className="p-3 font-mono font-bold text-blue-600">BCA501</td>
+                      <td className="p-3 font-bold">Computer Graphics</td>
+                      <td className="p-3 text-slate-600">Mr. Dhananjay Kr. Yadav (DKY)</td>
+                      <td className="p-3 text-center font-mono">13</td>
+                      <td className="p-3 text-center font-mono text-emerald-600 font-bold">13</td>
+                      <td className="p-3 text-right font-mono font-black text-emerald-600">100.0%</td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/80">
+                      <td className="p-3 font-mono font-bold text-blue-600">BCA502</td>
+                      <td className="p-3 font-bold">Cryptography & Network Security</td>
+                      <td className="p-3 text-slate-600">Dr. Gouri Shukla (GS)</td>
+                      <td className="p-3 text-center font-mono">12</td>
+                      <td className="p-3 text-center font-mono text-emerald-600 font-bold">10</td>
+                      <td className="p-3 text-right font-mono font-black text-emerald-600">83.3%</td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/80">
+                      <td className="p-3 font-mono font-bold text-blue-600">BCA503</td>
+                      <td className="p-3 font-bold">Web Technology</td>
+                      <td className="p-3 text-slate-600">Mr. Rishi Mohan Awasthi (RMA)</td>
+                      <td className="p-3 text-center font-mono">11</td>
+                      <td className="p-3 text-center font-mono text-emerald-600 font-bold">11</td>
+                      <td className="p-3 text-right font-mono font-black text-emerald-600">100.0%</td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/80">
+                      <td className="p-3 font-mono font-bold text-blue-600">BCA511</td>
+                      <td className="p-3 font-bold">Computer Graphics Lab</td>
+                      <td className="p-3 text-slate-600">Dr. Gouri Shukla (GS)</td>
+                      <td className="p-3 text-center font-mono">5</td>
+                      <td className="p-3 text-center font-mono text-emerald-600 font-bold">5</td>
+                      <td className="p-3 text-right font-mono font-black text-emerald-600">100.0%</td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/80">
+                      <td className="p-3 font-mono font-bold text-blue-600">BCA504</td>
+                      <td className="p-3 font-bold">Minor Project</td>
+                      <td className="p-3 text-slate-600">Dr. Peeyush Pathak (PP)</td>
+                      <td className="p-3 text-center font-mono">4</td>
+                      <td className="p-3 text-center font-mono text-emerald-600 font-bold">4</td>
+                      <td className="p-3 text-right font-mono font-black text-emerald-600">100.0%</td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/80">
+                      <td className="p-3 font-mono font-bold text-blue-600">ACE511</td>
+                      <td className="p-3 font-bold">Industrial Internship</td>
+                      <td className="p-3 text-slate-600">Mr. Imtiyaz Haq (IH)</td>
+                      <td className="p-3 text-center font-mono">3</td>
+                      <td className="p-3 text-center font-mono text-emerald-600 font-bold">3</td>
+                      <td className="p-3 text-right font-mono font-black text-emerald-600">100.0%</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Complete Day-by-Day Historical Log List */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                Full Historical Attendance Audit Logs (Jul 27 - Sep 29, 2026)
+              </h4>
+              <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                {attendanceLogs.map((log) => (
+                  <div key={log.id} className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs hover:border-blue-300">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-extrabold text-slate-900">{log.subject}</p>
+                        <span className="text-[10px] font-mono text-slate-500 font-bold">{log.room}</span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 font-medium mt-0.5">
+                        {log.date} • {log.time} • Instructor: {log.teacher} • Distance: {log.distance}
+                      </p>
+                      <p className="text-[9px] font-mono text-blue-600 mt-0.5">
+                        Cryptographic Hash: {log.hash}
+                      </p>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-black border ${
+                      log.status === 'PRESENT' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-red-100 text-red-800 border-red-300'
+                    }`}>
+                      {log.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer buttons */}
+            <div className="pt-2 border-t border-slate-200 flex justify-end gap-3">
+              <button
+                onClick={() => setShowFullReportModal(false)}
+                className="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs"
+              >
+                Close Report
+              </button>
+              <button
+                onClick={() => window.print()}
+                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md flex items-center gap-1.5"
+              >
+                <Printer className="w-4 h-4" /> Print Official Report
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* SINGLE AUDIT RECORD PROOF MODAL */}
+      {selectedAuditRecord && (
+        <div className="fixed inset-0 z-[99999] bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
+          <div className="max-w-md w-full bg-white text-slate-900 rounded-3xl p-6 space-y-4 shadow-2xl border border-slate-200">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-emerald-600" />
+                <h3 className="text-base font-black text-slate-900">Cryptographic Verification Record</h3>
+              </div>
+              <button
+                onClick={() => setSelectedAuditRecord(null)}
+                className="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+              <div className="flex justify-between items-center">
+                <h4 className="text-sm font-black text-slate-900">{selectedAuditRecord.subject}</h4>
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
+                  selectedAuditRecord.status === 'PRESENT' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-red-100 text-red-800 border-red-300'
+                }`}>
+                  {selectedAuditRecord.status}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 font-medium pt-2 border-t border-slate-200">
+                <div>Date: <strong className="text-slate-900 block font-mono">{selectedAuditRecord.date}</strong></div>
+                <div>Time: <strong className="text-slate-900 block font-mono">{selectedAuditRecord.time}</strong></div>
+                <div>Instructor: <strong className="text-slate-900 block">{selectedAuditRecord.teacher}</strong></div>
+                <div>Geofence Distance: <strong className="text-slate-900 block font-mono">{selectedAuditRecord.distance}</strong></div>
+                <div className="col-span-2">Verification Mode: <strong className="text-slate-900 block">GPS Geofence + Dynamic 5-Min QR + AI Face Liveness</strong></div>
+                <div className="col-span-2">SHA-256 Audit Hash: <strong className="text-blue-600 block font-mono text-[10px]">{selectedAuditRecord.hash}</strong></div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setSelectedAuditRecord(null)}
+              className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs shadow-md"
+            >
+              Close Verification Proof
+            </button>
+          </div>
         </div>
       )}
 
