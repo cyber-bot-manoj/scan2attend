@@ -969,7 +969,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               </p>
 
               <p className="text-xs text-slate-400 font-medium hidden sm:block">
-                Email: ssindia10677@gmail.com
+                Email: manojs082007@gmail.com
               </p>
             </div>
           </div>
@@ -1113,9 +1113,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                   <Calendar className="w-4 h-4 text-purple-600" /> Class Live Timetable
                 </span>
               </div>
-              <span className="text-[10px] font-mono font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded-md border border-purple-200">
-                Today: {todayDayName}
-              </span>
+              
             </div>
 
             {/* Day Selector & Clock Strip */}
@@ -1136,7 +1134,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                 ))}
               </div>
               <span className="text-[10px] font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 shrink-0">
-                ⏱️ {liveNow.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                {liveNow.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
               </span>
             </div>
 
@@ -1330,12 +1328,9 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Bell className="w-4 h-4 text-amber-500 animate-bounce" /> MUIT Notice Board Ticker
+                <Bell className="w-4 h-4 text-amber-500 animate-bounce" /> Notice Board
               </span>
-              <span className="text-[10px] font-mono bg-amber-500/10 text-amber-700 px-2 py-0.5 rounded-full border border-amber-300/80 flex items-center gap-1.5 font-bold">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
-                Auto Ticker Active
-              </span>
+              
             </div>
 
             {/* Continuous Vertical Ticker (Official MUIT Portal Upward Scroll Effect) */}
@@ -1361,16 +1356,14 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               </div>
             </div>
 
-            <p className="text-[10px] text-slate-400 font-semibold text-center italic pt-0.5">
-              💡 Hover mouse cursor to pause vertical scrolling
-            </p>
+            
           </div>
 
           <button
-            onClick={() => alert('📢 Official MUIT Notice Board sync complete!')}
+            onClick={() => alert('📢 Notice Board sync complete!')}
             className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black transition-all shadow-md flex items-center justify-center gap-1.5"
           >
-            <Bell className="w-3.5 h-3.5" /> MUIT Official Notice Board
+            <Bell className="w-3.5 h-3.5" /> Notice Board
           </button>
         </div>
 
