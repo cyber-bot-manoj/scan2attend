@@ -55,7 +55,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   // Automatic Voice & Chime Synthesizer Engine for Student Dashboard
   const playVoiceAlertNotification = () => {
     setVoiceAlertPlaying(true);
-    const studentName = user ? user.name : 'Manoj Sharma';
+    const studentName = user ? user.name : 'AARUSH PATEL';
     const text = `Attention! 5-minute QR active. Mark attendance now!`;
 
     try {
@@ -280,8 +280,8 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
 
   // Dedicated Print Function for Digital Student ID Card Only
   const handlePrintDigitalIdCard = () => {
-    const studentName = user ? user.name : 'Manoj Sharma';
-    const rollNo = user ? (user.rollNo || 'CS202601') : 'CS202601';
+    const studentName = user ? user.name : 'AARUSH PATEL';
+    const rollNo = user ? (user.rollNo || '2401031601001') : '2401031601001';
     const printWindow = window.open('', '_blank', 'width=600,height=700');
     if (!printWindow) return;
 
@@ -395,13 +395,13 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
             </div>
 
             <div class="profile-row">
-              <img src="/manoj_sharma_profile.jpg" class="avatar" alt="Student Profile" />
+              <img src="/aarush_patel_profile.jpg" class="avatar" alt="Student Profile" />
               <div class="details">
                 <div class="name">${studentName}</div>
                 <div style="color: #fcd34d; font-family: monospace; font-weight: bold;">Roll: ${rollNo}</div>
                 <div>B.C.A • Computer Applications</div>
                 <div>Semester V • Blood: O+</div>
-                <div style="font-family: monospace;">Mob: +91 8840034446</div>
+                <div style="font-family: monospace;">Mob: +91 7275288461</div>
               </div>
             </div>
 
@@ -488,7 +488,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   };
 
   const useSimulatedSnapshot = () => {
-    setFaceSnapshot('/manoj_sharma_profile.jpg');
+    setFaceSnapshot('/aarush_patel_profile.jpg');
     setLivenessChecked(true);
     stopCamera();
   };
@@ -548,8 +548,8 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
         subject: 'Computer Graphics (BCA501)',
         instructor: 'Mr. Dhananjay Kr. Yadav (DKY)',
         room: 'Room B-302',
-        studentName: user ? user.name : 'Manoj Sharma',
-        rollNo: user ? user.rollNo : 'CS202601',
+        studentName: user ? user.name : 'AARUSH PATEL',
+        rollNo: user ? user.rollNo : '2401031601001',
         course: 'B.C.A • Semester 5',
         timestamp: fullTimestamp,
         timeAgo: 'Just Now',
@@ -557,7 +557,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
         distance: `${distanceMeters}m`,
         livenessScore: '99.4% (Verified)',
         gpsCoords: `${studentLat.toFixed(4)}, ${studentLng.toFixed(4)}`,
-        smsStatus: `Dispatched to ${user ? user.mobile : '8840034446'}`
+        smsStatus: `Dispatched to ${user ? user.mobile : '7275288461'}`
       };
 
       setLiveRecord(passRecord);
@@ -605,7 +605,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           <div className="flex items-center gap-5">
             <div className="relative shrink-0">
               <img 
-                src="/manoj_sharma_profile.jpg" 
+                src="/aarush_patel_profile.jpg" 
                 alt="Student Profile Photo" 
                 onError={(event) => { event.currentTarget.src = '/student_profile_avatar.png'; }}
                 className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover object-[center_top] border-2 border-indigo-400/40 shadow-xl ring-4 ring-indigo-500/20"
@@ -618,19 +618,19 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
             <div className="space-y-1">
               <div className="flex items-center gap-2.5 flex-wrap">
                 <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                  {user ? user.name : 'Manoj Sharma'}
+                  {user ? user.name : 'AARUSH PATEL'}
                 </h2>
                 <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-[11px] font-mono font-extrabold">
-                  ID: {user ? (user.rollNo || 'CS202601') : 'CS202601'}
+                  ID: {user ? (user.rollNo || '2401031601001') : '2401031601001'}
                 </span>
               </div>
 
               <p className="text-xs text-slate-300 font-medium">
-                B.C.A • Semester 5 • Mobile: <span className="font-mono text-indigo-200 font-bold">8840034446</span>
+                B.C.A • Semester 5 • Mobile: <span className="font-mono text-indigo-200 font-bold">7275288461</span>
               </p>
 
               <p className="text-xs text-slate-400 font-medium hidden sm:block">
-                Email: manojs082007@gmail.com
+                Email: mrextraordinary480@gmail.com
               </p>
             </div>
           </div>
@@ -904,7 +904,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                   </div>
                 </div>
                 <span className="text-[9px] font-mono font-bold bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded border border-amber-400/30">
-                  CS202601
+                  2401031601001
                 </span>
               </div>
 
@@ -912,7 +912,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               <div className="flex items-center gap-3.5 pt-1">
                 <div className="relative shrink-0">
                   <img 
-                    src="/manoj_sharma_profile.jpg" 
+                    src="/aarush_patel_profile.jpg" 
                     alt="ID Profile" 
                     onError={(event) => { event.currentTarget.src = '/student_profile_avatar.png'; }}
                     className="w-16 h-18 rounded-xl object-cover border-2 border-amber-400/60 shadow-md ring-2 ring-amber-500/20" 
@@ -923,11 +923,11 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                 </div>
 
                 <div className="space-y-0.5 text-xs">
-                  <h4 className="text-sm font-black text-white tracking-wide uppercase">Manoj Sharma</h4>
-                  <p className="text-[10px] text-amber-300 font-mono font-extrabold">Roll No: CS202601</p>
+                  <h4 className="text-sm font-black text-white tracking-wide uppercase">AARUSH PATEL</h4>
+                  <p className="text-[10px] text-amber-300 font-mono font-extrabold">Roll No: 2401031601001</p>
                   <p className="text-[10px] text-slate-300 font-medium">B.C.A • Computer Applications</p>
                   <p className="text-[9px] text-slate-400">Semester 5 • Blood Group: O+</p>
-                  <p className="text-[9px] text-slate-400 font-mono">Mobile: +91 8840034446</p>
+                  <p className="text-[9px] text-slate-400 font-mono">Mobile: +91 7275288461</p>
                 </div>
               </div>
 
@@ -1009,7 +1009,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                   title: 'Parent SMS Dispatch Delivered',
                   time: '10m ago',
                   type: 'PARENT SMS GATEWAY',
-                  details: 'Official attendance verification notification SMS successfully dispatched to registered parent mobile number +91 8840034446. Cryptographic status tag: DELIVERED.'
+                  details: 'Official attendance verification notification SMS successfully dispatched to registered parent mobile number +91 7275288461. Cryptographic status tag: DELIVERED.'
                 })}
                 className="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200 cursor-pointer hover:bg-emerald-100/80 transition-all space-y-1"
               >
@@ -1020,7 +1020,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                   <span className="text-[10px] text-emerald-700 font-mono font-bold">10m ago</span>
                 </div>
                 <p className="text-[10px] text-slate-600 font-medium line-clamp-1">
-                  Confirmation SMS dispatched to +91 8840034446 for student Manoj Sharma.
+                  Confirmation SMS dispatched to +91 7275288461 for student AARUSH PATEL.
                 </p>
               </div>
 
@@ -1047,12 +1047,12 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
 
             <div className="p-2 bg-slate-50 rounded-xl border border-slate-200 text-[10px] flex items-center justify-between font-mono text-slate-600 px-3">
               <span>Carrier: <strong>SMS Gateway Active</strong></span>
-              <span>+91 8840034446</span>
+              <span>+91 7275288461</span>
             </div>
           </div>
 
           <button
-            onClick={() => alert('📲 SMS Alert dispatched to +91 8840034446!')}
+            onClick={() => alert('📲 SMS Alert dispatched to +91 7275288461!')}
             className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black transition-all shadow-md flex items-center justify-center gap-1.5"
           >
             <Smartphone className="w-3.5 h-3.5" /> SMS Alert

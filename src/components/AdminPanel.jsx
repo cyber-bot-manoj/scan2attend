@@ -86,10 +86,10 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
   };
 
   const master30StudentAuditRecords = [
-    { id: 'REC-01', studentName: 'Manoj Sharma', rollNo: 'CS202601', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:19:46 AM', distanceMeters: 14, status: 'PRESENT', hash: 'AUDIT-2026-REC-469063' },
-    { id: 'REC-02', studentName: 'Priya Singh', rollNo: 'CS202602', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:18:10 AM', distanceMeters: 12, status: 'PRESENT', hash: 'AUDIT-2026-REC-112934' },
-    { id: 'REC-03', studentName: 'Rohan Mehta', rollNo: 'CS202603', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:17:55 AM', distanceMeters: 68, status: 'ABSENT', hash: 'AUDIT-2026-REC-992381' },
-    { id: 'REC-04', studentName: 'Ananya Sharma', rollNo: 'CS202604', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:17:02 AM', distanceMeters: 9, status: 'PRESENT', hash: 'AUDIT-2026-REC-584920' },
+    { id: 'REC-01', studentName: 'AARUSH PATEL', rollNo: '2401031601001', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:19:46 AM', distanceMeters: 14, status: 'PRESENT', hash: 'AUDIT-2026-REC-469063' },
+    { id: 'REC-02', studentName: 'AASTHA PATEL', rollNo: '2401031601003', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:18:10 AM', distanceMeters: 12, status: 'PRESENT', hash: 'AUDIT-2026-REC-112934' },
+    { id: 'REC-03', studentName: 'ABHINAV KUMAR TRIPATHI', rollNo: '2401031601255', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:17:55 AM', distanceMeters: 68, status: 'ABSENT', hash: 'AUDIT-2026-REC-992381' },
+    { id: 'REC-04', studentName: 'ABHISHEK', rollNo: '2401031601008', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:17:02 AM', distanceMeters: 9, status: 'PRESENT', hash: 'AUDIT-2026-REC-584920' },
     { id: 'REC-05', studentName: 'Vikramaditya Verma', rollNo: 'CS202605', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:16:30 AM', distanceMeters: 15, status: 'PRESENT', hash: 'AUDIT-2026-REC-392019' },
     { id: 'REC-06', studentName: 'Sneha Gupta', rollNo: 'CS202606', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:15:45 AM', distanceMeters: 11, status: 'PRESENT', hash: 'AUDIT-2026-REC-884012' },
     { id: 'REC-07', studentName: 'Ishaan Patel', rollNo: 'CS202607', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:15:10 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-739201' },
@@ -394,7 +394,7 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                 </thead>
                 <tbody className="divide-y divide-slate-100 text-[11px]">
                   <tr>
-                    <td className="py-2 font-bold text-slate-900">Manoj Sharma</td>
+                    <td className="py-2 font-bold text-slate-900">AARUSH PATEL</td>
                     <td className="py-2 text-slate-500">Student</td>
                     <td className="py-2 text-right">
                       <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-black border border-emerald-200">Active</span>
@@ -408,7 +408,7 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                     </td>
                   </tr>
                   <tr>
-                    <td className="py-2 font-bold text-slate-900">Priya Sharma</td>
+                    <td className="py-2 font-bold text-slate-900">ANSHIKA SINGH</td>
                     <td className="py-2 text-slate-500">Student</td>
                     <td className="py-2 text-right">
                       <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-black border border-emerald-200">Active</span>
@@ -423,7 +423,7 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
             onClick={() => alert('User Directory Modal opened. Search by Roll No or Faculty ID.')}
             className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold transition-colors border border-slate-200"
           >
-            Manage All 2,498 Accounts
+            Manage All 271 Student Accounts (Sections A, B, C, D)
           </button>
         </div>
 
