@@ -32,6 +32,7 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
   });
 
   const [selectedClassId, setSelectedClassId] = useState('bca501');
+  const [selectedSubjectFilter, setSelectedSubjectFilter] = useState('bca501');
   const [geoLat, setGeoLat] = useState('28.6139');
   const [geoLng, setGeoLng] = useState('77.2090');
   const [geoRadius, setGeoRadius] = useState('50');
@@ -85,37 +86,84 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
     }
   };
 
-  const master30StudentAuditRecords = [
-    { id: 'REC-01', studentName: 'MANOJ SHARMA', rollNo: '2401031601137', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:19:46 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-469000' },
-    { id: 'REC-02', studentName: 'ANSH GUPTA', rollNo: '2401031601046', subject: 'Cryptography & Network Security (BCA502)', timestamp: 'Sep 02, 2026, 12:18:45 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-469137' },
-    { id: 'REC-03', studentName: 'AYUSH SRIVASTAVA', rollNo: '2401031601077', subject: 'Web Technology (BCA503)', timestamp: 'Sep 02, 2026, 12:17:44 AM', distanceMeters: 69, status: 'ABSENT', hash: 'AUDIT-2026-REC-469274' },
-    { id: 'REC-04', studentName: 'AYUSHI GUPTA', rollNo: '2401031601079', subject: 'Computer Graphics Lab (BCA511)', timestamp: 'Sep 02, 2026, 12:16:43 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-469411' },
-    { id: 'REC-05', studentName: 'BADRINATH GUPTA', rollNo: '2401031601080', subject: 'Web Technology Lab (BCA512)', timestamp: 'Sep 02, 2026, 12:15:42 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-469548' },
-    { id: 'REC-06', studentName: 'BHAVISHYA PRATAP SINGH', rollNo: '2401031601081', subject: 'Minor Project (BCA504)', timestamp: 'Sep 02, 2026, 12:14:41 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-469685' },
-    { id: 'REC-07', studentName: 'CHAMAN', rollNo: '2401031601082', subject: 'Industrial Internship (ACE511)', timestamp: 'Sep 02, 2026, 12:13:40 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-469822' },
-    { id: 'REC-08', studentName: 'CHANDRA PRAKASH SAH', rollNo: '2401031601083', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:12:39 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-469959' },
-    { id: 'REC-09', studentName: 'CHANDRANSH SINGH', rollNo: '2401031601085', subject: 'Cryptography & Network Security (BCA502)', timestamp: 'Sep 02, 2026, 12:11:38 AM', distanceMeters: 81, status: 'ABSENT', hash: 'AUDIT-2026-REC-470096' },
-    { id: 'REC-10', studentName: 'DARKHSHA KHATOON', rollNo: '2401031601086', subject: 'Web Technology (BCA503)', timestamp: 'Sep 02, 2026, 12:10:37 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-470233' },
-    { id: 'REC-11', studentName: 'DEEPAK', rollNo: '2401031601087', subject: 'Computer Graphics Lab (BCA511)', timestamp: 'Sep 02, 2026, 12:09:36 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-470370' },
-    { id: 'REC-12', studentName: 'DHAIRYA DIXIT', rollNo: '2401031601091', subject: 'Web Technology Lab (BCA512)', timestamp: 'Sep 02, 2026, 12:08:35 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-470507' },
-    { id: 'REC-13', studentName: 'DIVANCI SAXENA', rollNo: '2401031601264', subject: 'Minor Project (BCA504)', timestamp: 'Sep 02, 2026, 12:07:34 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-470644' },
-    { id: 'REC-14', studentName: 'DIVYANSH SRIVASTAVA', rollNo: '2401031601094', subject: 'Industrial Internship (ACE511)', timestamp: 'Sep 02, 2026, 12:06:33 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-470781' },
-    { id: 'REC-15', studentName: 'DIVYANSHU PATEL', rollNo: '2401031601095', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:05:32 AM', distanceMeters: 63, status: 'ABSENT', hash: 'AUDIT-2026-REC-470918' },
-    { id: 'REC-16', studentName: 'EKANSHI SHARAN SRIVASTAVA', rollNo: '2401031601098', subject: 'Cryptography & Network Security (BCA502)', timestamp: 'Sep 02, 2026, 12:04:31 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-471055' },
-    { id: 'REC-17', studentName: 'EKATA', rollNo: '2401031601099', subject: 'Web Technology (BCA503)', timestamp: 'Sep 02, 2026, 12:03:30 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-471192' },
-    { id: 'REC-18', studentName: 'GARIMA SINGH', rollNo: '2401031601101', subject: 'Computer Graphics Lab (BCA511)', timestamp: 'Sep 02, 2026, 12:02:29 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-471329' },
-    { id: 'REC-19', studentName: 'GAURAV RAWAT', rollNo: '2401031601102', subject: 'Web Technology Lab (BCA512)', timestamp: 'Sep 02, 2026, 12:01:28 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-471466' },
-    { id: 'REC-20', studentName: 'GAURAV SHARMA', rollNo: '2401031601103', subject: 'Minor Project (BCA504)', timestamp: 'Sep 02, 2026, 12:19:27 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-471603' },
-    { id: 'REC-21', studentName: 'HARSH TRIVEDI', rollNo: '2401031601105', subject: 'Industrial Internship (ACE511)', timestamp: 'Sep 02, 2026, 12:18:26 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-471740' },
-    { id: 'REC-22', studentName: 'HARSHIT PANDEY', rollNo: '2401031601283', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:17:25 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-471877' },
-    { id: 'REC-23', studentName: 'HARSHIT SHUKLA', rollNo: '2401031601107', subject: 'Cryptography & Network Security (BCA502)', timestamp: 'Sep 02, 2026, 12:16:24 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-472014' },
-    { id: 'REC-24', studentName: 'HEMANT KUMAR PANDEY', rollNo: '2401031601108', subject: 'Web Technology (BCA503)', timestamp: 'Sep 02, 2026, 12:15:23 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-472151' },
-    { id: 'REC-25', studentName: 'HIMANSHU KUMAR', rollNo: '2401031601110', subject: 'Computer Graphics Lab (BCA511)', timestamp: 'Sep 02, 2026, 12:14:22 AM', distanceMeters: 73, status: 'ABSENT', hash: 'AUDIT-2026-REC-472288' },
-    { id: 'REC-26', studentName: 'HIMANSHU SRIVASTAVA', rollNo: '2401031601262', subject: 'Web Technology Lab (BCA512)', timestamp: 'Sep 02, 2026, 12:13:21 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-472425' },
-    { id: 'REC-27', studentName: 'INDRAJEET SAHANI', rollNo: '2401031601260', subject: 'Minor Project (BCA504)', timestamp: 'Sep 02, 2026, 12:12:20 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-472562' },
-    { id: 'REC-28', studentName: 'ISHIKA GAUR', rollNo: '2401031601111', subject: 'Industrial Internship (ACE511)', timestamp: 'Sep 02, 2026, 12:11:19 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-472699' },
-    { id: 'REC-29', studentName: 'ISHITA DIXIT', rollNo: '2401031601112', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:10:18 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-472836' },
-    { id: 'REC-30', studentName: 'ISHITA GUPTA', rollNo: '2401031601113', subject: 'Cryptography & Network Security (BCA502)', timestamp: 'Sep 02, 2026, 12:09:17 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-472973' }
+  
+  const subjectNameMap = {
+    bca501: 'Computer Graphics (BCA501)',
+    bca502: 'Cryptography & Network Security (BCA502)',
+    bca503: 'Web Technology (BCA503)',
+    bca504: 'Minor Project (BCA504)',
+    bca511: 'Computer Graphics Lab (BCA511)',
+    bca512: 'Web Technology Lab (BCA512)',
+    ace511: 'Industrial Internship (ACE511)'
+  };
+  const activeSelectedSubjectName = subjectNameMap[selectedSubjectFilter] || 'Computer Graphics (BCA501)';
+
+  const master65StudentAuditRecords = [
+    { id: 'REC-01', studentName: 'MANOJ SHARMA', rollNo: '2401031601137', timestamp: 'Sep 02, 2026, 10:59:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-469000' },
+    { id: 'REC-02', studentName: 'ANSH GUPTA', rollNo: '2401031601046', timestamp: 'Sep 02, 2026, 10:58:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-469137' },
+    { id: 'REC-03', studentName: 'AYUSH SRIVASTAVA', rollNo: '2401031601077', timestamp: 'Sep 02, 2026, 10:57:15 AM', distanceMeters: 69, status: 'ABSENT', hash: 'AUDIT-2026-REC-469274' },
+    { id: 'REC-04', studentName: 'AYUSHI GUPTA', rollNo: '2401031601079', timestamp: 'Sep 02, 2026, 10:56:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-469411' },
+    { id: 'REC-05', studentName: 'BADRINATH GUPTA', rollNo: '2401031601080', timestamp: 'Sep 02, 2026, 10:55:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-469548' },
+    { id: 'REC-06', studentName: 'BHAVISHYA PRATAP SINGH', rollNo: '2401031601081', timestamp: 'Sep 02, 2026, 10:54:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-469685' },
+    { id: 'REC-07', studentName: 'CHAMAN', rollNo: '2401031601082', timestamp: 'Sep 02, 2026, 10:53:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-469822' },
+    { id: 'REC-08', studentName: 'CHANDRA PRAKASH SAH', rollNo: '2401031601083', timestamp: 'Sep 02, 2026, 10:52:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-469959' },
+    { id: 'REC-09', studentName: 'CHANDRANSH SINGH', rollNo: '2401031601085', timestamp: 'Sep 02, 2026, 10:51:15 AM', distanceMeters: 81, status: 'ABSENT', hash: 'AUDIT-2026-REC-470096' },
+    { id: 'REC-10', studentName: 'DARKHSHA KHATOON', rollNo: '2401031601086', timestamp: 'Sep 02, 2026, 10:50:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-470233' },
+    { id: 'REC-11', studentName: 'DEEPAK', rollNo: '2401031601087', timestamp: 'Sep 02, 2026, 10:49:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-470370' },
+    { id: 'REC-12', studentName: 'DHAIRYA DIXIT', rollNo: '2401031601091', timestamp: 'Sep 02, 2026, 10:48:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-470507' },
+    { id: 'REC-13', studentName: 'DIVANCI SAXENA', rollNo: '2401031601264', timestamp: 'Sep 02, 2026, 10:47:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-470644' },
+    { id: 'REC-14', studentName: 'DIVYANSH SRIVASTAVA', rollNo: '2401031601094', timestamp: 'Sep 02, 2026, 10:46:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-470781' },
+    { id: 'REC-15', studentName: 'DIVYANSHU PATEL', rollNo: '2401031601095', timestamp: 'Sep 02, 2026, 10:45:15 AM', distanceMeters: 63, status: 'ABSENT', hash: 'AUDIT-2026-REC-470918' },
+    { id: 'REC-16', studentName: 'EKANSHI SHARAN SRIVASTAVA', rollNo: '2401031601098', timestamp: 'Sep 02, 2026, 10:44:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-471055' },
+    { id: 'REC-17', studentName: 'EKATA', rollNo: '2401031601099', timestamp: 'Sep 02, 2026, 10:43:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-471192' },
+    { id: 'REC-18', studentName: 'GARIMA SINGH', rollNo: '2401031601101', timestamp: 'Sep 02, 2026, 10:42:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-471329' },
+    { id: 'REC-19', studentName: 'GAURAV RAWAT', rollNo: '2401031601102', timestamp: 'Sep 02, 2026, 10:41:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-471466' },
+    { id: 'REC-20', studentName: 'GAURAV SHARMA', rollNo: '2401031601103', timestamp: 'Sep 02, 2026, 10:40:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-471603' },
+    { id: 'REC-21', studentName: 'HARSH TRIVEDI', rollNo: '2401031601105', timestamp: 'Sep 02, 2026, 10:39:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-471740' },
+    { id: 'REC-22', studentName: 'HARSHIT PANDEY', rollNo: '2401031601283', timestamp: 'Sep 02, 2026, 10:38:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-471877' },
+    { id: 'REC-23', studentName: 'HARSHIT SHUKLA', rollNo: '2401031601107', timestamp: 'Sep 02, 2026, 10:37:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-472014' },
+    { id: 'REC-24', studentName: 'HEMANT KUMAR PANDEY', rollNo: '2401031601108', timestamp: 'Sep 02, 2026, 10:36:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-472151' },
+    { id: 'REC-25', studentName: 'HIMANSHU KUMAR', rollNo: '2401031601110', timestamp: 'Sep 02, 2026, 10:35:15 AM', distanceMeters: 73, status: 'ABSENT', hash: 'AUDIT-2026-REC-472288' },
+    { id: 'REC-26', studentName: 'HIMANSHU SRIVASTAVA', rollNo: '2401031601262', timestamp: 'Sep 02, 2026, 10:34:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-472425' },
+    { id: 'REC-27', studentName: 'INDRAJEET SAHANI', rollNo: '2401031601260', timestamp: 'Sep 02, 2026, 10:33:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-472562' },
+    { id: 'REC-28', studentName: 'ISHIKA GAUR', rollNo: '2401031601111', timestamp: 'Sep 02, 2026, 10:32:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-472699' },
+    { id: 'REC-29', studentName: 'ISHITA DIXIT', rollNo: '2401031601112', timestamp: 'Sep 02, 2026, 10:31:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-472836' },
+    { id: 'REC-30', studentName: 'ISHITA GUPTA', rollNo: '2401031601113', timestamp: 'Sep 02, 2026, 10:30:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-472973' },
+    { id: 'REC-31', studentName: 'ISHU AMAN', rollNo: '2401031601263', timestamp: 'Sep 02, 2026, 10:29:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-473110' },
+    { id: 'REC-32', studentName: 'JAVED HUSAIN', rollNo: '2401031601115', timestamp: 'Sep 02, 2026, 10:28:15 AM', distanceMeters: 62, status: 'ABSENT', hash: 'AUDIT-2026-REC-473247' },
+    { id: 'REC-33', studentName: 'JAY SHUKLA', rollNo: '2401031601116', timestamp: 'Sep 02, 2026, 10:27:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-473384' },
+    { id: 'REC-34', studentName: 'KARISHMA SINGH', rollNo: '2401031601119', timestamp: 'Sep 02, 2026, 10:26:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-473521' },
+    { id: 'REC-35', studentName: 'KASHIF ANSARI', rollNo: '2401031601120', timestamp: 'Sep 02, 2026, 10:25:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-473658' },
+    { id: 'REC-36', studentName: 'KASHISH CHAURASIA', rollNo: '2401031601121', timestamp: 'Sep 02, 2026, 10:24:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-473795' },
+    { id: 'REC-37', studentName: 'KAUSHAL KUMAR BHARTI', rollNo: '2401031601122', timestamp: 'Sep 02, 2026, 10:23:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-473932' },
+    { id: 'REC-38', studentName: 'KAVYANSHI SRIVASTAVA', rollNo: '2401031601123', timestamp: 'Sep 02, 2026, 10:22:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-474069' },
+    { id: 'REC-39', studentName: 'KHAN MOHD JUNED NOOR MOHAMMED', rollNo: '2401031601125', timestamp: 'Sep 02, 2026, 10:21:15 AM', distanceMeters: 81, status: 'ABSENT', hash: 'AUDIT-2026-REC-474206' },
+    { id: 'REC-40', studentName: 'KHUSHI KANNOUJIYA', rollNo: '2401031601127', timestamp: 'Sep 02, 2026, 10:20:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-474343' },
+    { id: 'REC-41', studentName: 'KOMAL SINGH', rollNo: '2401031601129', timestamp: 'Sep 02, 2026, 10:19:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-474480' },
+    { id: 'REC-42', studentName: 'KULDEEP MAURYA', rollNo: '2401031601130', timestamp: 'Sep 02, 2026, 10:18:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-474617' },
+    { id: 'REC-43', studentName: 'KUNAL PATEL', rollNo: '2401031601293', timestamp: 'Sep 02, 2026, 10:17:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-474754' },
+    { id: 'REC-44', studentName: 'MANDAVI SINGH', rollNo: '2401031601134', timestamp: 'Sep 02, 2026, 10:16:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-474891' },
+    { id: 'REC-45', studentName: 'MANEESH SINGH', rollNo: '2401031601135', timestamp: 'Sep 02, 2026, 10:15:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-475028' },
+    { id: 'REC-46', studentName: 'MANSI YADAV', rollNo: '2401031601138', timestamp: 'Sep 02, 2026, 10:14:15 AM', distanceMeters: 70, status: 'ABSENT', hash: 'AUDIT-2026-REC-475165' },
+    { id: 'REC-47', studentName: 'MEDHA PANDEY', rollNo: '2401031601139', timestamp: 'Sep 02, 2026, 10:13:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-475302' },
+    { id: 'REC-48', studentName: 'MOHAMMAD ABDULLA', rollNo: '2401031601140', timestamp: 'Sep 02, 2026, 10:12:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-475439' },
+    { id: 'REC-49', studentName: 'MOHAN SINGH', rollNo: '2401031601287', timestamp: 'Sep 02, 2026, 10:11:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-475576' },
+    { id: 'REC-50', studentName: 'MOHD TAUSIF KHAN', rollNo: '2401031601142', timestamp: 'Sep 02, 2026, 10:10:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-475713' },
+    { id: 'REC-51', studentName: 'MONU', rollNo: '2401031601144', timestamp: 'Sep 02, 2026, 10:09:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-475850' },
+    { id: 'REC-52', studentName: 'MUJAHID HUSAIN', rollNo: '2401031601145', timestamp: 'Sep 02, 2026, 10:08:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-475987' },
+    { id: 'REC-53', studentName: 'NANDINI KESHARWANI', rollNo: '2401031601147', timestamp: 'Sep 02, 2026, 10:07:15 AM', distanceMeters: 59, status: 'ABSENT', hash: 'AUDIT-2026-REC-476124' },
+    { id: 'REC-54', studentName: 'NILESH KUMAR SINGH', rollNo: '2401031601151', timestamp: 'Sep 02, 2026, 10:06:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-476261' },
+    { id: 'REC-55', studentName: 'NISHANT MISHRA', rollNo: '2401031601152', timestamp: 'Sep 02, 2026, 10:05:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-476398' },
+    { id: 'REC-56', studentName: 'NITESH KUMAR CHAUHAN', rollNo: '2401031601153', timestamp: 'Sep 02, 2026, 10:04:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-476535' },
+    { id: 'REC-57', studentName: 'NITIN RAJPOOT', rollNo: '2401031601288', timestamp: 'Sep 02, 2026, 10:03:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-476672' },
+    { id: 'REC-58', studentName: 'RAVI JAISWAL', rollNo: '2401031601176', timestamp: 'Sep 02, 2026, 10:02:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-476809' },
+    { id: 'REC-59', studentName: 'RITIK VERMA', rollNo: '2401031601182', timestamp: 'Sep 02, 2026, 10:01:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-476946' },
+    { id: 'REC-60', studentName: 'SHANTANU MISHRA', rollNo: '2401031601203', timestamp: 'Sep 02, 2026, 10:00:15 AM', distanceMeters: 78, status: 'ABSENT', hash: 'AUDIT-2026-REC-477083' },
+    { id: 'REC-61', studentName: 'SHIVANSHI TRIPATHI', rollNo: '2401031601214', timestamp: 'Sep 02, 2026, 10:00:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-477220' },
+    { id: 'REC-62', studentName: 'SHREESH MISHRA', rollNo: '2401031601216', timestamp: 'Sep 02, 2026, 10:00:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-477357' },
+    { id: 'REC-63', studentName: 'YASH SRIVASTAVA', rollNo: '2401031601316', timestamp: 'Sep 02, 2026, 10:00:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-477494' },
+    { id: 'REC-64', studentName: 'YASHIKA UPADHYAY', rollNo: '2401031601251', timestamp: 'Sep 02, 2026, 10:00:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-477631' },
+    { id: 'REC-65', studentName: 'Kuldeep Maurya', rollNo: '2401031601130', timestamp: 'Sep 02, 2026, 10:00:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-477768' }
   ];
 
   const exportComprehensiveReport = () => {
@@ -392,9 +440,9 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                     <th className="py-2 text-right">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-[11px]">
+                <tbody className="divide-y divide-slate-100 text-[11px] max-h-96 overflow-y-auto">
                   {data.students && data.students.length > 0 ? (
-                    data.students.slice(0, 10).map((s) => (
+                    data.students.map((s) => (
                       <tr key={s.id}>
                         <td className="py-2 font-bold text-slate-900">{s.name} <span className="text-[10px] text-blue-600 font-mono">({s.rollNo})</span></td>
                         <td className="py-2 text-slate-500">{s.section || 'Section B'}</td>
@@ -560,6 +608,29 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
             </div>
           </div>
 
+          {/* Equal Subject Selection Bar */}
+          <div className="p-4 bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-2xl shadow-md border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Sliders className="w-4 h-4 text-yellow-400" />
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-200">
+                Select Unified Class / Subject:
+              </span>
+            </div>
+            <select
+              value={selectedSubjectFilter}
+              onChange={(e) => setSelectedSubjectFilter(e.target.value)}
+              className="bg-slate-800 border-2 border-indigo-500/50 rounded-xl px-4 py-2 text-xs font-black text-yellow-300 shadow-inner focus:outline-none focus:border-indigo-400 transition-all"
+            >
+              <option value="bca501">BCA 501 - Computer Graphics</option>
+              <option value="bca502">BCA 502 - Cryptography and Network Security</option>
+              <option value="bca503">BCA 503 - Web Technology</option>
+              <option value="bca504">BCA 504 - Minor Project</option>
+              <option value="bca511">BCA 511 - Computer Graphics Lab</option>
+              <option value="bca512">BCA 512 - Web Technology Lab</option>
+              <option value="ace511">ACE 511 - Industrial Internship</option>
+            </select>
+          </div>
+
           {/* Master Audit Stream Table */}
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
@@ -583,8 +654,8 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                     <td className="py-3 px-3 font-mono text-[11px] text-slate-600">
                       {rec.rollNo}
                     </td>
-                    <td className="py-3 px-3 font-semibold text-slate-800">
-                      {rec.subject}
+                    <td className="py-3 px-3 font-extrabold text-blue-700 font-sans">
+                      {activeSelectedSubjectName}
                     </td>
                     <td className="py-3 px-3 text-slate-500 text-[11px]">
                       {rec.timestamp}

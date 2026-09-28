@@ -165,40 +165,87 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
 
   // Default demo records if globalAttendanceRecords is empty
   const attendanceList = globalAttendanceRecords.length > 0 ? globalAttendanceRecords : [
-    { id: 'att_demo_01', studentName: 'MANOJ SHARMA', rollNo: '2401031601137', timestamp: '10:19:46 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '97.5%' },
-    { id: 'att_demo_02', studentName: 'ANSH GUPTA', rollNo: '2401031601046', timestamp: '10:18:45 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '97.6%' },
-    { id: 'att_demo_03', studentName: 'AYUSH SRIVASTAVA', rollNo: '2401031601077', timestamp: '10:17:44 AM', distanceMeters: 69, status: 'ABSENT', livenessScore: 'Geofence Exceeded (69m)' },
-    { id: 'att_demo_04', studentName: 'AYUSHI GUPTA', rollNo: '2401031601079', timestamp: '10:16:43 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '97.8%' },
-    { id: 'att_demo_05', studentName: 'BADRINATH GUPTA', rollNo: '2401031601080', timestamp: '10:15:42 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '97.9%' },
-    { id: 'att_demo_06', studentName: 'BHAVISHYA PRATAP SINGH', rollNo: '2401031601081', timestamp: '10:14:41 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '98.0%' },
-    { id: 'att_demo_07', studentName: 'CHAMAN', rollNo: '2401031601082', timestamp: '10:13:40 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '98.1%' },
-    { id: 'att_demo_08', studentName: 'CHANDRA PRAKASH SAH', rollNo: '2401031601083', timestamp: '10:12:39 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '98.2%' },
-    { id: 'att_demo_09', studentName: 'CHANDRANSH SINGH', rollNo: '2401031601085', timestamp: '10:11:38 AM', distanceMeters: 81, status: 'ABSENT', livenessScore: 'Geofence Exceeded (81m)' },
-    { id: 'att_demo_10', studentName: 'DARKHSHA KHATOON', rollNo: '2401031601086', timestamp: '10:10:37 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '98.4%' },
-    { id: 'att_demo_11', studentName: 'DEEPAK', rollNo: '2401031601087', timestamp: '10:09:36 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '98.5%' },
-    { id: 'att_demo_12', studentName: 'DHAIRYA DIXIT', rollNo: '2401031601091', timestamp: '10:08:35 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '98.6%' },
-    { id: 'att_demo_13', studentName: 'DIVANCI SAXENA', rollNo: '2401031601264', timestamp: '10:07:34 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '98.7%' },
-    { id: 'att_demo_14', studentName: 'DIVYANSH SRIVASTAVA', rollNo: '2401031601094', timestamp: '10:06:33 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '98.8%' },
-    { id: 'att_demo_15', studentName: 'DIVYANSHU PATEL', rollNo: '2401031601095', timestamp: '10:05:32 AM', distanceMeters: 63, status: 'ABSENT', livenessScore: 'Geofence Exceeded (63m)' },
-    { id: 'att_demo_16', studentName: 'EKANSHI SHARAN SRIVASTAVA', rollNo: '2401031601098', timestamp: '10:04:31 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '99.0%' },
-    { id: 'att_demo_17', studentName: 'EKATA', rollNo: '2401031601099', timestamp: '10:03:30 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '99.1%' },
-    { id: 'att_demo_18', studentName: 'GARIMA SINGH', rollNo: '2401031601101', timestamp: '10:02:29 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '99.2%' },
-    { id: 'att_demo_19', studentName: 'GAURAV RAWAT', rollNo: '2401031601102', timestamp: '10:01:28 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '99.3%' },
-    { id: 'att_demo_20', studentName: 'GAURAV SHARMA', rollNo: '2401031601103', timestamp: '10:19:27 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '99.4%' },
-    { id: 'att_demo_21', studentName: 'HARSH TRIVEDI', rollNo: '2401031601105', timestamp: '10:18:26 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '99.5%' },
-    { id: 'att_demo_22', studentName: 'HARSHIT PANDEY', rollNo: '2401031601283', timestamp: '10:17:25 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '99.6%' },
-    { id: 'att_demo_23', studentName: 'HARSHIT SHUKLA', rollNo: '2401031601107', timestamp: '10:16:24 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '99.7%' },
-    { id: 'att_demo_24', studentName: 'HEMANT KUMAR PANDEY', rollNo: '2401031601108', timestamp: '10:15:23 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '99.8%' },
-    { id: 'att_demo_25', studentName: 'HIMANSHU KUMAR', rollNo: '2401031601110', timestamp: '10:14:22 AM', distanceMeters: 73, status: 'ABSENT', livenessScore: 'Geofence Exceeded (73m)' },
-    { id: 'att_demo_26', studentName: 'HIMANSHU SRIVASTAVA', rollNo: '2401031601262', timestamp: '10:13:21 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '97.6%' },
-    { id: 'att_demo_27', studentName: 'INDRAJEET SAHANI', rollNo: '2401031601260', timestamp: '10:12:20 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '97.7%' },
-    { id: 'att_demo_28', studentName: 'ISHIKA GAUR', rollNo: '2401031601111', timestamp: '10:11:19 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '97.8%' },
-    { id: 'att_demo_29', studentName: 'ISHITA DIXIT', rollNo: '2401031601112', timestamp: '10:10:18 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '97.9%' },
-    { id: 'att_demo_30', studentName: 'ISHITA GUPTA', rollNo: '2401031601113', timestamp: '10:09:17 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '98.0%' }
+    { id: 'att_demo_01', studentName: 'MANOJ SHARMA', rollNo: '2401031601137', timestamp: '10:59:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '97.5%' },
+    { id: 'att_demo_02', studentName: 'ANSH GUPTA', rollNo: '2401031601046', timestamp: '10:58:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '97.6%' },
+    { id: 'att_demo_03', studentName: 'AYUSH SRIVASTAVA', rollNo: '2401031601077', timestamp: '10:57:15 AM', distanceMeters: 69, status: 'ABSENT', livenessScore: 'Geofence Exceeded (69m)' },
+    { id: 'att_demo_04', studentName: 'AYUSHI GUPTA', rollNo: '2401031601079', timestamp: '10:56:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '97.8%' },
+    { id: 'att_demo_05', studentName: 'BADRINATH GUPTA', rollNo: '2401031601080', timestamp: '10:55:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '97.9%' },
+    { id: 'att_demo_06', studentName: 'BHAVISHYA PRATAP SINGH', rollNo: '2401031601081', timestamp: '10:54:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '98.0%' },
+    { id: 'att_demo_07', studentName: 'CHAMAN', rollNo: '2401031601082', timestamp: '10:53:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '98.1%' },
+    { id: 'att_demo_08', studentName: 'CHANDRA PRAKASH SAH', rollNo: '2401031601083', timestamp: '10:52:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '98.2%' },
+    { id: 'att_demo_09', studentName: 'CHANDRANSH SINGH', rollNo: '2401031601085', timestamp: '10:51:15 AM', distanceMeters: 81, status: 'ABSENT', livenessScore: 'Geofence Exceeded (81m)' },
+    { id: 'att_demo_10', studentName: 'DARKHSHA KHATOON', rollNo: '2401031601086', timestamp: '10:50:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '98.4%' },
+    { id: 'att_demo_11', studentName: 'DEEPAK', rollNo: '2401031601087', timestamp: '10:49:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '98.5%' },
+    { id: 'att_demo_12', studentName: 'DHAIRYA DIXIT', rollNo: '2401031601091', timestamp: '10:48:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '98.6%' },
+    { id: 'att_demo_13', studentName: 'DIVANCI SAXENA', rollNo: '2401031601264', timestamp: '10:47:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '98.7%' },
+    { id: 'att_demo_14', studentName: 'DIVYANSH SRIVASTAVA', rollNo: '2401031601094', timestamp: '10:46:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '98.8%' },
+    { id: 'att_demo_15', studentName: 'DIVYANSHU PATEL', rollNo: '2401031601095', timestamp: '10:45:15 AM', distanceMeters: 63, status: 'ABSENT', livenessScore: 'Geofence Exceeded (63m)' },
+    { id: 'att_demo_16', studentName: 'EKANSHI SHARAN SRIVASTAVA', rollNo: '2401031601098', timestamp: '10:44:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '99.0%' },
+    { id: 'att_demo_17', studentName: 'EKATA', rollNo: '2401031601099', timestamp: '10:43:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '99.1%' },
+    { id: 'att_demo_18', studentName: 'GARIMA SINGH', rollNo: '2401031601101', timestamp: '10:42:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '99.2%' },
+    { id: 'att_demo_19', studentName: 'GAURAV RAWAT', rollNo: '2401031601102', timestamp: '10:41:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '99.3%' },
+    { id: 'att_demo_20', studentName: 'GAURAV SHARMA', rollNo: '2401031601103', timestamp: '10:40:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '99.4%' },
+    { id: 'att_demo_21', studentName: 'HARSH TRIVEDI', rollNo: '2401031601105', timestamp: '10:39:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '99.5%' },
+    { id: 'att_demo_22', studentName: 'HARSHIT PANDEY', rollNo: '2401031601283', timestamp: '10:38:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '99.6%' },
+    { id: 'att_demo_23', studentName: 'HARSHIT SHUKLA', rollNo: '2401031601107', timestamp: '10:37:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '99.7%' },
+    { id: 'att_demo_24', studentName: 'HEMANT KUMAR PANDEY', rollNo: '2401031601108', timestamp: '10:36:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '99.8%' },
+    { id: 'att_demo_25', studentName: 'HIMANSHU KUMAR', rollNo: '2401031601110', timestamp: '10:35:15 AM', distanceMeters: 73, status: 'ABSENT', livenessScore: 'Geofence Exceeded (73m)' },
+    { id: 'att_demo_26', studentName: 'HIMANSHU SRIVASTAVA', rollNo: '2401031601262', timestamp: '10:34:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '97.6%' },
+    { id: 'att_demo_27', studentName: 'INDRAJEET SAHANI', rollNo: '2401031601260', timestamp: '10:33:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '97.7%' },
+    { id: 'att_demo_28', studentName: 'ISHIKA GAUR', rollNo: '2401031601111', timestamp: '10:32:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '97.8%' },
+    { id: 'att_demo_29', studentName: 'ISHITA DIXIT', rollNo: '2401031601112', timestamp: '10:31:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '97.9%' },
+    { id: 'att_demo_30', studentName: 'ISHITA GUPTA', rollNo: '2401031601113', timestamp: '10:30:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '98.0%' },
+    { id: 'att_demo_31', studentName: 'ISHU AMAN', rollNo: '2401031601263', timestamp: '10:29:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '98.1%' },
+    { id: 'att_demo_32', studentName: 'JAVED HUSAIN', rollNo: '2401031601115', timestamp: '10:28:15 AM', distanceMeters: 62, status: 'ABSENT', livenessScore: 'Geofence Exceeded (62m)' },
+    { id: 'att_demo_33', studentName: 'JAY SHUKLA', rollNo: '2401031601116', timestamp: '10:27:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '98.3%' },
+    { id: 'att_demo_34', studentName: 'KARISHMA SINGH', rollNo: '2401031601119', timestamp: '10:26:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '98.4%' },
+    { id: 'att_demo_35', studentName: 'KASHIF ANSARI', rollNo: '2401031601120', timestamp: '10:25:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '98.5%' },
+    { id: 'att_demo_36', studentName: 'KASHISH CHAURASIA', rollNo: '2401031601121', timestamp: '10:24:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '98.6%' },
+    { id: 'att_demo_37', studentName: 'KAUSHAL KUMAR BHARTI', rollNo: '2401031601122', timestamp: '10:23:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '98.7%' },
+    { id: 'att_demo_38', studentName: 'KAVYANSHI SRIVASTAVA', rollNo: '2401031601123', timestamp: '10:22:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '98.8%' },
+    { id: 'att_demo_39', studentName: 'KHAN MOHD JUNED NOOR MOHAMMED', rollNo: '2401031601125', timestamp: '10:21:15 AM', distanceMeters: 81, status: 'ABSENT', livenessScore: 'Geofence Exceeded (81m)' },
+    { id: 'att_demo_40', studentName: 'KHUSHI KANNOUJIYA', rollNo: '2401031601127', timestamp: '10:20:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '99.0%' },
+    { id: 'att_demo_41', studentName: 'KOMAL SINGH', rollNo: '2401031601129', timestamp: '10:19:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '99.1%' },
+    { id: 'att_demo_42', studentName: 'KULDEEP MAURYA', rollNo: '2401031601130', timestamp: '10:18:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '99.2%' },
+    { id: 'att_demo_43', studentName: 'KUNAL PATEL', rollNo: '2401031601293', timestamp: '10:17:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '99.3%' },
+    { id: 'att_demo_44', studentName: 'MANDAVI SINGH', rollNo: '2401031601134', timestamp: '10:16:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '99.4%' },
+    { id: 'att_demo_45', studentName: 'MANEESH SINGH', rollNo: '2401031601135', timestamp: '10:15:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '99.5%' },
+    { id: 'att_demo_46', studentName: 'MANSI YADAV', rollNo: '2401031601138', timestamp: '10:14:15 AM', distanceMeters: 70, status: 'ABSENT', livenessScore: 'Geofence Exceeded (70m)' },
+    { id: 'att_demo_47', studentName: 'MEDHA PANDEY', rollNo: '2401031601139', timestamp: '10:13:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '99.7%' },
+    { id: 'att_demo_48', studentName: 'MOHAMMAD ABDULLA', rollNo: '2401031601140', timestamp: '10:12:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '99.8%' },
+    { id: 'att_demo_49', studentName: 'MOHAN SINGH', rollNo: '2401031601287', timestamp: '10:11:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '97.5%' },
+    { id: 'att_demo_50', studentName: 'MOHD TAUSIF KHAN', rollNo: '2401031601142', timestamp: '10:10:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '97.6%' },
+    { id: 'att_demo_51', studentName: 'MONU', rollNo: '2401031601144', timestamp: '10:09:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '97.7%' },
+    { id: 'att_demo_52', studentName: 'MUJAHID HUSAIN', rollNo: '2401031601145', timestamp: '10:08:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '97.8%' },
+    { id: 'att_demo_53', studentName: 'NANDINI KESHARWANI', rollNo: '2401031601147', timestamp: '10:07:15 AM', distanceMeters: 59, status: 'ABSENT', livenessScore: 'Geofence Exceeded (59m)' },
+    { id: 'att_demo_54', studentName: 'NILESH KUMAR SINGH', rollNo: '2401031601151', timestamp: '10:06:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '98.0%' },
+    { id: 'att_demo_55', studentName: 'NISHANT MISHRA', rollNo: '2401031601152', timestamp: '10:05:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '98.1%' },
+    { id: 'att_demo_56', studentName: 'NITESH KUMAR CHAUHAN', rollNo: '2401031601153', timestamp: '10:04:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '98.2%' },
+    { id: 'att_demo_57', studentName: 'NITIN RAJPOOT', rollNo: '2401031601288', timestamp: '10:03:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '98.3%' },
+    { id: 'att_demo_58', studentName: 'RAVI JAISWAL', rollNo: '2401031601176', timestamp: '10:02:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '98.4%' },
+    { id: 'att_demo_59', studentName: 'RITIK VERMA', rollNo: '2401031601182', timestamp: '10:01:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '98.5%' },
+    { id: 'att_demo_60', studentName: 'SHANTANU MISHRA', rollNo: '2401031601203', timestamp: '10:00:15 AM', distanceMeters: 78, status: 'ABSENT', livenessScore: 'Geofence Exceeded (78m)' },
+    { id: 'att_demo_61', studentName: 'SHIVANSHI TRIPATHI', rollNo: '2401031601214', timestamp: '10:00:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '98.7%' },
+    { id: 'att_demo_62', studentName: 'SHREESH MISHRA', rollNo: '2401031601216', timestamp: '10:00:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '98.8%' },
+    { id: 'att_demo_63', studentName: 'YASH SRIVASTAVA', rollNo: '2401031601316', timestamp: '10:00:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '98.9%' },
+    { id: 'att_demo_64', studentName: 'YASHIKA UPADHYAY', rollNo: '2401031601251', timestamp: '10:00:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '99.0%' },
+    { id: 'att_demo_65', studentName: 'Kuldeep Maurya', rollNo: '2401031601130', timestamp: '10:00:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '99.1%' }
   ];
 
+  
+  const classNameMap = {
+    bca501: 'Computer Graphics (BCA501)',
+    bca502: 'Cryptography & Network Security (BCA502)',
+    bca503: 'Web Technology (BCA503)',
+    bca504: 'Minor Project (BCA504)',
+    bca511: 'Computer Graphics Lab (BCA511)',
+    bca512: 'Web Technology Lab (BCA512)',
+    ace511: 'Industrial Internship (ACE511)'
+  };
+  const activeSelectedSubjectName = classNameMap[selectedClassId] || 'Computer Graphics (BCA501)';
+
   const presentCount = attendanceList.filter(r => r.status === 'PRESENT').length;
-  const totalEnrolled = 30;
+  const totalEnrolled = 65;
   const attendancePercentage = Math.round((presentCount / totalEnrolled) * 100);
 
   const handleSendSms = () => {
@@ -440,7 +487,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
                         <span className="text-[10px] text-slate-500 font-mono font-normal">({rec.rollNo})</span>
                       </p>
                       <p className="text-[10px] text-slate-500 font-medium mt-0.5">
-                        {rec.timestamp} • {rec.distanceMeters || 14}m away
+                        <strong className="text-blue-600 font-sans">{activeSelectedSubjectName}</strong> • {rec.timestamp} • {rec.distanceMeters || 14}m away
                       </p>
                     </div>
 
