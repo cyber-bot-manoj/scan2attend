@@ -127,7 +127,7 @@ export default function App() {
   }, [user]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#EAEFF5] relative overflow-hidden bg-watermark-pattern">
+    <div className="min-h-screen flex flex-col bg-[#DCE2E9] relative overflow-hidden bg-watermark-pattern">
       {/* 3D Modern Top Navbar */}
       <Navbar 
         user={user} 
