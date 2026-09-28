@@ -17,7 +17,7 @@ import {
   Sliders
 } from 'lucide-react';
 
-export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
+export default function Navbar({ user, setUser, activeTab, setActiveTab, globalAttendanceRecords = [] }) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -27,6 +27,31 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
   const [geofenceRadius, setGeofenceRadius] = useState(50);
   const [livenessMode, setLivenessMode] = useState('STRICT');
   const [savedSuccess, setSavedSuccess] = useState(false);
+  // Global Search State & Results Engine
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [selectedResultModal, setSelectedResultModal] = useState(null);
+
+  const studentMasterList = [
+    { name: 'ANSH GUPTA', rollNo: '2401031601046', mobile: '8957495178', email: 'anshguptakld345@gmail.com', status: 'PRESENT' },
+    { name: 'AYUSH SRIVASTAVA', rollNo: '2401031601077', mobile: '9129600235', email: 'ayushsrivastava9918@gmail.com', status: 'ABSENT' },
+    { name: 'AYUSHI GUPTA', rollNo: '2401031601079', mobile: '9044202225', email: 'ashiigupta9044@gmail.com', status: 'PRESENT' },
+    { name: 'BADRINATH GUPTA', rollNo: '2401031601080', mobile: '7275886499', email: 'badrinathgupta179@gmail.com', status: 'PRESENT' },
+    { name: 'BHAVISHYA PRATAP SINGH', rollNo: '2401031601081', mobile: '9580266148', email: 'yashsinghdevil11@gmail.com', status: 'PRESENT' },
+    { name: 'CHAMAN', rollNo: '2401031601082', mobile: '8318260068', email: 'chamanbhargaw@gmail.com', status: 'PRESENT' },
+    { name: 'CHANDRA PRAKASH SAH', rollNo: '2401031601083', mobile: '9462408316', email: 'chandrasah88@gmail.com', status: 'PRESENT' },
+    { name: 'CHANDRANSH SINGH', rollNo: '2401031601085', mobile: '8400648286', email: 'chandranshsinghchauhan@gmail.com', status: 'ABSENT' },
+    { name: 'DARKHSHA KHATOON', rollNo: '2401031601086', mobile: '9125780518', email: 'mnafees9935@gmail.com', status: 'PRESENT' },
+    { name: 'DEEPAK', rollNo: '2401031601087', mobile: '9580625265', email: 'kumar088966@gmail.com', status: 'PRESENT' },
+    { name: 'MANOJ SHARMA', rollNo: '2401031601137', mobile: '8840034446', email: 'ssindia10677@gmail.com', status: 'PRESENT' }
+  ];
+
+  const searchResults = searchQuery.trim() === '' ? [] : studentMasterList.filter(s => 
+    s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    s.rollNo.includes(searchQuery) ||
+    s.mobile.includes(searchQuery)
+  );
+
 
   const handleSaveSettings = () => {
     setSavedSuccess(true);
@@ -116,7 +141,55 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
                     </button>
                   )}
                 </nav>
-              </>
+          
+      {/* Search Result Detail Modal */}
+      {selectedResultModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-[99999]">
+          <div className="bg-white text-slate-900 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200 animate-scaleUp">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-blue-600" />
+                <h3 className="text-base font-black text-slate-900">Student Profile & Verification</h3>
+              </div>
+              <button
+                onClick={() => setSelectedResultModal(null)}
+                className="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-base font-black text-slate-900">{selectedResultModal.name}</h4>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
+                    selectedResultModal.status === 'PRESENT' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-red-100 text-red-800 border-red-300'
+                  }`}>
+                    {selectedResultModal.status}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 font-medium pt-2 border-t border-slate-200">
+                  <div>Roll No: <strong className="text-slate-900 block font-mono">{selectedResultModal.rollNo}</strong></div>
+                  <div>Mobile: <strong className="text-slate-900 block font-mono">{selectedResultModal.mobile}</strong></div>
+                  <div className="col-span-2">Email: <strong className="text-slate-900 block font-mono">{selectedResultModal.email}</strong></div>
+                  <div className="col-span-2">Course: <strong className="text-slate-900 block">B.C.A • Semester V-B • Room B-302</strong></div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setSelectedResultModal(null)}
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md"
+            >
+              Close Record View
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+
             ) : (
               null
             )}
@@ -126,14 +199,118 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
               {user && activeTab !== 'LOGIN' ? (
                 <>
 
-                  {/* Search Bar */}
+                  {/* Interactive Search Bar */}
                   <div className="relative hidden lg:block">
-                    <Search className="w-4 h-4 text-[#757575] absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      placeholder="Search classes, roll no..."
-                      className="w-48 pl-9 pr-3 py-1.5 bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl text-xs text-[#212121] focus:outline-none focus:border-[#2979FF] focus:bg-white transition-all font-medium"
-                    />
+                    <div className="relative">
+                      <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                      <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => {
+                          setSearchQuery(e.target.value);
+                          setShowSearchResults(true);
+                        }}
+                        onFocus={() => setShowSearchResults(true)}
+                        placeholder="Search student, roll no, mobile..."
+                        className="w-56 pl-9 pr-3 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all font-medium"
+                      />
+                      {searchQuery && (
+                        <button
+                          onClick={() => { setSearchQuery(''); setShowSearchResults(false); }}
+                          className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Live Search Results Dropdown */}
+                    {showSearchResults && searchQuery.trim() !== '' && (
+                      <>
+                        <div className="fixed inset-0 z-40" onClick={() => setShowSearchResults(false)} />
+                        <div className="absolute right-0 top-10 w-72 bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-50 text-xs animate-fadeIn max-h-72 overflow-y-auto">
+                          <div className="px-3 py-1.5 border-b border-slate-100 flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase">
+                            <span>Search Results ({searchResults.length})</span>
+                            <span>BCA V-B</span>
+                          </div>
+
+                          {searchResults.length > 0 ? (
+                            searchResults.map((st, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => {
+                                  setSelectedResultModal(st);
+                                  setShowSearchResults(false);
+                                }}
+                                className="w-full text-left px-3 py-2 hover:bg-slate-50 transition-colors flex items-center justify-between border-b border-slate-50 last:border-b-0"
+                              >
+                                <div>
+                                  <p className="font-extrabold text-slate-900 leading-tight">{st.name}</p>
+                                  <p className="text-[10px] text-slate-500 font-mono">Roll: {st.rollNo} • {st.mobile}</p>
+                                </div>
+                                <span className={`px-2 py-0.5 rounded-full text-[9px] font-black border ${
+                                  st.status === 'PRESENT' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'
+                                }`}>
+                                  {st.status}
+                                </span>
+                              </button>
+                            ))
+                          ) : (
+                            <div className="p-3 text-center text-xs text-slate-400 font-medium">
+                              No student matching "{searchQuery}"
+                            </div>
+                          )}
+                        </div>
+                  
+      {/* Search Result Detail Modal */}
+      {selectedResultModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-[99999]">
+          <div className="bg-white text-slate-900 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200 animate-scaleUp">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-blue-600" />
+                <h3 className="text-base font-black text-slate-900">Student Profile & Verification</h3>
+              </div>
+              <button
+                onClick={() => setSelectedResultModal(null)}
+                className="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-base font-black text-slate-900">{selectedResultModal.name}</h4>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
+                    selectedResultModal.status === 'PRESENT' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-red-100 text-red-800 border-red-300'
+                  }`}>
+                    {selectedResultModal.status}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 font-medium pt-2 border-t border-slate-200">
+                  <div>Roll No: <strong className="text-slate-900 block font-mono">{selectedResultModal.rollNo}</strong></div>
+                  <div>Mobile: <strong className="text-slate-900 block font-mono">{selectedResultModal.mobile}</strong></div>
+                  <div className="col-span-2">Email: <strong className="text-slate-900 block font-mono">{selectedResultModal.email}</strong></div>
+                  <div className="col-span-2">Course: <strong className="text-slate-900 block">B.C.A • Semester V-B • Room B-302</strong></div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setSelectedResultModal(null)}
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md"
+            >
+              Close Record View
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+
+                    )}
                   </div>
 
                   {/* Settings Gear Icon */}
@@ -222,10 +399,106 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
                             </button>
                           </div>
                         </div>
-                      </>
+                  
+      {/* Search Result Detail Modal */}
+      {selectedResultModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-[99999]">
+          <div className="bg-white text-slate-900 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200 animate-scaleUp">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-blue-600" />
+                <h3 className="text-base font-black text-slate-900">Student Profile & Verification</h3>
+              </div>
+              <button
+                onClick={() => setSelectedResultModal(null)}
+                className="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-base font-black text-slate-900">{selectedResultModal.name}</h4>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
+                    selectedResultModal.status === 'PRESENT' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-red-100 text-red-800 border-red-300'
+                  }`}>
+                    {selectedResultModal.status}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 font-medium pt-2 border-t border-slate-200">
+                  <div>Roll No: <strong className="text-slate-900 block font-mono">{selectedResultModal.rollNo}</strong></div>
+                  <div>Mobile: <strong className="text-slate-900 block font-mono">{selectedResultModal.mobile}</strong></div>
+                  <div className="col-span-2">Email: <strong className="text-slate-900 block font-mono">{selectedResultModal.email}</strong></div>
+                  <div className="col-span-2">Course: <strong className="text-slate-900 block">B.C.A • Semester V-B • Room B-302</strong></div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setSelectedResultModal(null)}
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md"
+            >
+              Close Record View
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+
                     )}
                   </div>
-                </>
+            
+      {/* Search Result Detail Modal */}
+      {selectedResultModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-[99999]">
+          <div className="bg-white text-slate-900 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200 animate-scaleUp">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-blue-600" />
+                <h3 className="text-base font-black text-slate-900">Student Profile & Verification</h3>
+              </div>
+              <button
+                onClick={() => setSelectedResultModal(null)}
+                className="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-base font-black text-slate-900">{selectedResultModal.name}</h4>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
+                    selectedResultModal.status === 'PRESENT' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-red-100 text-red-800 border-red-300'
+                  }`}>
+                    {selectedResultModal.status}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 font-medium pt-2 border-t border-slate-200">
+                  <div>Roll No: <strong className="text-slate-900 block font-mono">{selectedResultModal.rollNo}</strong></div>
+                  <div>Mobile: <strong className="text-slate-900 block font-mono">{selectedResultModal.mobile}</strong></div>
+                  <div className="col-span-2">Email: <strong className="text-slate-900 block font-mono">{selectedResultModal.email}</strong></div>
+                  <div className="col-span-2">Course: <strong className="text-slate-900 block">B.C.A • Semester V-B • Room B-302</strong></div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setSelectedResultModal(null)}
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md"
+            >
+              Close Record View
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+
               ) : (
                 <button
                   onClick={() => setActiveTab('LOGIN')}
@@ -379,6 +652,54 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
           </div>
         </div>
       )}
+
+      {/* Search Result Detail Modal */}
+      {selectedResultModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-[99999]">
+          <div className="bg-white text-slate-900 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-slate-200 animate-scaleUp">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-blue-600" />
+                <h3 className="text-base font-black text-slate-900">Student Profile & Verification</h3>
+              </div>
+              <button
+                onClick={() => setSelectedResultModal(null)}
+                className="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-base font-black text-slate-900">{selectedResultModal.name}</h4>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
+                    selectedResultModal.status === 'PRESENT' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-red-100 text-red-800 border-red-300'
+                  }`}>
+                    {selectedResultModal.status}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 font-medium pt-2 border-t border-slate-200">
+                  <div>Roll No: <strong className="text-slate-900 block font-mono">{selectedResultModal.rollNo}</strong></div>
+                  <div>Mobile: <strong className="text-slate-900 block font-mono">{selectedResultModal.mobile}</strong></div>
+                  <div className="col-span-2">Email: <strong className="text-slate-900 block font-mono">{selectedResultModal.email}</strong></div>
+                  <div className="col-span-2">Course: <strong className="text-slate-900 block">B.C.A • Semester V-B • Room B-302</strong></div>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setSelectedResultModal(null)}
+              className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs shadow-md"
+            >
+              Close Record View
+            </button>
+          </div>
+        </div>
+      )}
     </>
+
   );
 }

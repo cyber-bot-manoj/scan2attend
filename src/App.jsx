@@ -134,6 +134,7 @@ export default function App() {
         setUser={setUser} 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
+        globalAttendanceRecords={globalAttendanceRecords}
       />
 
       {/* Main Content View Container */}
