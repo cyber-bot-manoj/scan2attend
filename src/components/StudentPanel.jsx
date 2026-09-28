@@ -716,7 +716,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
                 isWithinGeofence ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'
               }`}>
-                {isWithinGeofence ? 'INSIDE GEOFENCE 🟢' : 'OUTSIDE RANGE 🔴'}
+                {isWithinGeofence ? 'In Range' : 'Out of Range'}
               </span>
             </div>
 

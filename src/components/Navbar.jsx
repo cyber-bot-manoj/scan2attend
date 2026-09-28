@@ -125,11 +125,6 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
             <div className="flex items-center gap-3">
               {user && activeTab !== 'LOGIN' ? (
                 <>
-                  {/* System Status Pill */}
-                  <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200/80 text-[11px] font-bold text-emerald-700">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    <span>System Online • 24ms</span>
-                  </div>
 
                   {/* Search Bar */}
                   <div className="relative hidden lg:block">

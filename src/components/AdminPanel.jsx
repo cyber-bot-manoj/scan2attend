@@ -172,11 +172,6 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
 
             {/* Admin Metric Chips Bar */}
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
-              <div className="px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs font-semibold text-slate-200 flex items-center gap-1.5 shadow-sm">
-                <Server className="w-3.5 h-3.5 text-emerald-400" />
-                <span>System Uptime: <strong className="text-emerald-400 font-mono">99.9%</strong></span>
-              </div>
-
               <div className="px-3.5 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs font-semibold text-slate-200 flex items-center gap-1.5 shadow-sm">
                 <Users className="w-3.5 h-3.5 text-blue-400" />
                 <span>Total Students: <strong className="text-white">2,450</strong></span>
