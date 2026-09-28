@@ -1237,22 +1237,11 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
         <div className="card-3d p-5 space-y-3 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
           <div className="space-y-2.5">
             
-            {/* Card Header & Semester Attendance Stat */}
+            {/* Card Header */}
             <div className="flex justify-between items-center">
-              <div>
-                <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                  <FileText className="w-4 h-4 text-emerald-600" /> Attendance History
-                </span>
-                <span className="text-[10px] text-slate-400 font-medium block">
-                  w.e.f. 27 July 2026 (Semester V-B)
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 shadow-2xs font-mono block">
-                  95.8% Attendance
-                </span>
-                <span className="text-[9px] text-slate-400 font-bold block">46/48 Conducted</span>
-              </div>
+              <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <FileText className="w-4 h-4 text-emerald-600" /> Attendance History
+              </span>
             </div>
 
             {/* Subject Quick Filter Pills */}
