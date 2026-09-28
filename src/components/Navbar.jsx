@@ -189,7 +189,7 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
 
                   {/* Interactive Search Bar (Hidden on Student Dashboard) */}
                   {activeTab !== 'STUDENT' && (
-                    <div className="relative hidden lg:block">
+                    <div className="relative block">
                     <div className="relative">
                       <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                       <input
@@ -200,8 +200,8 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
                           setShowSearchResults(true);
                         }}
                         onFocus={() => setShowSearchResults(true)}
-                        placeholder="Search student, roll no, mobile..."
-                        className="w-56 pl-9 pr-3 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all font-medium"
+                        placeholder="Search student..."
+                        className="w-28 sm:w-48 lg:w-56 pl-8 sm:pl-9 pr-3 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-blue-500 focus:bg-white transition-all font-medium"
                       />
                       {searchQuery && (
                         <button
@@ -217,7 +217,7 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
                     {showSearchResults && searchQuery.trim() !== '' && (
                       <>
                         <div className="fixed inset-0 z-40" onClick={() => setShowSearchResults(false)} />
-                        <div className="absolute right-0 top-10 w-72 bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-50 text-xs animate-fadeIn max-h-72 overflow-y-auto">
+                        <div className="absolute right-0 top-10 w-72 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-slate-200 py-2 z-50 text-xs animate-fadeIn max-h-72 overflow-y-auto">
                           <div className="px-3 py-1.5 border-b border-slate-100 flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase">
                             <span>Search Results ({searchResults.length})</span>
                             <span>BCA V-B</span>
