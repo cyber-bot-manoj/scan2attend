@@ -1102,103 +1102,94 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           </button>
         </div>
 
-        {/* CARD 3: CLASS LIVE TIMETABLE (OFFICIAL MUIT BCA V-B ROOM B-302) */}
-        <div className="card-3d p-6 space-y-4 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
-          <div className="space-y-3">
+        {/* CARD 3: CLASS LIVE TIMETABLE (COMPACT BALANCED LAYOUT) */}
+        <div className="card-3d p-5 space-y-3 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
+          <div className="space-y-2.5">
+            
+            {/* Header */}
             <div className="flex justify-between items-center">
               <div>
                 <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                   <Calendar className="w-4 h-4 text-purple-600" /> Class Live Timetable
                 </span>
-                <span className="text-[10px] text-slate-400 font-medium block">
-                  BCA V-B • Room B-302 • MSOET MUIT
-                </span>
               </div>
-              <span className="text-[10px] font-mono font-bold bg-purple-100 text-purple-800 px-2.5 py-0.5 rounded-full border border-purple-200 shadow-2xs">
+              <span className="text-[10px] font-mono font-bold bg-purple-100 text-purple-800 px-2 py-0.5 rounded-md border border-purple-200">
                 Today: {todayDayName}
               </span>
             </div>
 
-            {/* Day Selector Navigation Bar */}
-            <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b border-slate-200 text-[10px] font-bold">
-              {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
-                <button
-                  key={day}
-                  onClick={() => setSelectedDay(day)}
-                  className={`px-2.5 py-1 rounded-lg transition-all shrink-0 flex items-center gap-1 ${
-                    selectedDay === day
-                      ? 'bg-purple-600 text-white shadow-xs font-black'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
-                >
-                  {day.slice(0, 3)}
-                  {day === todayDayName && (
-                    <span className={`w-1.5 h-1.5 rounded-full ${selectedDay === day ? 'bg-yellow-300' : 'bg-purple-600'}`}></span>
-                  )}
-                </button>
-              ))}
-            </div>
-
-            {/* Live Clock Bar */}
-            <div className="flex items-center justify-between bg-slate-100/90 p-2 rounded-xl border border-slate-200/80 text-[11px] font-mono">
-              <span className="text-slate-600 font-semibold flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-blue-600 animate-spin" style={{ animationDuration: '6s' }} /> Live System Clock:
-              </span>
-              <span className="font-black text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-300 shadow-2xs">
-                {liveNow.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            {/* Day Selector & Clock Strip */}
+            <div className="flex items-center justify-between gap-1.5 border-b border-slate-200 pb-2">
+              <div className="flex items-center gap-1 overflow-x-auto text-[10px] font-bold pr-1">
+                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
+                  <button
+                    key={day}
+                    onClick={() => setSelectedDay(day)}
+                    className={`px-2 py-0.5 rounded-md transition-all shrink-0 ${
+                      selectedDay === day
+                        ? 'bg-purple-600 text-white font-black shadow-xs'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    {day.slice(0, 3)}
+                  </button>
+                ))}
+              </div>
+              <span className="text-[10px] font-mono font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 shrink-0">
+                ⏱️ {liveNow.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
               </span>
             </div>
 
-            {/* Timetable List for Selected Day */}
-            <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
+            {/* Timetable Scroll List (Compact Height) */}
+            <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
               {processedTimetable.length > 0 ? (
                 processedTimetable.map(item => (
-                  <div key={item.id} className={`p-2.5 rounded-xl border flex items-center justify-between text-xs transition-all ${item.cardBg}`}>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className={`font-extrabold ${item.status === 'ONGOING' ? 'text-blue-950' : 'text-slate-900'}`}>
+                  <div key={item.id} className={`p-2 rounded-xl border flex items-center justify-between text-[11px] transition-all ${item.cardBg}`}>
+                    <div className="pr-2 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <p className={`font-extrabold truncate ${item.status === 'ONGOING' ? 'text-blue-950' : 'text-slate-900'}`}>
                           {item.subject}
                         </p>
-                        {item.status === 'ONGOING' && <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping"></span>}
+                        {item.status === 'ONGOING' && <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping shrink-0"></span>}
                       </div>
-                      <p className="text-[10px] text-slate-500 font-medium">
+                      <p className="text-[10px] text-slate-500 font-medium truncate">
                         {item.timeSlot} • {item.room} • {item.teacher}
                       </p>
                     </div>
-                    <span className={`px-2.5 py-0.5 rounded-full text-[9px] border ${item.badgeClass} shrink-0`}>
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] border ${item.badgeClass} shrink-0`}>
                       {item.badgeText}
                     </span>
                   </div>
                 ))
               ) : (
-                <div className="p-4 text-center text-xs text-slate-500 font-medium bg-slate-50 rounded-xl border border-dashed border-slate-200">
-                  🎉 No scheduled classes for {selectedDay} (Holiday / Off Day)
+                <div className="p-3 text-center text-xs text-slate-500 font-medium bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                  🎉 No scheduled classes for {selectedDay}
                 </div>
               )}
             </div>
           </div>
 
           {/* Dynamic Footer */}
-          <div className="p-2.5 bg-slate-900 text-white rounded-xl text-[11px] font-bold text-center flex items-center justify-between px-3 border border-slate-800 shadow-md">
+          <div className="p-2 bg-slate-900 text-white rounded-xl text-[10px] font-bold text-center flex items-center justify-between px-3 border border-slate-800 shadow-sm mt-1">
             {!isSelectedToday ? (
               <span className="w-full text-center text-purple-300 font-medium">
-                Viewing schedule for <strong>{selectedDay}</strong> (Click Today's tab for live status)
+                Viewing schedule for <strong>{selectedDay}</strong>
               </span>
             ) : ongoingClass ? (
               <>
                 <span className="truncate pr-2">Current Class: <strong className="text-yellow-300 font-mono">{ongoingClass.subject}</strong></span>
-                <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30 shrink-0">
+                <span className="text-[9px] text-emerald-400 font-mono font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30 shrink-0">
                   LIVE • {ongoingClass.room}
                 </span>
               </>
             ) : nextClass ? (
               <>
                 <span className="truncate pr-2">Next Class: <strong className="text-indigo-300 font-mono">{nextClass.subject}</strong></span>
-                <span className="text-[10px] text-amber-300 font-mono shrink-0">Starts {nextClass.timeSlot.split(' - ')[0]}</span>
+                <span className="text-[9px] text-amber-300 font-mono shrink-0">Starts {nextClass.timeSlot.split(' - ')[0]}</span>
               </>
             ) : (
               <span className="w-full text-center text-emerald-400 font-bold">
-                🎉 All Classes Completed for {todayDayName} ({liveNow.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })})
+                🎉 All Classes Completed for {todayDayName}
               </span>
             )}
           </div>
