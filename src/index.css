@@ -99,6 +99,33 @@ body {
   transform: none;
 }
 
+/* Smooth Vertical Notice Ticker (Official MUIT Student Portal Effect) */
+@keyframes verticalTicker {
+  0% {
+    transform: translateY(0%);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+.notice-ticker-wrapper {
+  overflow: hidden;
+  position: relative;
+  height: 200px;
+}
+
+.notice-ticker-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: verticalTicker 18s linear infinite;
+}
+
+.notice-ticker-content:hover {
+  animation-play-state: paused;
+}
+
 .btn-secondary {
   background: #FFFFFF;
   color: var(--text-primary);

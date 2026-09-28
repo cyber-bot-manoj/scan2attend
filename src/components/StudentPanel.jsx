@@ -33,6 +33,50 @@ import confetti from 'canvas-confetti';
 export default function StudentPanel({ user, activeSession, setActiveSession, setActiveTab, onNewAttendance }) {
   const [step, setStep] = useState(1); // 1: Main Dashboard, 2: Verification Flow, 3: Success Confirmation
   const [selectedNotification, setSelectedNotification] = useState(null);
+
+  const noticeItems = [
+    {
+      title: 'Class QR Session Active',
+      time: 'Just Now',
+      type: 'LIVE CLASS ALERT',
+      summary: 'Mr. Dhananjay Kr. Yadav generated 5-minute QR for Computer Graphics (BCA501).',
+      details: 'Mr. Dhananjay Kr. Yadav generated a live 5-minute dynamic QR code session for Computer Graphics (BCA501) in Room B-302. Please scan the QR code before the 5-minute timer expires to record your attendance.',
+      icon: <Bell className="w-3.5 h-3.5 text-blue-600" />
+    },
+    {
+      title: 'Parent SMS Dispatch Delivered',
+      time: '10m ago',
+      type: 'PARENT SMS GATEWAY',
+      summary: 'Confirmation SMS dispatched to registered parent mobile +91 8840034446.',
+      details: 'Official attendance verification notification SMS successfully dispatched to registered parent mobile number +91 8840034446. Cryptographic status tag: DELIVERED.',
+      icon: <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
+    },
+    {
+      title: 'GPS Geofence Perimeter Verified',
+      time: '25m ago',
+      type: 'GEOFENCE RADAR',
+      summary: '50m Geofence perimeter check passed for Room B-302 (28.6139° N, 77.2090° E).',
+      details: 'Real-time GPS Haversine distance calculator verified student location at 14 meters from classroom center point (28.6139° N, 77.2090° E), well within the 50m campus perimeter.',
+      icon: <MapPin className="w-3.5 h-3.5 text-purple-600" />
+    },
+    {
+      title: 'Mid-Term Practical & Viva Schedule',
+      time: 'Today',
+      type: 'ACADEMIC AFFAIRS',
+      summary: 'BCA Semester V-B mid-term practical examination date sheet released.',
+      details: 'Office of Academic Affairs: Mid-term practical examinations for BCA Semester V-B (Room B-302) are scheduled from Oct 12 to Oct 16. Attendance audit compliance mandatory.',
+      icon: <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+    },
+    {
+      title: 'Minor Project Synopsis Deadline',
+      time: '2 days ago',
+      type: 'DEPT NOTICE',
+      summary: 'Minor Project (BCA504) synopsis submission under Dr. Peeyush Pathak.',
+      details: 'Department of Computer Science: All BCA V-B students must submit their Minor Project (BCA504) synopsis under Dr. Peeyush Pathak before Friday 5:00 PM.',
+      icon: <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
+    }
+  ];
+
   const [studentLat, setStudentLat] = useState(28.6139);
   const [studentLng, setStudentLng] = useState(77.2090);
   const [distanceMeters, setDistanceMeters] = useState(18); // Default 18m (Inside 50m fence)
@@ -974,88 +1018,52 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           </button>
         </div>
 
-        {/* CARD 6: RECENT NOTIFICATIONS & PARENT SMS ALERT GATEWAY */}
+        {/* CARD 6: RECENT NOTIFICATIONS & OFFICIAL MUIT NOTICE BOARD VERTICAL TICKER */}
         <div className="card-3d p-6 space-y-4 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Bell className="w-4 h-4 text-amber-500" /> Recent Live Notifications & SMS
+                <Bell className="w-4 h-4 text-amber-500 animate-bounce" /> MUIT Notice Board Ticker
+              </span>
+              <span className="text-[10px] font-mono bg-amber-500/10 text-amber-700 px-2 py-0.5 rounded-full border border-amber-300/80 flex items-center gap-1.5 font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
+                Auto Ticker Active
               </span>
             </div>
 
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              <div 
-                onClick={() => setSelectedNotification({
-                  title: 'Class QR Session Active',
-                  time: 'Just Now',
-                  type: 'LIVE CLASS ALERT',
-                  details: 'Mr. Dhananjay Kr. Yadav generated a live 5-minute dynamic QR code session for Computer Graphics (BCA501) in Room B-302. Please scan the QR code before the 5-minute timer expires to record your attendance.'
-                })}
-                className="p-2.5 rounded-xl bg-blue-50/70 border border-blue-200 cursor-pointer hover:bg-blue-100/80 transition-all space-y-1"
-              >
-                <div className="flex justify-between font-extrabold text-slate-900 text-xs">
-                  <span className="flex items-center gap-1">
-                    <Bell className="w-3 h-3 text-blue-600" /> Class QR Session Active
-                  </span>
-                  <span className="text-[10px] text-blue-600 font-mono font-bold">Just Now</span>
-                </div>
-                <p className="text-[10px] text-slate-600 font-medium line-clamp-1">
-                  Teacher generated 5-minute QR for Computer Graphics (BCA501). Click to read full alert.
-                </p>
-              </div>
-
-              <div 
-                onClick={() => setSelectedNotification({
-                  title: 'Parent SMS Dispatch Delivered',
-                  time: '10m ago',
-                  type: 'PARENT SMS GATEWAY',
-                  details: 'Official attendance verification notification SMS successfully dispatched to registered parent mobile number +91 8840034446. Cryptographic status tag: DELIVERED.'
-                })}
-                className="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200 cursor-pointer hover:bg-emerald-100/80 transition-all space-y-1"
-              >
-                <div className="flex justify-between font-extrabold text-slate-900 text-xs">
-                  <span className="flex items-center gap-1">
-                    <Smartphone className="w-3 h-3 text-emerald-600" /> Parent SMS Delivered
-                  </span>
-                  <span className="text-[10px] text-emerald-700 font-mono font-bold">10m ago</span>
-                </div>
-                <p className="text-[10px] text-slate-600 font-medium line-clamp-1">
-                  Confirmation SMS dispatched to +91 8840034446 for student Manoj Sharma.
-                </p>
-              </div>
-
-              <div 
-                onClick={() => setSelectedNotification({
-                  title: 'GPS Geofence Perimeter Verified',
-                  time: '25m ago',
-                  type: 'GEOFENCE RADAR',
-                  details: 'Real-time GPS Haversine distance calculator verified student location at 18 meters from classroom center point (28.6139° N, 77.2090° E), well within the 50m campus perimeter.'
-                })}
-                className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100 transition-all space-y-1"
-              >
-                <div className="flex justify-between font-extrabold text-slate-800 text-xs">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3 text-purple-600" /> GPS Geofence Verified
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-mono">25m ago</span>
-                </div>
-                <p className="text-[10px] text-slate-500 font-medium line-clamp-1">
-                  50m Geofence perimeter check passed for Lab 402 (28.6139° N, 77.2090° E).
-                </p>
+            {/* Continuous Vertical Ticker (Official MUIT Portal Upward Scroll Effect) */}
+            <div className="notice-ticker-wrapper rounded-2xl bg-slate-50 border border-slate-200/90 p-2 shadow-inner">
+              <div className="notice-ticker-content">
+                {[...noticeItems, ...noticeItems].map((item, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => setSelectedNotification(item)}
+                    className="p-2.5 rounded-xl bg-white border border-slate-200/80 cursor-pointer hover:border-blue-400 hover:shadow-md transition-all space-y-1 group"
+                  >
+                    <div className="flex justify-between font-extrabold text-slate-900 text-xs">
+                      <span className="flex items-center gap-1.5 text-slate-900 group-hover:text-blue-600 transition-colors">
+                        {item.icon} {item.title}
+                      </span>
+                      <span className="text-[10px] text-blue-600 font-mono font-bold">{item.time}</span>
+                    </div>
+                    <p className="text-[10px] text-slate-600 font-medium line-clamp-1">
+                      {item.summary}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="p-2 bg-slate-50 rounded-xl border border-slate-200 text-[10px] flex items-center justify-between font-mono text-slate-600 px-3">
-              <span>Carrier: <strong>SMS Gateway Active</strong></span>
-              <span>+91 8840034446</span>
-            </div>
+            <p className="text-[10px] text-slate-400 font-semibold text-center italic pt-0.5">
+              💡 Hover mouse cursor to pause vertical scrolling
+            </p>
           </div>
 
           <button
-            onClick={() => alert('📲 SMS Alert dispatched to +91 8840034446!')}
-            className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black transition-all shadow-md flex items-center justify-center gap-1.5"
+            onClick={() => alert('📢 Official MUIT Notice Board sync complete!')}
+            className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black transition-all shadow-md flex items-center justify-center gap-1.5"
           >
-            <Smartphone className="w-3.5 h-3.5" /> SMS Alert
+            <Bell className="w-3.5 h-3.5" /> MUIT Official Notice Board
           </button>
         </div>
 
