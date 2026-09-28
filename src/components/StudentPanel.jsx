@@ -32,76 +32,254 @@ import confetti from 'canvas-confetti';
 
 export default function StudentPanel({ user, activeSession, setActiveSession, setActiveTab, onNewAttendance }) {
   const [step, setStep] = useState(1); // 1: Main Dashboard, 2: Verification Flow, 3: Success Confirmation
-  // Live Real-Time Timetable Clock State
+  // Live Real-Time Official MUIT Timetable Engine (Program: BCA, Semester: V-B, Room: B-302)
   const [liveNow, setLiveNow] = useState(new Date());
 
   useEffect(() => {
     const timer = setInterval(() => {
       setLiveNow(new Date());
-    }, 2000);
+    }, 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const masterTimetable = [
-    {
-      id: 'BCA501',
-      subject: 'Computer Graphics (BCA501)',
-      startHours: 9, startMins: 35,
-      endHours: 10, endMins: 15,
-      timeSlot: '09:35 AM - 10:15 AM',
-      room: 'Room B-302',
-      teacher: 'Mr. Dhananjay Kr. Yadav (DKY)'
-    },
-    {
-      id: 'BCA502',
-      subject: 'Cryptography & Network Security (BCA502)',
-      startHours: 10, startMins: 35,
-      endHours: 11, endMins: 15,
-      timeSlot: '10:35 AM - 11:15 AM',
-      room: 'Room B-302',
-      teacher: 'Dr. Gouri Shukla (GS)'
-    },
-    {
-      id: 'BCA503',
-      subject: 'Web Technology (BCA503)',
-      startHours: 11, startMins: 15,
-      endHours: 12, endMins: 5,
-      timeSlot: '11:15 AM - 12:05 PM',
-      room: 'Room B-302',
-      teacher: 'Mr. Rishi Mohan Awasthi (RMA)'
-    },
-    {
-      id: 'BCA511',
-      subject: 'Computer Graphics Lab (BCA511) / Web Tech Lab (BCA512)',
-      startHours: 12, startMins: 55,
-      endHours: 13, endMins: 45,
-      timeSlot: '12:55 PM - 01:45 PM',
-      room: 'Lab CCL1 / B-108',
-      teacher: 'Dr. Gouri Shukla & Mr. Rishi Mohan Awasthi'
-    },
-    {
-      id: 'BCA504',
-      subject: 'Minor Project (BCA504)',
-      startHours: 14, startMins: 35,
-      endHours: 15, endMins: 25,
-      timeSlot: '02:35 PM - 03:25 PM',
-      room: 'Room B-302',
-      teacher: 'Dr. Peeyush Pathak (PP)'
-    },
-    {
-      id: 'ACE511',
-      subject: 'Industrial Internship (ACE511)',
-      startHours: 15, startMins: 25,
-      endHours: 16, endMins: 15,
-      timeSlot: '03:25 PM - 04:15 PM',
-      room: 'Room B-302',
-      teacher: 'Mr. Imtiyaz Haq (IH)'
-    }
-  ];
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const todayDayName = dayNames[liveNow.getDay()];
+  const [selectedDay, setSelectedDay] = useState(todayDayName === 'Sunday' ? 'Monday' : todayDayName);
+
+  // Keep selectedDay synced to today if changed, unless manually selected by user
+  const isSelectedToday = selectedDay === todayDayName;
+
+  const weeklyTimetable = {
+    Monday: [
+      {
+        id: 'MON-1',
+        subject: 'Computer Graphics (BCA501)',
+        type: 'Lecture (L)',
+        startHours: 10, startMins: 35,
+        endHours: 11, endMins: 15,
+        timeSlot: '10:35 AM - 11:15 AM',
+        room: 'Room B-302',
+        teacher: 'Mr. Dhananjay Kr. Yadav (DKY)'
+      },
+      {
+        id: 'MON-2',
+        subject: 'Cryptography & Network Security (BCA502)',
+        type: 'Lecture (L)',
+        startHours: 11, startMins: 15,
+        endHours: 12, endMins: 5,
+        timeSlot: '11:15 AM - 12:05 PM',
+        room: 'Room B-302',
+        teacher: 'Dr. Gouri Shukla (GS)'
+      },
+      {
+        id: 'MON-LUNCH',
+        subject: 'LUNCH BREAK 🍱',
+        type: 'Break',
+        startHours: 12, startMins: 5,
+        endHours: 12, endMins: 55,
+        timeSlot: '12:05 PM - 12:55 PM',
+        room: 'Cafeteria / Campus',
+        teacher: 'Lunch Break'
+      },
+      {
+        id: 'MON-3',
+        subject: 'Computer Graphics Lab (BCA511-B2) / Web Tech Lab (BCA512-B1)',
+        type: 'Practical Lab (P)',
+        startHours: 12, startMins: 55,
+        endHours: 14, endMins: 35,
+        timeSlot: '12:55 PM - 02:35 PM',
+        room: 'Lab CCL1 / Room B-106',
+        teacher: 'Dr. Gouri Shukla & Mr. Rishi Mohan Awasthi'
+      }
+    ],
+    Tuesday: [
+      {
+        id: 'TUE-1',
+        subject: 'Cryptography & Network Security (BCA502)',
+        type: 'Lecture (L)',
+        startHours: 11, startMins: 15,
+        endHours: 12, endMins: 5,
+        timeSlot: '11:15 AM - 12:05 PM',
+        room: 'Room B-302',
+        teacher: 'Dr. Gouri Shukla (GS)'
+      },
+      {
+        id: 'TUE-LUNCH',
+        subject: 'LUNCH BREAK 🍱',
+        type: 'Break',
+        startHours: 12, startMins: 5,
+        endHours: 12, endMins: 55,
+        timeSlot: '12:05 PM - 12:55 PM',
+        room: 'Cafeteria / Campus',
+        teacher: 'Lunch Break'
+      },
+      {
+        id: 'TUE-2',
+        subject: 'Computer Graphics Lab (BCA511-B1) / Web Tech Lab (BCA512-B2)',
+        type: 'Practical Lab (P)',
+        startHours: 12, startMins: 55,
+        endHours: 14, endMins: 35,
+        timeSlot: '12:55 PM - 02:35 PM',
+        room: 'Room B-103 / B-CCL3',
+        teacher: 'Dr. Gouri Shukla & Mr. Rishi Mohan Awasthi'
+      },
+      {
+        id: 'TUE-3',
+        subject: 'Minor Project (BCA504)',
+        type: 'Practical (P)',
+        startHours: 14, startMins: 35,
+        endHours: 15, endMins: 25,
+        timeSlot: '02:35 PM - 03:25 PM',
+        room: 'Room B-302',
+        teacher: 'Dr. Peeyush Pathak (PP)'
+      }
+    ],
+    Wednesday: [
+      {
+        id: 'WED-1',
+        subject: 'Computer Graphics Lab (BCA511-B2) / Web Tech Lab (BCA512-B1)',
+        type: 'Practical Lab (P)',
+        startHours: 9, startMins: 35,
+        endHours: 11, endMins: 15,
+        timeSlot: '09:35 AM - 11:15 AM',
+        room: 'Lab CCL1 / Room B-108',
+        teacher: 'Dr. Gouri Shukla & Mr. Rishi Mohan Awasthi'
+      },
+      {
+        id: 'WED-2',
+        subject: 'Web Technology (BCA503)',
+        type: 'Lecture (L)',
+        startHours: 11, startMins: 15,
+        endHours: 12, endMins: 5,
+        timeSlot: '11:15 AM - 12:05 PM',
+        room: 'Room B-302',
+        teacher: 'Mr. Rishi Mohan Awasthi (RMA)'
+      }
+    ],
+    Thursday: [
+      {
+        id: 'THU-1',
+        subject: 'Computer Graphics (BCA501)',
+        type: 'Lecture (L)',
+        startHours: 9, startMins: 35,
+        endHours: 10, endMins: 15,
+        timeSlot: '09:35 AM - 10:15 AM',
+        room: 'Room B-302',
+        teacher: 'Mr. Dhananjay Kr. Yadav (DKY)'
+      },
+      {
+        id: 'THU-2',
+        subject: 'Web Technology (BCA503)',
+        type: 'Lecture (L)',
+        startHours: 10, startMins: 35,
+        endHours: 11, endMins: 15,
+        timeSlot: '10:35 AM - 11:15 AM',
+        room: 'Room B-302',
+        teacher: 'Mr. Rishi Mohan Awasthi (RMA)'
+      },
+      {
+        id: 'THU-3',
+        subject: 'Cryptography & Network Security (BCA502)',
+        type: 'Tutorial (T)',
+        startHours: 11, startMins: 15,
+        endHours: 12, endMins: 5,
+        timeSlot: '11:15 AM - 12:05 PM',
+        room: 'Room B-302',
+        teacher: 'Dr. Gouri Shukla (GS)'
+      },
+      {
+        id: 'THU-LUNCH',
+        subject: 'LUNCH BREAK 🍱',
+        type: 'Break',
+        startHours: 12, startMins: 5,
+        endHours: 12, endMins: 55,
+        timeSlot: '12:05 PM - 12:55 PM',
+        room: 'Cafeteria / Campus',
+        teacher: 'Lunch Break'
+      },
+      {
+        id: 'THU-4',
+        subject: 'Computer Graphics Lab (BCA511-B1) / Web Tech Lab (BCA512-B2)',
+        type: 'Practical Lab (P)',
+        startHours: 12, startMins: 55,
+        endHours: 14, endMins: 35,
+        timeSlot: '12:55 PM - 02:35 PM',
+        room: 'Room B-103 / B-CCL3',
+        teacher: 'Dr. Gouri Shukla & Mr. Rishi Mohan Awasthi'
+      },
+      {
+        id: 'THU-5',
+        subject: 'Industrial Internship (ACE511)',
+        type: 'Practical (P)',
+        startHours: 14, startMins: 35,
+        endHours: 15, endMins: 25,
+        timeSlot: '02:35 PM - 03:25 PM',
+        room: 'Room B-302',
+        teacher: 'Mr. Imtiyaz Haq (IH)'
+      }
+    ],
+    Friday: [
+      {
+        id: 'FRI-1',
+        subject: 'Web Technology (BCA503)',
+        type: 'Lecture (L)',
+        startHours: 9, startMins: 35,
+        endHours: 10, endMins: 15,
+        timeSlot: '09:35 AM - 10:15 AM',
+        room: 'Room B-302',
+        teacher: 'Mr. Rishi Mohan Awasthi (RMA)'
+      },
+      {
+        id: 'FRI-2',
+        subject: 'Computer Graphics (BCA501)',
+        type: 'Lecture (L)',
+        startHours: 10, startMins: 35,
+        endHours: 11, endMins: 15,
+        timeSlot: '10:35 AM - 11:15 AM',
+        room: 'Room B-302',
+        teacher: 'Mr. Dhananjay Kr. Yadav (DKY)'
+      },
+      {
+        id: 'FRI-3',
+        subject: 'Cryptography & Network Security (BCA502)',
+        type: 'Lecture (L)',
+        startHours: 11, startMins: 15,
+        endHours: 12, endMins: 5,
+        timeSlot: '11:15 AM - 12:05 PM',
+        room: 'Room B-302',
+        teacher: 'Dr. Gouri Shukla (GS)'
+      }
+    ],
+    Saturday: [
+      {
+        id: 'SAT-1',
+        subject: 'Computer Graphics (BCA501)',
+        type: 'Tutorial (T)',
+        startHours: 9, startMins: 35,
+        endHours: 10, endMins: 15,
+        timeSlot: '09:35 AM - 10:15 AM',
+        room: 'Room B-302',
+        teacher: 'Mr. Dhananjay Kr. Yadav (DKY)'
+      },
+      {
+        id: 'SAT-2',
+        subject: 'Web Technology (BCA503)',
+        type: 'Tutorial (T)',
+        startHours: 10, startMins: 35,
+        endHours: 11, endMins: 15,
+        timeSlot: '10:35 AM - 11:15 AM',
+        room: 'Room B-302',
+        teacher: 'Mr. Rishi Mohan Awasthi (RMA)'
+      }
+    ],
+    Sunday: []
+  };
 
   const currentMinutes = liveNow.getHours() * 60 + liveNow.getMinutes();
+  const currentDaySchedule = weeklyTimetable[selectedDay] || [];
+
   let nextFound = false;
-  const processedTimetable = masterTimetable.map(item => {
+  const processedTimetable = currentDaySchedule.map(item => {
     const slotStart = item.startHours * 60 + item.startMins;
     const slotEnd = item.endHours * 60 + item.endMins;
 
@@ -110,23 +288,36 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
     let badgeClass = 'bg-slate-100 text-slate-600 border-slate-200';
     let cardBg = 'bg-slate-50 border-slate-200';
 
-    if (currentMinutes >= slotEnd) {
-      status = 'DONE';
-      badgeText = 'DONE 🟢';
-      badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200 font-bold';
-      cardBg = 'bg-slate-50/80 border-slate-200 opacity-80';
-    } else if (currentMinutes >= slotStart && currentMinutes < slotEnd) {
-      status = 'ONGOING';
-      badgeText = 'ONGOING ⏱️';
-      badgeClass = 'bg-blue-600 text-white shadow-xs animate-pulse font-black';
-      cardBg = 'bg-blue-50/90 border-blue-300 ring-2 ring-blue-400/50';
-    } else if (currentMinutes < slotStart) {
-      if (!nextFound) {
-        nextFound = true;
-        status = 'NEXT';
-        badgeText = 'NEXT ⏳';
-        badgeClass = 'bg-amber-100 text-amber-800 border-amber-300 font-bold';
-        cardBg = 'bg-amber-50/50 border-amber-200';
+    if (item.type === 'Break') {
+      badgeText = 'LUNCH BREAK 🍱';
+      badgeClass = 'bg-amber-100 text-amber-800 border-amber-300 font-bold';
+      cardBg = 'bg-amber-50/40 border-amber-200';
+    }
+
+    if (isSelectedToday && item.type !== 'Break') {
+      if (currentMinutes >= slotEnd) {
+        status = 'DONE';
+        badgeText = 'DONE 🟢';
+        badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200 font-bold';
+        cardBg = 'bg-slate-50/80 border-slate-200 opacity-80';
+      } else if (currentMinutes >= slotStart && currentMinutes < slotEnd) {
+        status = 'ONGOING';
+        badgeText = 'ONGOING ⏱️';
+        badgeClass = 'bg-blue-600 text-white shadow-xs animate-pulse font-black';
+        cardBg = 'bg-blue-50/90 border-blue-300 ring-2 ring-blue-400/50';
+      } else if (currentMinutes < slotStart) {
+        if (!nextFound) {
+          nextFound = true;
+          status = 'NEXT';
+          badgeText = 'NEXT ⏳';
+          badgeClass = 'bg-amber-100 text-amber-800 border-amber-300 font-bold';
+          cardBg = 'bg-amber-50/60 border-amber-200';
+        }
+      }
+    } else if (isSelectedToday && item.type === 'Break') {
+      if (currentMinutes >= slotStart && currentMinutes < slotEnd) {
+        badgeText = 'LUNCH NOW 🍱';
+        badgeClass = 'bg-orange-500 text-white animate-pulse font-black';
       }
     }
 
@@ -911,51 +1102,89 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           </button>
         </div>
 
-        {/* CARD 3: CLASS LIVE TIMETABLE */}
+        {/* CARD 3: CLASS LIVE TIMETABLE (OFFICIAL MUIT BCA V-B ROOM B-302) */}
         <div className="card-3d p-6 space-y-4 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-purple-600" /> Class Live Timetable
-              </span>
+              <div>
+                <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4 text-purple-600" /> Class Live Timetable
+                </span>
+                <span className="text-[10px] text-slate-400 font-medium block">
+                  BCA V-B • Room B-302 • MSOET MUIT
+                </span>
+              </div>
               <span className="text-[10px] font-mono font-bold bg-purple-100 text-purple-800 px-2.5 py-0.5 rounded-full border border-purple-200 shadow-2xs">
-                Today • {liveNow.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })}
+                Today: {todayDayName}
               </span>
+            </div>
+
+            {/* Day Selector Navigation Bar */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b border-slate-200 text-[10px] font-bold">
+              {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
+                <button
+                  key={day}
+                  onClick={() => setSelectedDay(day)}
+                  className={`px-2.5 py-1 rounded-lg transition-all shrink-0 flex items-center gap-1 ${
+                    selectedDay === day
+                      ? 'bg-purple-600 text-white shadow-xs font-black'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {day.slice(0, 3)}
+                  {day === todayDayName && (
+                    <span className={`w-1.5 h-1.5 rounded-full ${selectedDay === day ? 'bg-yellow-300' : 'bg-purple-600'}`}></span>
+                  )}
+                </button>
+              ))}
             </div>
 
             {/* Live Clock Bar */}
             <div className="flex items-center justify-between bg-slate-100/90 p-2 rounded-xl border border-slate-200/80 text-[11px] font-mono">
               <span className="text-slate-600 font-semibold flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-blue-600 animate-spin" style={{ animationDuration: '6s' }} /> Dynamic System Clock:
+                <Clock className="w-3.5 h-3.5 text-blue-600 animate-spin" style={{ animationDuration: '6s' }} /> Live System Clock:
               </span>
               <span className="font-black text-slate-900 bg-white px-2 py-0.5 rounded border border-slate-300 shadow-2xs">
                 {liveNow.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
               </span>
             </div>
 
+            {/* Timetable List for Selected Day */}
             <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
-              {processedTimetable.map(item => (
-                <div key={item.id} className={`p-2.5 rounded-xl border flex items-center justify-between text-xs transition-all ${item.cardBg}`}>
-                  <div>
-                    <p className={`font-extrabold flex items-center gap-1.5 ${item.status === 'ONGOING' ? 'text-blue-950' : 'text-slate-900'}`}>
-                      {item.subject}
-                      {item.status === 'ONGOING' && <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping"></span>}
-                    </p>
-                    <p className="text-[10px] text-slate-500 font-medium">
-                      {item.timeSlot} • {item.room} • {item.teacher}
-                    </p>
+              {processedTimetable.length > 0 ? (
+                processedTimetable.map(item => (
+                  <div key={item.id} className={`p-2.5 rounded-xl border flex items-center justify-between text-xs transition-all ${item.cardBg}`}>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className={`font-extrabold ${item.status === 'ONGOING' ? 'text-blue-950' : 'text-slate-900'}`}>
+                          {item.subject}
+                        </p>
+                        {item.status === 'ONGOING' && <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping"></span>}
+                      </div>
+                      <p className="text-[10px] text-slate-500 font-medium">
+                        {item.timeSlot} • {item.room} • {item.teacher}
+                      </p>
+                    </div>
+                    <span className={`px-2.5 py-0.5 rounded-full text-[9px] border ${item.badgeClass} shrink-0`}>
+                      {item.badgeText}
+                    </span>
                   </div>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[9px] border ${item.badgeClass}`}>
-                    {item.badgeText}
-                  </span>
+                ))
+              ) : (
+                <div className="p-4 text-center text-xs text-slate-500 font-medium bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                  🎉 No scheduled classes for {selectedDay} (Holiday / Off Day)
                 </div>
-              ))}
+              )}
             </div>
           </div>
 
           {/* Dynamic Footer */}
           <div className="p-2.5 bg-slate-900 text-white rounded-xl text-[11px] font-bold text-center flex items-center justify-between px-3 border border-slate-800 shadow-md">
-            {ongoingClass ? (
+            {!isSelectedToday ? (
+              <span className="w-full text-center text-purple-300 font-medium">
+                Viewing schedule for <strong>{selectedDay}</strong> (Click Today's tab for live status)
+              </span>
+            ) : ongoingClass ? (
               <>
                 <span className="truncate pr-2">Current Class: <strong className="text-yellow-300 font-mono">{ongoingClass.subject}</strong></span>
                 <span className="text-[10px] text-emerald-400 font-mono font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30 shrink-0">
@@ -965,11 +1194,11 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
             ) : nextClass ? (
               <>
                 <span className="truncate pr-2">Next Class: <strong className="text-indigo-300 font-mono">{nextClass.subject}</strong></span>
-                <span className="text-[10px] text-amber-300 font-mono shrink-0">Starts {nextClass.startHours > 12 ? `${nextClass.startHours - 12}:${String(nextClass.startMins).padStart(2, '0')} PM` : `${nextClass.startHours}:${String(nextClass.startMins).padStart(2, '0')} AM`}</span>
+                <span className="text-[10px] text-amber-300 font-mono shrink-0">Starts {nextClass.timeSlot.split(' - ')[0]}</span>
               </>
             ) : (
               <span className="w-full text-center text-emerald-400 font-bold">
-                🎉 All Classes Completed for Today ({liveNow.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })})
+                🎉 All Classes Completed for {todayDayName} ({liveNow.toLocaleDateString('en-US', { day: '2-digit', month: 'short' })})
               </span>
             )}
           </div>
