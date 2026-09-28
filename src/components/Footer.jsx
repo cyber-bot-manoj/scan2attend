@@ -111,10 +111,6 @@ export default function Footer({ setActiveTab, user }) {
                   <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <span>+91 8840034446</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <MapPin className="w-3.5 h-3.5 text-purple-400 shrink-0 mt-0.5" />
-                  <span className="leading-tight">Tech Block, Unified Campus</span>
-                </li>
               </ul>
             </div>
 
