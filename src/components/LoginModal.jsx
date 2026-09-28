@@ -89,15 +89,15 @@ export default function LoginModal({ setUser, setActiveTab }) {
     } else {
       mockUser = {
         id: 'student_1',
-        name: 'AARUSH PATEL',
-        enrollmentNo: 'MUIT0124031307',
-        rollNo: '2401031601001',
-        fatherName: 'VINOD KUMAR VERMA',
+        name: 'Manoj Sharma',
+        enrollmentNo: 'MUIT0124031001',
+        rollNo: 'CS202601',
+        fatherName: 'Rajendra Sharma',
         email: 'student@school.edu',
         role: 'STUDENT',
-        section: 'Section A',
-        classSection: 'B.C.A - Semester V (Section A)',
-        mobile: '7275288461'
+        section: 'Section B',
+        classSection: 'B.C.A - Semester V (Section B)',
+        mobile: '8840034446'
       };
     }
 

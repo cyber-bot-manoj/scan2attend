@@ -153,7 +153,7 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab }) {
                     >
                       <div className="w-8 h-8 rounded-full overflow-hidden border border-[#2979FF] shadow-xs flex-shrink-0 bg-[#2979FF]/10 flex items-center justify-center text-white font-bold text-xs">
                         <img 
-                          src={user.role === 'TEACHER' ? '/faculty_dhananjay_yadav.jpg' : '/aarush_patel_profile.jpg'} 
+                          src={user.role === 'TEACHER' ? '/faculty_dhananjay_yadav.jpg' : '/manoj_sharma_profile.jpg'} 
                           alt="Profile" 
                           className="w-full h-full object-cover object-[center_top]"
                           onError={(e) => { 
