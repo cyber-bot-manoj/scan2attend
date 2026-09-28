@@ -7,7 +7,7 @@ export default function SmsEnginePanel() {
   const [broadcastRecipient, setBroadcastRecipient] = useState('Manoj Sharma');
   const [broadcastMobile, setBroadcastMobile] = useState('8840034446');
   const [broadcastType, setBroadcastType] = useState('CLASS_REMINDER');
-  const [broadcastMessage, setBroadcastMessage] = useState('Reminder: Data Structures class starts in 2 minutes in Lab 402.');
+  const [broadcastMessage, setBroadcastMessage] = useState('Reminder: Computer Graphics class starts in 2 minutes in Room B-302.');
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
@@ -92,7 +92,7 @@ export default function SmsEnginePanel() {
                 onChange={(e) => {
                   setBroadcastType(e.target.value);
                   if (e.target.value === 'CLASS_REMINDER') {
-                    setBroadcastMessage('Reminder: Data Structures class starts in 2 minutes in Lab 402.');
+                    setBroadcastMessage('Reminder: Computer Graphics class starts in 2 minutes in Room B-302.');
                   } else if (e.target.value === 'LOW_ATTENDANCE_WARNING') {
                     setBroadcastMessage('Low Attendance Warning: Your attendance is below 75%. Please attend upcoming classes.');
                   } else if (e.target.value === 'HIGH_RISK_ALERT') {

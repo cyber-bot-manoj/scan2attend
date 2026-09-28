@@ -29,12 +29,12 @@ import {
 
 export default function TeacherPanel({ user, activeSession, setActiveSession, globalAttendanceRecords = [] }) {
   const [classes, setClasses] = useState([]);
-  const [selectedClassId, setSelectedClassId] = useState('cs401');
+  const [selectedClassId, setSelectedClassId] = useState('bca501');
   const [timeLeft, setTimeLeft] = useState(0); // 5 minutes (300s)
   const [filterStatus, setFilterStatus] = useState('ALL'); // 'ALL', 'PRESENT', 'ABSENT'
   const [loading, setLoading] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
-  const [customSmsText, setCustomSmsText] = useState('Reminder: Advanced AI (CS401) lecture starts now. Please scan class QR code.');
+  const [customSmsText, setCustomSmsText] = useState('Reminder: BCA V-B lecture starts now in Room B-302. Please scan class QR code.');
   const [smsSentNotice, setSmsSentNotice] = useState(false);
 
   // Initial classes setup
@@ -81,7 +81,16 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
     setLoading(true);
     const generatedAt = Date.now();
     const expiresAt = generatedAt + 300000; // Exactly 5 minutes (300s)
-    const className = selectedClassId === 'cs401' ? 'Advanced AI (CS401)' : selectedClassId === 'cs301' ? 'Data Structures (CS301)' : 'Database Systems (CS302)';
+    const classNameMap = {
+      bca501: 'Computer Graphics (BCA501)',
+      bca502: 'Cryptography & Network Security (BCA502)',
+      bca503: 'Web Technology (BCA503)',
+      bca504: 'Minor Project (BCA504)',
+      bca511: 'Computer Graphics Lab (BCA511)',
+      bca512: 'Web Technology Lab (BCA512)',
+      ace511: 'Industrial Internship (ACE511)'
+    };
+    const className = classNameMap[selectedClassId] || 'Computer Graphics (BCA501)';
 
     const payloadObj = {
       classId: selectedClassId,
@@ -228,7 +237,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative">
                 <img 
-                  src="/faculty_rajesh_sharma.jpg" 
+                  src="/faculty_dhananjay_yadav.jpg" 
                   alt="Faculty Profile" 
                   className="w-14 h-14 rounded-2xl object-cover border-2 border-amber-400/60 shadow-lg ring-2 ring-amber-500/20"
                   onError={(e) => {
@@ -236,7 +245,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
                   }}
                 />
                 <div className="w-14 h-14 rounded-2xl bg-indigo-600/30 border-2 border-indigo-400/40 hidden items-center justify-center text-white font-black text-xl shadow-lg">
-                  RS
+                  DKY
                 </div>
                 <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-slate-900 rounded-full"></span>
               </div>
@@ -244,7 +253,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                    {user ? user.name : 'Dr. Rajesh Sharma'}
+                    {user ? user.name : 'Mr. Dhananjay Kr. Yadav'}
                   </h1>
                 </div>
                 <p className="text-xs text-slate-300 font-medium">
@@ -343,9 +352,13 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
                 onChange={(e) => setSelectedClassId(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-extrabold focus:outline-none focus:border-blue-500 shadow-inner transition-all"
               >
-                <option value="cs401">CS 401 - Section A (Advanced AI)</option>
-                <option value="cs301">CS 301 - Section B (Data Structures)</option>
-                <option value="cs302">CS 302 - Section A (Database Systems)</option>
+                <option value="bca501">BCA 501 - Computer Graphics (Mr. Dhananjay Kr. Yadav)</option>
+                <option value="bca502">BCA 502 - Cryptography and Network Security (Dr. Gouri Shukla)</option>
+                <option value="bca503">BCA 503 - Web Technology (Mr. Rishi Mohan Awasthi)</option>
+                <option value="bca504">BCA 504 - Minor Project (Dr. Peeyush Pathak)</option>
+                <option value="bca511">BCA 511 - Computer Graphics Lab (Dr. Gouri Shukla)</option>
+                <option value="bca512">BCA 512 - Web Technology Lab (Mr. Rishi Mohan Awasthi)</option>
+                <option value="ace511">ACE 511 - Industrial Internship (Mr. Imtiyaz Haq)</option>
               </select>
             </div>
 
@@ -354,7 +367,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-red-400 animate-bounce" />
-                  <span className="text-xs font-extrabold text-white">Lab 402 • Academic Block</span>
+                  <span className="text-xs font-extrabold text-white">Room B-302 • Academic Block</span>
                 </div>
                 <span className="text-[10px] font-mono bg-blue-500/30 text-blue-300 px-2 py-0.5 rounded-md border border-blue-400/30">
                   50m Radius
@@ -564,11 +577,11 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
 
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5 text-xs">
             <div className="flex justify-between items-center text-[11px] font-bold">
-              <span className="text-slate-800">CS401 (Advanced AI):</span>
+              <span className="text-slate-800">BCA501 (Computer Graphics):</span>
               <span className="text-emerald-600 font-mono">95.2% (Peak)</span>
             </div>
             <div className="flex justify-between items-center text-[11px] font-bold">
-              <span className="text-slate-800">CS301 (Data Structures):</span>
+              <span className="text-slate-800">BCA503 (Web Technology):</span>
               <span className="text-blue-600 font-mono">92.8% (Stable)</span>
             </div>
           </div>
@@ -660,7 +673,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 mb-2">
                 <Sparkles className="w-3.5 h-3.5 text-yellow-300" /> Classroom Projection Mode
               </span>
-              <h2 className="text-2xl font-black text-white">Advanced AI (CS401) • Lab 402</h2>
+              <h2 className="text-2xl font-black text-white">{activeSession?.className || 'Computer Graphics (BCA501)'} • Room B-302</h2>
               <p className="text-xs text-slate-400 mt-1">Scan this QR code using student portal on your mobile device</p>
             </div>
 

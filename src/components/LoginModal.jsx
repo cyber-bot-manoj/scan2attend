@@ -72,7 +72,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
     if (email.toLowerCase().includes('teacher') || selectedRole === 'TEACHER') {
       mockUser = {
         id: 'teacher_1',
-        name: 'Dr. Rajesh Sharma',
+        name: 'Mr. Dhananjay Kr. Yadav',
         email: 'teacher@school.edu',
         role: 'TEACHER',
         department: 'Computer Science',

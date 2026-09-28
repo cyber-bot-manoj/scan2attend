@@ -31,7 +31,7 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
     smsLogs: []
   });
 
-  const [selectedClassId, setSelectedClassId] = useState('cs401');
+  const [selectedClassId, setSelectedClassId] = useState('bca501');
   const [geoLat, setGeoLat] = useState('28.6139');
   const [geoLng, setGeoLng] = useState('77.2090');
   const [geoRadius, setGeoRadius] = useState('50');
@@ -86,36 +86,36 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
   };
 
   const master30StudentAuditRecords = [
-    { id: 'REC-01', studentName: 'Manoj Sharma', rollNo: 'CS202601', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:19:46 AM', distanceMeters: 14, status: 'PRESENT', hash: 'AUDIT-2026-REC-469063' },
-    { id: 'REC-02', studentName: 'Priya Singh', rollNo: 'CS202602', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:18:10 AM', distanceMeters: 12, status: 'PRESENT', hash: 'AUDIT-2026-REC-112934' },
-    { id: 'REC-03', studentName: 'Rohan Mehta', rollNo: 'CS202603', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:17:55 AM', distanceMeters: 68, status: 'ABSENT', hash: 'AUDIT-2026-REC-992381' },
-    { id: 'REC-04', studentName: 'Ananya Sharma', rollNo: 'CS202604', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:17:02 AM', distanceMeters: 9, status: 'PRESENT', hash: 'AUDIT-2026-REC-584920' },
-    { id: 'REC-05', studentName: 'Vikramaditya Verma', rollNo: 'CS202605', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:16:30 AM', distanceMeters: 15, status: 'PRESENT', hash: 'AUDIT-2026-REC-392019' },
-    { id: 'REC-06', studentName: 'Sneha Gupta', rollNo: 'CS202606', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:15:45 AM', distanceMeters: 11, status: 'PRESENT', hash: 'AUDIT-2026-REC-884012' },
-    { id: 'REC-07', studentName: 'Ishaan Patel', rollNo: 'CS202607', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:15:10 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-739201' },
-    { id: 'REC-08', studentName: 'Kavya Deshmukh', rollNo: 'CS202608', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:14:35 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-483920' },
-    { id: 'REC-09', studentName: 'Aditya Reddy', rollNo: 'CS202609', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:14:00 AM', distanceMeters: 74, status: 'ABSENT', hash: 'AUDIT-2026-REC-294018' },
-    { id: 'REC-10', studentName: 'Diya Roy', rollNo: 'CS202610', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:13:20 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-673029' },
-    { id: 'REC-11', studentName: 'Rahul Nair', rollNo: 'CS202611', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:12:50 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-940281' },
-    { id: 'REC-12', studentName: 'Tanvi Joshi', rollNo: 'CS202612', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:12:15 AM', distanceMeters: 8, status: 'PRESENT', hash: 'AUDIT-2026-REC-184029' },
-    { id: 'REC-13', studentName: 'Amit Kumar', rollNo: 'CS202613', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:11:40 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-592018' },
-    { id: 'REC-14', studentName: 'Neha Agarwal', rollNo: 'CS202614', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:11:05 AM', distanceMeters: 14, status: 'PRESENT', hash: 'AUDIT-2026-REC-830291' },
-    { id: 'REC-15', studentName: 'Harsh Vardhan', rollNo: 'CS202615', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:10:30 AM', distanceMeters: 82, status: 'ABSENT', hash: 'AUDIT-2026-REC-492018' },
-    { id: 'REC-16', studentName: 'Pooja Mishra', rollNo: 'CS202616', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:10:00 AM', distanceMeters: 17, status: 'PRESENT', hash: 'AUDIT-2026-REC-382019' },
-    { id: 'REC-17', studentName: 'Siddharth Rao', rollNo: 'CS202617', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:09:20 AM', distanceMeters: 12, status: 'PRESENT', hash: 'AUDIT-2026-REC-749201' },
-    { id: 'REC-18', studentName: 'Shreya Pandey', rollNo: 'CS202618', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:08:50 AM', distanceMeters: 15, status: 'PRESENT', hash: 'AUDIT-2026-REC-194028' },
-    { id: 'REC-19', studentName: 'Arjun Kapoor', rollNo: 'CS202619', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:08:15 AM', distanceMeters: 21, status: 'PRESENT', hash: 'AUDIT-2026-REC-683029' },
-    { id: 'REC-20', studentName: 'Riya Sen', rollNo: 'CS202620', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:07:40 AM', distanceMeters: 11, status: 'PRESENT', hash: 'AUDIT-2026-REC-492810' },
-    { id: 'REC-21', studentName: 'Yash Malhotra', rollNo: 'CS202621', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:07:05 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-839201' },
-    { id: 'REC-22', studentName: 'Anjali Yadav', rollNo: 'CS202622', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:06:30 AM', distanceMeters: 9, status: 'PRESENT', hash: 'AUDIT-2026-REC-284019' },
-    { id: 'REC-23', studentName: 'Karan Sharma', rollNo: 'CS202623', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:05:55 AM', distanceMeters: 18, status: 'PRESENT', hash: 'AUDIT-2026-REC-739281' },
-    { id: 'REC-24', studentName: 'Meera Rajput', rollNo: 'CS202624', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:05:20 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-592810' },
-    { id: 'REC-25', studentName: 'Abhinav Saxena', rollNo: 'CS202625', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:04:45 AM', distanceMeters: 55, status: 'ABSENT', hash: 'AUDIT-2026-REC-184920' },
-    { id: 'REC-26', studentName: 'Swati Tripathi', rollNo: 'CS202626', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:04:10 AM', distanceMeters: 14, status: 'PRESENT', hash: 'AUDIT-2026-REC-839102' },
-    { id: 'REC-27', studentName: 'Vivek Choudhary', rollNo: 'CS202627', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:03:35 AM', distanceMeters: 12, status: 'PRESENT', hash: 'AUDIT-2026-REC-492019' },
-    { id: 'REC-28', studentName: 'Divya Thakur', rollNo: 'CS202628', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:03:00 AM', distanceMeters: 17, status: 'PRESENT', hash: 'AUDIT-2026-REC-284910' },
-    { id: 'REC-29', studentName: 'Gaurav Bhatia', rollNo: 'CS202629', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:02:25 AM', distanceMeters: 20, status: 'PRESENT', hash: 'AUDIT-2026-REC-739182' },
-    { id: 'REC-30', studentName: 'Simran Kaur', rollNo: 'CS202630', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:01:50 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-392810' }
+    { id: 'REC-01', studentName: 'Manoj Sharma', rollNo: 'CS202601', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:19:46 AM', distanceMeters: 14, status: 'PRESENT', hash: 'AUDIT-2026-REC-469063' },
+    { id: 'REC-02', studentName: 'Priya Singh', rollNo: 'CS202602', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:18:10 AM', distanceMeters: 12, status: 'PRESENT', hash: 'AUDIT-2026-REC-112934' },
+    { id: 'REC-03', studentName: 'Rohan Mehta', rollNo: 'CS202603', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:17:55 AM', distanceMeters: 68, status: 'ABSENT', hash: 'AUDIT-2026-REC-992381' },
+    { id: 'REC-04', studentName: 'Ananya Sharma', rollNo: 'CS202604', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:17:02 AM', distanceMeters: 9, status: 'PRESENT', hash: 'AUDIT-2026-REC-584920' },
+    { id: 'REC-05', studentName: 'Vikramaditya Verma', rollNo: 'CS202605', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:16:30 AM', distanceMeters: 15, status: 'PRESENT', hash: 'AUDIT-2026-REC-392019' },
+    { id: 'REC-06', studentName: 'Sneha Gupta', rollNo: 'CS202606', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:15:45 AM', distanceMeters: 11, status: 'PRESENT', hash: 'AUDIT-2026-REC-884012' },
+    { id: 'REC-07', studentName: 'Ishaan Patel', rollNo: 'CS202607', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:15:10 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-739201' },
+    { id: 'REC-08', studentName: 'Kavya Deshmukh', rollNo: 'CS202608', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:14:35 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-483920' },
+    { id: 'REC-09', studentName: 'Aditya Reddy', rollNo: 'CS202609', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:14:00 AM', distanceMeters: 74, status: 'ABSENT', hash: 'AUDIT-2026-REC-294018' },
+    { id: 'REC-10', studentName: 'Diya Roy', rollNo: 'CS202610', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:13:20 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-673029' },
+    { id: 'REC-11', studentName: 'Rahul Nair', rollNo: 'CS202611', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:12:50 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-940281' },
+    { id: 'REC-12', studentName: 'Tanvi Joshi', rollNo: 'CS202612', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:12:15 AM', distanceMeters: 8, status: 'PRESENT', hash: 'AUDIT-2026-REC-184029' },
+    { id: 'REC-13', studentName: 'Amit Kumar', rollNo: 'CS202613', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:11:40 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-592018' },
+    { id: 'REC-14', studentName: 'Neha Agarwal', rollNo: 'CS202614', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:11:05 AM', distanceMeters: 14, status: 'PRESENT', hash: 'AUDIT-2026-REC-830291' },
+    { id: 'REC-15', studentName: 'Harsh Vardhan', rollNo: 'CS202615', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:10:30 AM', distanceMeters: 82, status: 'ABSENT', hash: 'AUDIT-2026-REC-492018' },
+    { id: 'REC-16', studentName: 'Pooja Mishra', rollNo: 'CS202616', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:10:00 AM', distanceMeters: 17, status: 'PRESENT', hash: 'AUDIT-2026-REC-382019' },
+    { id: 'REC-17', studentName: 'Siddharth Rao', rollNo: 'CS202617', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:09:20 AM', distanceMeters: 12, status: 'PRESENT', hash: 'AUDIT-2026-REC-749201' },
+    { id: 'REC-18', studentName: 'Shreya Pandey', rollNo: 'CS202618', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:08:50 AM', distanceMeters: 15, status: 'PRESENT', hash: 'AUDIT-2026-REC-194028' },
+    { id: 'REC-19', studentName: 'Arjun Kapoor', rollNo: 'CS202619', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:08:15 AM', distanceMeters: 21, status: 'PRESENT', hash: 'AUDIT-2026-REC-683029' },
+    { id: 'REC-20', studentName: 'Riya Sen', rollNo: 'CS202620', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:07:40 AM', distanceMeters: 11, status: 'PRESENT', hash: 'AUDIT-2026-REC-492810' },
+    { id: 'REC-21', studentName: 'Yash Malhotra', rollNo: 'CS202621', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:07:05 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-839201' },
+    { id: 'REC-22', studentName: 'Anjali Yadav', rollNo: 'CS202622', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:06:30 AM', distanceMeters: 9, status: 'PRESENT', hash: 'AUDIT-2026-REC-284019' },
+    { id: 'REC-23', studentName: 'Karan Sharma', rollNo: 'CS202623', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:05:55 AM', distanceMeters: 18, status: 'PRESENT', hash: 'AUDIT-2026-REC-739281' },
+    { id: 'REC-24', studentName: 'Meera Rajput', rollNo: 'CS202624', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:05:20 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-592810' },
+    { id: 'REC-25', studentName: 'Abhinav Saxena', rollNo: 'CS202625', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:04:45 AM', distanceMeters: 55, status: 'ABSENT', hash: 'AUDIT-2026-REC-184920' },
+    { id: 'REC-26', studentName: 'Swati Tripathi', rollNo: 'CS202626', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:04:10 AM', distanceMeters: 14, status: 'PRESENT', hash: 'AUDIT-2026-REC-839102' },
+    { id: 'REC-27', studentName: 'Vivek Choudhary', rollNo: 'CS202627', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:03:35 AM', distanceMeters: 12, status: 'PRESENT', hash: 'AUDIT-2026-REC-492019' },
+    { id: 'REC-28', studentName: 'Divya Thakur', rollNo: 'CS202628', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:03:00 AM', distanceMeters: 17, status: 'PRESENT', hash: 'AUDIT-2026-REC-284910' },
+    { id: 'REC-29', studentName: 'Gaurav Bhatia', rollNo: 'CS202629', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:02:25 AM', distanceMeters: 20, status: 'PRESENT', hash: 'AUDIT-2026-REC-739182' },
+    { id: 'REC-30', studentName: 'Simran Kaur', rollNo: 'CS202630', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:01:50 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-392810' }
   ];
 
   const exportComprehensiveReport = () => {
@@ -333,9 +333,13 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                   onChange={(e) => setSelectedClassId(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold text-slate-900 focus:outline-none focus:border-blue-500"
                 >
-                  <option value="cs401">CS 401 - Advanced AI (Lab 402)</option>
-                  <option value="cs301">CS 301 - Data Structures (Room 305)</option>
-                  <option value="cs302">CS 302 - Database Systems (Lab 401)</option>
+                  <option value="bca501">BCA 501 - Computer Graphics (Room B-302)</option>
+                  <option value="bca502">BCA 502 - Cryptography & Network Security (Room B-302)</option>
+                  <option value="bca503">BCA 503 - Web Technology (Room B-302)</option>
+                  <option value="bca504">BCA 504 - Minor Project (Room B-302)</option>
+                  <option value="bca511">BCA 511 - Computer Graphics Lab (Room B-302)</option>
+                  <option value="bca512">BCA 512 - Web Technology Lab (Room B-302)</option>
+                  <option value="ace511">ACE 511 - Industrial Internship (Room B-302)</option>
                 </select>
               </div>
 
@@ -397,7 +401,7 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                     </td>
                   </tr>
                   <tr>
-                    <td className="py-2 font-bold text-slate-900">Dr. Rajesh Sharma</td>
+                    <td className="py-2 font-bold text-slate-900">Mr. Dhananjay Kr. Yadav</td>
                     <td className="py-2 text-slate-500">Faculty</td>
                     <td className="py-2 text-right">
                       <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[9px] font-black border border-blue-200">Verified</span>

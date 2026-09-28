@@ -44,9 +44,9 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   const [pipelineResults, setPipelineResults] = useState(null);
   const [liveRecord, setLiveRecord] = useState(null);
   const [attendanceLogs, setAttendanceLogs] = useState([
-    { id: '1', subject: 'Data Structures (CS301)', time: 'Today • 09:00 AM', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-771829' },
-    { id: '2', subject: 'Database Systems (CS302)', time: 'Yesterday • 02:00 PM', status: 'LATE', distance: '32m', hash: 'AUDIT-2026-REC-551940' },
-    { id: '3', subject: 'Web Engineering (CS305)', time: '18 Aug • 11:00 AM', status: 'PRESENT', distance: '18m', hash: 'AUDIT-2026-REC-332910' }
+    { id: '1', subject: 'Computer Graphics (BCA501)', time: 'Today • 09:30 AM', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-771829' },
+    { id: '2', subject: 'Cryptography and Network Security (BCA502)', time: 'Yesterday • 10:30 AM', status: 'LATE', distance: '32m', hash: 'AUDIT-2026-REC-551940' },
+    { id: '3', subject: 'Web Technology (BCA503)', time: '18 Aug • 11:30 AM', status: 'PRESENT', distance: '18m', hash: 'AUDIT-2026-REC-332910' }
   ]);
   const [voiceAlertPlaying, setVoiceAlertPlaying] = useState(false);
   const [hasMarkedAttendance, setHasMarkedAttendance] = useState(false);
@@ -545,9 +545,9 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
       const passRecord = {
         id: recordId,
         hash: recordId,
-        subject: 'Advanced AI (CS401)',
-        instructor: 'Dr. Rajesh Sharma',
-        room: 'Lab 402',
+        subject: 'Computer Graphics (BCA501)',
+        instructor: 'Mr. Dhananjay Kr. Yadav (DKY)',
+        room: 'Room B-302',
         studentName: user ? user.name : 'Manoj Sharma',
         rollNo: user ? user.rollNo : 'CS202601',
         course: 'B.C.A • Semester 5',
@@ -568,7 +568,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
       setAttendanceLogs(prev => [
         {
           id: String(Date.now()),
-          subject: 'Advanced AI (CS401)',
+          subject: 'Computer Graphics (BCA501)',
           time: `Today • ${timeNow}`,
           status: finalStatus,
           distance: `${distanceMeters}m`,
@@ -663,7 +663,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                   LIVE 5-MINUTE CLASS SESSION
                 </span>
                 <span className="text-xs text-blue-100 font-bold">
-                  {activeSession?.className || 'Advanced AI (CS401)'}
+                  {activeSession?.className || 'Computer Graphics (BCA501)'}
                 </span>
               </div>
               <p className="text-xs font-bold mt-1 text-white">
@@ -775,8 +775,8 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
             <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
               <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
                 <div>
-                  <p className="font-extrabold text-slate-900">Data Structures (CS301)</p>
-                  <p className="text-[10px] text-slate-500 font-medium">09:00 AM - 10:00 AM • Room 305</p>
+                  <p className="font-extrabold text-slate-900">Computer Graphics (BCA501)</p>
+                  <p className="text-[10px] text-slate-500 font-medium">09:35 AM - 10:15 AM • Room B-302 • Mr. Dhananjay Kr. Yadav (DKY)</p>
                 </div>
                 <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                   DONE 🟢
@@ -786,10 +786,10 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               <div className="p-2.5 rounded-xl bg-blue-50/80 border border-blue-200 flex items-center justify-between text-xs">
                 <div>
                   <p className="font-extrabold text-blue-950 flex items-center gap-1.5">
-                    Advanced AI (CS401)
+                    Cryptography & Network Security (BCA502)
                     <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping"></span>
                   </p>
-                  <p className="text-[10px] text-blue-700 font-medium">10:00 AM - 11:00 AM • Lab 402</p>
+                  <p className="text-[10px] text-blue-700 font-medium">10:35 AM - 11:15 AM • Room B-302 • Dr. Gouri Shukla (GS)</p>
                 </div>
                 <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-600 text-white shadow-xs animate-pulse">
                   ONGOING ⏱️
@@ -798,8 +798,8 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
 
               <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
                 <div>
-                  <p className="font-extrabold text-slate-800">Database Systems (CS302)</p>
-                  <p className="text-[10px] text-slate-500 font-medium">11:15 AM - 12:15 PM • Lab 401</p>
+                  <p className="font-extrabold text-slate-800">Web Technology (BCA503)</p>
+                  <p className="text-[10px] text-slate-500 font-medium">11:15 AM - 12:05 PM • Room B-302 • Mr. Rishi Mohan Awasthi (RMA)</p>
                 </div>
                 <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
                   NEXT
@@ -808,8 +808,28 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
 
               <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
                 <div>
-                  <p className="font-extrabold text-slate-800">Web Engineering (CS305)</p>
-                  <p className="text-[10px] text-slate-500 font-medium">01:30 PM - 02:30 PM • Room 204</p>
+                  <p className="font-extrabold text-slate-800">Computer Graphics Lab (BCA511) / Web Tech Lab (BCA512)</p>
+                  <p className="text-[10px] text-slate-500 font-medium">12:55 PM - 01:45 PM • Lab CCL1 / B-108 • Dr. Gouri Shukla & Mr. Rishi Mohan Awasthi</p>
+                </div>
+                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                  UPCOMING
+                </span>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
+                <div>
+                  <p className="font-extrabold text-slate-800">Minor Project (BCA504)</p>
+                  <p className="text-[10px] text-slate-500 font-medium">02:35 PM - 03:25 PM • Room B-302 • Dr. Peeyush Pathak (PP)</p>
+                </div>
+                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                  UPCOMING
+                </span>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
+                <div>
+                  <p className="font-extrabold text-slate-800">Industrial Internship (ACE511)</p>
+                  <p className="text-[10px] text-slate-500 font-medium">03:25 PM - 04:15 PM • Room B-302 • Mr. Imtiyaz Haq (IH)</p>
                 </div>
                 <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
                   UPCOMING
@@ -819,8 +839,8 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           </div>
 
           <div className="p-2.5 bg-slate-900 text-white rounded-xl text-[11px] font-bold text-center flex items-center justify-between px-3 border border-slate-800 shadow-md">
-            <span>Current Class: <strong className="text-yellow-300 font-mono">Advanced AI (CS401)</strong></span>
-            <span className="text-[10px] text-blue-300 font-mono">Lab 402</span>
+            <span>Current Class: <strong className="text-yellow-300 font-mono">Computer Graphics (BCA501)</strong></span>
+            <span className="text-[10px] text-blue-300 font-mono">Room B-302</span>
           </div>
         </div>
 
@@ -969,7 +989,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                   title: 'Class QR Session Active',
                   time: 'Just Now',
                   type: 'LIVE CLASS ALERT',
-                  details: 'Dr. Rajesh Sharma generated a live 5-minute dynamic QR code session for Advanced AI (CS401) in Lab 402. Please scan the QR code before the 5-minute timer expires to record your attendance.'
+                  details: 'Mr. Dhananjay Kr. Yadav generated a live 5-minute dynamic QR code session for Computer Graphics (BCA501) in Room B-302. Please scan the QR code before the 5-minute timer expires to record your attendance.'
                 })}
                 className="p-2.5 rounded-xl bg-blue-50/70 border border-blue-200 cursor-pointer hover:bg-blue-100/80 transition-all space-y-1"
               >
@@ -980,7 +1000,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                   <span className="text-[10px] text-blue-600 font-mono font-bold">Just Now</span>
                 </div>
                 <p className="text-[10px] text-slate-600 font-medium line-clamp-1">
-                  Teacher generated 5-minute QR for Advanced AI (CS401). Click to read full alert.
+                  Teacher generated 5-minute QR for Computer Graphics (BCA501). Click to read full alert.
                 </p>
               </div>
 
@@ -1091,7 +1111,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs font-black uppercase tracking-wider inline-block mb-1">
                 Step 2 of 3: AI Face & Geofence Verification
               </span>
-              <h3 className="text-xl font-black text-white">Advanced AI (CS401)</h3>
+              <h3 className="text-xl font-black text-white">{activeSession?.className || 'Computer Graphics (BCA501)'}</h3>
               <p className="text-xs text-slate-400">Position your face inside webcam frame for 3D liveness check</p>
             </div>
 
