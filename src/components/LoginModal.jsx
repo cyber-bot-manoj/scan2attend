@@ -128,11 +128,6 @@ export default function LoginModal({ setUser, setActiveTab }) {
                   className="w-full h-56 sm:h-64 object-cover object-center transform transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0F172A] via-transparent to-transparent opacity-80"></div>
-                <div className="absolute bottom-3 left-3 right-3 text-center">
-                  <span className="text-[11px] font-extrabold text-blue-200 bg-slate-900/80 px-3 py-1.5 rounded-full border border-blue-400/30 backdrop-blur-md shadow-md inline-flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-yellow-300 animate-pulse" /> Smart Geofence & AI Attendance Portal
-                  </span>
-                </div>
               </div>
             </div>
           </div>
