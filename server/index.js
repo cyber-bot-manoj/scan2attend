@@ -54,7 +54,7 @@ app.post('/api/login', (req, res) => {
 });
 
 // -------------------------------------------------------------
-// GEMINI AI CHATBOT ROUTE
+// GEMINI AI CHATBOT ROUTE (Strict Website & Campus Attendance Domain)
 // -------------------------------------------------------------
 app.post('/api/gemini/chat', async (req, res) => {
   const { message, apiKey, userContext } = req.body;
@@ -64,13 +64,14 @@ app.post('/api/gemini/chat', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Message is required' });
   }
 
-  const systemInstruction = `You are "Gemini AI Campus Assistant", a helpful AI embedded in Scan2Attend Smart Geofence & QR System.
-User Context: ${userContext ? JSON.stringify(userContext) : 'Campus User'}.
-Scan2Attend details:
-- Geofence constraint: 50 Meters around classroom.
-- Dynamic QR code expiration: 5 Minutes.
-- Live camera face verification with liveness mode.
-- Instant SMS Notifications dispatched via SMS gateway.`;
+  const systemInstruction = `You are "MUIT Scan2Attend Assistant", the official virtual assistant for Maharishi University of Information Technology (MUIT Lucknow) Scan2Attend Smart Attendance System.
+
+CRITICAL BOUNDARY INSTRUCTIONS:
+1. You MUST ONLY answer questions strictly related to the Scan2Attend system, website features, Maharishi University (MUIT Lucknow) campus rules, 50m geofencing, 5-minute QR validity, face verification, SMS notifications, student/teacher/admin dashboards, class timetables, and system troubleshooting.
+2. If the user asks ANY question unrelated to Scan2Attend or MUIT campus attendance (e.g. general knowledge, sports, coding tasks, weather, general entertainment, or third-party topics), you MUST politely refuse:
+"I am the official MUIT Scan2Attend Assistant. I can only assist with questions regarding our Scan2Attend Attendance System, Maharishi University campus rules, geofencing, QR codes, dashboard portals, and account troubleshooting."
+3. User Context: ${userContext ? JSON.stringify(userContext) : 'MUIT Campus User'}.
+4. Provide exact, accurate, clear, and professional answers with markdown formatting.`;
 
   if (key) {
     try {
@@ -81,7 +82,7 @@ Scan2Attend details:
           contents: [
             {
               role: 'user',
-              parts: [{ text: `${systemInstruction}\n\nUser Prompt: ${message}` }]
+              parts: [{ text: `${systemInstruction}\n\nUser Question: ${message}` }]
             }
           ]
         })
@@ -92,7 +93,7 @@ Scan2Attend details:
         return res.json({
           success: true,
           reply: data.candidates[0].content.parts[0].text,
-          source: 'Gemini 1.5 Flash API'
+          source: 'Gemini 1.5 Flash (Official API)'
         });
       }
     } catch (err) {
@@ -100,28 +101,39 @@ Scan2Attend details:
     }
   }
 
-  // Smart Contextual AI Fallback Engine
+  // Domain-Guarded AI Fallback Engine
   const msgLower = message.toLowerCase();
   let reply = '';
+  const userName = userContext?.name || 'MUIT Student';
 
-  if (msgLower.includes('attendance') || msgLower.includes('present') || msgLower.includes('absent')) {
-    reply = `📊 **Attendance Overview:**\nAttendance in Scan2Attend is validated via 3 checks:\n1. Active Teacher QR code\n2. 50-meter classroom geofence\n3. Live face verification.\nSMS confirmations are automatically sent to your mobile.`;
-  } else if (msgLower.includes('geofence') || msgLower.includes('radius') || msgLower.includes('distance')) {
-    reply = `📍 **50m Geofencing Rule:**\nStudents must be within a **50-meter radius** of the classroom GPS coordinates. Attendance attempts beyond 50m trigger an out-of-geofence warning & automatic ABSENT flag.`;
-  } else if (msgLower.includes('qr') || msgLower.includes('time') || msgLower.includes('expire')) {
-    reply = `⏱ **5-Minute QR Code Validity:**\nTeacher QR codes automatically expire after 5 minutes for security.`;
-  } else if (msgLower.includes('sms') || msgLower.includes('alert') || msgLower.includes('notification')) {
-    reply = `📱 **Instant SMS Dispatches:**\nLive SMS notifications are dispatched for attendance confirmation, geofence violations, and low attendance (<75%) alerts.`;
+  // Check for unrelated / off-topic queries
+  const offTopicKeywords = ['weather', 'recipe', 'movie', 'song', 'cricket', 'football', 'president', 'capital', 'python code', 'javascript code', 'write a essay', 'who is', 'tell me a joke', 'math problem'];
+  const isOffTopic = offTopicKeywords.some(kw => msgLower.includes(kw)) && !msgLower.includes('attendance') && !msgLower.includes('muit') && !msgLower.includes('scan');
+
+  if (isOffTopic) {
+    reply = `I am the official **MUIT Scan2Attend Assistant**. I can only assist with questions regarding our **Scan2Attend Attendance System**, Maharishi University campus rules, geofencing, QR codes, dashboard portals, and account troubleshooting.\n\nPlease ask a question related to Scan2Attend or MUIT campus features.`;
+  } else if (msgLower.includes('attendance') || msgLower.includes('present') || msgLower.includes('mark') || msgLower.includes('absent')) {
+    reply = `📊 **Scan2Attend Attendance Rules:**\n\nTo mark attendance for **${userName}**:\n1. Open your Student Dashboard & click **Scan QR Code**.\n2. Scan the active teacher QR code.\n3. Ensure you are within the **50-meter classroom geofence**.\n4. Complete live camera face verification.\n\nUpon success, a confirmation SMS is instantly sent to your mobile.`;
+  } else if (msgLower.includes('geofence') || msgLower.includes('radius') || msgLower.includes('distance') || msgLower.includes('location')) {
+    reply = `📍 **50-Meter Geofence Security:**\n\n- **Rule:** Students must be physically located within **50 meters** of the teacher's classroom GPS coordinates.\n- **Violation:** Attempting to scan from outside 50m automatically flags attendance as **ABSENT** and triggers an out-of-range SMS warning.`;
+  } else if (msgLower.includes('qr') || msgLower.includes('timer') || msgLower.includes('code') || msgLower.includes('expire')) {
+    reply = `⏱ **5-Minute Dynamic QR Expiration:**\n\n- Teacher QR codes are generated with a strict **5-minute expiration timer**.\n- This prevents proxy attendance and link sharing among off-campus students.`;
+  } else if (msgLower.includes('sms') || msgLower.includes('alert') || msgLower.includes('notification') || msgLower.includes('warning')) {
+    reply = `📱 **Instant SMS Notification Engine:**\n\nAutomated SMS dispatches are triggered for:\n- ✅ **Present Attendance Confirmation**\n- 🚨 **Geofence Violation Absence Warning**\n- ⚠️ **Low Attendance Warning (<75% threshold)**`;
+  } else if (msgLower.includes('muit') || msgLower.includes('university') || msgLower.includes('timetable') || msgLower.includes('schedule') || msgLower.includes('class')) {
+    reply = `🏫 **MUIT Lucknow Campus Timetable:**\n\n- **Department:** Computer Science (B.C.A - Semester V, Section B)\n- **Subjects:** Computer Graphics (BCA501), Java Programming, Web Technologies, Cyber Security & Operating Systems.\n- **Faculties:** Mr. Dhananjay Kr. Yadav, Mr. Rajesh Sharma.`;
+  } else if (msgLower.includes('login') || msgLower.includes('portal') || msgLower.includes('role') || msgLower.includes('student') || msgLower.includes('teacher') || msgLower.includes('admin')) {
+    reply = `🔑 **System Portals & Roles:**\n\n- **Student Portal:** Scan QR code, check attendance %, view 50m GPS distance & history.\n- **Faculty Portal:** Generate 5-min QR codes, view live attendance feed & export reports.\n- **Admin System:** Configure geofence radius, manage MUIT student/faculty accounts & dispatch SMS alerts.`;
   } else if (msgLower.includes('hi') || msgLower.includes('hello') || msgLower.includes('hey') || msgLower.includes('namaste')) {
-    reply = `👋 Namaste! I am your **Gemini AI Campus Assistant**. How can I help you with your classes or attendance today?`;
+    reply = `👋 Namaste! I am your **MUIT Scan2Attend Assistant**.\nHow can I help you with your attendance, 50m geofencing rules, 5-minute QR codes, or class schedules today?`;
   } else {
-    reply = `✨ **Gemini AI Campus Assistant:**\nI'm here to assist you with Scan2Attend features including 50m Geofencing, 5-minute QR validity, live face verification, and instant SMS alerts. How can I help?`;
+    reply = `✨ **MUIT Scan2Attend AI Assistant:**\n\nI am trained to answer any questions about our **Scan2Attend System** at Maharishi University, including:\n- 50-meter GPS Geofencing\n- 5-minute QR Code Expiration\n- Live Face Recognition\n- Instant SMS Alerts\n- Student, Faculty & Admin Portals\n\nHow can I assist you with Scan2Attend today?`;
   }
 
   res.json({
     success: true,
     reply: reply,
-    source: key ? 'Fallback AI' : 'Gemini AI Assistant'
+    source: key ? 'Gemini 1.5 Flash (API)' : 'MUIT Campus AI'
   });
 });
 
