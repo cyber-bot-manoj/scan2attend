@@ -53,14 +53,26 @@ export default function LoginModal({ setUser, setActiveTab }) {
       <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl pointer-events-none"></div>
 
       <div className="text-center mb-6">
-        <div className="relative group w-full mb-4 overflow-hidden rounded-2xl border border-indigo-500/30 shadow-xl bg-slate-900/50">
+        <div className="flex items-center justify-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 p-2 shadow-lg shadow-indigo-500/30 flex items-center justify-center border border-white/20">
+            <img src="/scan2attend-logo.svg" alt="Scan2Attend Logo" className="w-full h-full object-contain" />
+          </div>
+          <div className="text-left">
+            <h1 className="text-2xl font-black text-white tracking-tight flex items-center gap-1">
+              Scan<span className="text-indigo-400">2</span>Attend
+            </h1>
+            <span className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-300">Smart Attendance System</span>
+          </div>
+        </div>
+
+        <div className="relative group w-full mb-4 p-2 rounded-2xl border-2 border-indigo-500/50 shadow-2xl bg-gradient-to-br from-[#1E1B4B] via-[#0F172A] to-[#1E293B] overflow-hidden">
           <img 
             src="/campus_attendance_hero.png" 
-            alt="Smart Campus Attendance System" 
-            className="w-full h-48 sm:h-56 object-cover object-center transform transition-transform duration-500 group-hover:scale-105"
+            alt="Scan2Attend Campus System" 
+            className="w-full h-48 sm:h-56 object-contain object-center rounded-xl transform transition-transform duration-500 group-hover:scale-102"
           />
         </div>
-        <h2 className="text-2xl font-bold text-white">System Portal Login</h2>
+        <h2 className="text-xl font-bold text-white">System Portal Login</h2>
         <p className="text-xs text-gray-400 mt-1">Select role or enter your credentials</p>
       </div>
 
