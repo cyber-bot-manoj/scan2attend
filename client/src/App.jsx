@@ -4,7 +4,6 @@ import StudentPanel from './components/StudentPanel';
 import TeacherPanel from './components/TeacherPanel';
 import AdminPanel from './components/AdminPanel';
 import LoginModal from './components/LoginModal';
-import GeminiChatbot from './components/GeminiChatbot';
 import Footer from './components/Footer';
 
 export default function App() {
@@ -89,9 +88,6 @@ export default function App() {
           <LoginModal setUser={setUser} setActiveTab={setActiveTab} />
         )}
       </main>
-
-      {/* MAHARISHI UNIVERSITY STYLE AI CAMPUS CHATBOT */}
-      <GeminiChatbot user={user} />
 
       {/* Modern High-End Footer for Scan2Attend */}
       {user && activeTab !== 'LOGIN' && (

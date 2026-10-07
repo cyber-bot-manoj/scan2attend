@@ -13,8 +13,7 @@ import {
   Clock,
   MessageSquare,
   Zap,
-  CheckCircle2,
-  Key
+  CheckCircle2
 } from 'lucide-react';
 
 export default function GeminiChatbot({ user }) {
@@ -22,16 +21,14 @@ export default function GeminiChatbot({ user }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('gemini_api_key') || '');
-  const [showKeyInput, setShowKeyInput] = useState(false);
   
   const [messages, setMessages] = useState([
     {
       id: 'msg_welcome',
       sender: 'bot',
-      text: `Namaste **${user?.name || 'MUIT Student'}**! 👋 I am your **MUIT Scan2Attend AI Assistant**.\n\nI can answer questions regarding our **Scan2Attend Smart Attendance System**, 50m GPS geofencing, 5-minute QR codes, face recognition, instant SMS alerts, and Maharishi University class schedules. How can I help you today?`,
+      text: `Hello **${user?.name || 'Student'}**! 👋 I am your **AI Campus Assistant**.\n\nI can assist you with your attendance records, 50m geofence rules, 5-minute QR codes, SMS alert dispatches, and class schedules. Ask me anything!`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      source: 'MUIT Campus AI'
+      source: 'AI Assistant'
     }
   ]);
 
@@ -42,16 +39,6 @@ export default function GeminiChatbot({ user }) {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isOpen]);
-
-  const saveApiKey = (key) => {
-    setApiKey(key);
-    if (key) {
-      localStorage.setItem('gemini_api_key', key);
-    } else {
-      localStorage.removeItem('gemini_api_key');
-    }
-    setShowKeyInput(false);
-  };
 
   const handleSendMessage = async (textToSend) => {
     const text = textToSend || inputMessage.trim();
@@ -69,13 +56,12 @@ export default function GeminiChatbot({ user }) {
     setLoading(true);
 
     try {
-      // Send request to backend Gemini endpoint (passes custom apiKey if provided)
+      // Send request to backend Gemini endpoint
       const res = await fetch('/api/gemini/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: text,
-          apiKey: apiKey || undefined,
           userContext: {
             name: user?.name,
             role: user?.role,
@@ -88,14 +74,14 @@ export default function GeminiChatbot({ user }) {
       const data = await res.json();
 
       let replyText = '';
-      let sourceInfo = 'MUIT Campus AI';
+      let sourceInfo = 'AI Chatbot';
 
       if (data.success && data.reply) {
         replyText = data.reply;
-        sourceInfo = data.source || 'Gemini 1.5 Flash (Free API)';
+        sourceInfo = 'AI Assistant';
       } else {
         replyText = generateFallbackResponse(text, user);
-        sourceInfo = 'Scan2Attend AI';
+        sourceInfo = 'Smart Campus AI';
       }
 
       setMessages(prev => [
@@ -109,7 +95,7 @@ export default function GeminiChatbot({ user }) {
         }
       ]);
     } catch (err) {
-      console.warn('API connection offline, using domain fallback AI:', err);
+      console.warn('API error, executing fallback AI response:', err);
       const fallbackReply = generateFallbackResponse(text, user);
       
       setMessages(prev => [
@@ -119,7 +105,7 @@ export default function GeminiChatbot({ user }) {
           sender: 'bot',
           text: fallbackReply,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          source: 'MUIT Campus AI'
+          source: 'AI Assistant'
         }
       ]);
     } finally {
@@ -129,68 +115,60 @@ export default function GeminiChatbot({ user }) {
 
   const generateFallbackResponse = (query, currentUser) => {
     const q = query.toLowerCase();
-    const userName = currentUser?.name || 'MUIT Student';
-
-    // Check for off-topic queries
-    const offTopicKeywords = ['weather', 'recipe', 'movie', 'song', 'cricket', 'football', 'president', 'capital', 'python code', 'javascript code', 'write a essay', 'who is', 'tell me a joke', 'math problem'];
-    const isOffTopic = offTopicKeywords.some(kw => q.includes(kw)) && !q.includes('attendance') && !q.includes('muit') && !q.includes('scan');
-
-    if (isOffTopic) {
-      return `I am the official **MUIT Scan2Attend Assistant**. I am programmed to ONLY answer questions regarding our **Scan2Attend Attendance System**, Maharishi University campus rules, geofencing, QR codes, dashboard portals, and account troubleshooting.\n\nPlease ask a question related to Scan2Attend or MUIT campus features.`;
-    }
+    const userName = currentUser?.name || 'Student';
 
     if (q.includes('attendance') || q.includes('present') || q.includes('mark') || q.includes('absent')) {
-      return `📊 **Scan2Attend Attendance Verification for ${userName}:**\n\n- **Verification Pipeline:**\n  1. Scan active teacher QR code\n  2. Must be within **50 meters** classroom geofence radius\n  3. Pass live camera face verification.\n- **Instant Alerts:** Attendance confirmation is immediately dispatched via SMS.`;
+      return `📊 **Attendance Information for ${userName}:**\n\n- **Status:** Active Present sessions logged.\n- **Rules:** Attendance requires 3 checks:\n  1. Scanning active teacher QR code\n  2. Being within **50 meters** classroom geofence\n  3. Passing live camera face verification.\n- **SMS Dispatch:** Delivered immediately to registered phone.`;
     } 
     
     if (q.includes('geofence') || q.includes('radius') || q.includes('location') || q.includes('meter') || q.includes('distance')) {
-      return `📍 **50-Meter Geofence Security System:**\n\n- **Allowed Boundary:** Exactly **50 Meters** around the classroom teacher GPS coordinates.\n- **Out of Boundary:** Scanning from >50m away automatically flags attendance as **ABSENT** and sends an instant SMS warning!`;
+      return `📍 **Geofence Security System:**\n\n- **Allowed Radius:** Exactly **50 Meters** around the teacher's classroom GPS coordinates.\n- **Out-of-Range Handling:** If you scan from >50 meters away, the system automatically flags attendance as **ABSENT** and dispatches an immediate SMS alert to your phone!`;
     }
 
     if (q.includes('qr') || q.includes('timer') || q.includes('time') || q.includes('expire') || q.includes('code')) {
-      return `⏱ **5-Minute Dynamic QR Code Timer:**\n\n- **Validity:** Teacher QR codes expire in **5 Minutes**.\n- **Security:** Prevents proxy attendance & link sharing across off-campus students.`;
+      return `⏱ **Dynamic QR Session Timer:**\n\n- **Validity:** Teacher QR codes expire in **5 Minutes**.\n- **Purpose:** Prevents proxy attendance and link sharing across off-campus students.`;
     }
 
     if (q.includes('sms') || q.includes('notification') || q.includes('alert') || q.includes('mobile')) {
-      return `📱 **Instant SMS Notification Engine:**\n\n- Powered by automated SMS Gateway.\n- Triggers SMS for:\n  • Present attendance confirmation\n  • Out-of-geofence attempts\n  • Low attendance warnings (<75% threshold).`;
+      return `📱 **Instant SMS Notification Engine:**\n\n- Powered by automated SMS Gateway.\n- Triggers SMS for:\n  • Present attendance verification\n  • Out-of-geofence attempts\n  • Low attendance warnings (<75% threshold).`;
     }
 
-    if (q.includes('muit') || q.includes('timetable') || q.includes('schedule') || q.includes('class')) {
-      return `🏫 **MUIT Lucknow Timetable & Courses:**\n\n- **Department:** Computer Science (B.C.A - Semester V, Section B)\n- **Subjects:** Computer Graphics (BCA501), Java Programming, Cyber Security, Web Tech & Operating Systems.`;
+    if (q.includes('teacher') || q.includes('admin') || q.includes('role')) {
+      return `🎓 **Role Overview:**\n\n- **Student:** Scans QR code within 50m & passes face check.\n- **Teacher:** Launches 5-min QR session & monitors live student feed.\n- **Admin:** Configures GPS coordinates, geofence radius & manages user profiles.`;
     }
 
     if (q.includes('hi') || q.includes('hello') || q.includes('hey') || q.includes('namaste')) {
-      return `👋 Namaste **${userName}**! How can I help you today with your MUIT Scan2Attend attendance, classroom geofence, or 5-minute QR codes?`;
+      return `👋 Hello **${userName}**! How can I help you today with your attendance, classroom geofencing, or QR sessions?`;
     }
 
-    return `✨ **MUIT Scan2Attend Assistant:**\n\nI can assist you with:\n- 50-meter GPS Geofencing Rules\n- 5-minute Dynamic QR Code Validity\n- Live Face Recognition\n- Instant SMS Alerts\n- MUIT Timetable & Portal Support\n\nHow can I help you with Scan2Attend today?`;
+    return `✨ **AI Campus Assistant:**\n\nThank you for asking! I am trained on **Scan2Attend** smart attendance features including:\n- 50-meter GPS Geofencing\n- 5-minute dynamic QR expiration\n- Live camera face verification\n- Instant SMS alerts & parent dispatches\n\nHow else can I assist you today?`;
   };
 
   const quickPrompts = [
-    { label: '📊 How to mark attendance?', query: 'How do I mark my attendance in Scan2Attend?' },
-    { label: '📍 50m Geofence Rule', query: 'What is the 50-meter geofence rule?' },
-    { label: '⏱ 5-Min QR Timer', query: 'How long is the QR code valid?' },
-    { label: '📱 SMS Alert Engine', query: 'How do instant SMS notifications work?' },
-    { label: '🏫 MUIT Timetable', query: 'What is the MUIT class schedule and timetable?' }
+    { label: '📊 Attendance Rules', query: 'What are the attendance rules and geofence distance?' },
+    { label: '📍 How 50m Geofencing works', query: 'Explain how 50m geofencing works' },
+    { label: '⏱ QR Code validity timer', query: 'How long is QR code valid?' },
+    { label: '📱 SMS Alerts dispatches', query: 'How do SMS notification alerts work?' }
   ];
 
   return (
     <>
-      {/* FLOATING ACTION BUTTON - MAHARISHI UNIVERSITY STYLE BOTTOM RIGHT */}
+      {/* FLOATING ACTION BUTTON - LOWER CORNER OF DASHBOARD */}
       {!isOpen && (
         <div className="fixed bottom-6 right-6 z-50 animate-bounce-short">
           <button
             onClick={() => setIsOpen(true)}
-            className="group relative flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-[#1E3A8A] via-[#2979FF] to-[#7C4DFF] text-white rounded-full shadow-2xl hover:shadow-indigo-500/50 hover:scale-105 transition-all duration-300 border-2 border-white/40"
+            className="group relative flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-[#2979FF] via-[#7C4DFF] to-[#FF4081] text-white rounded-full shadow-2xl hover:shadow-indigo-500/50 hover:scale-105 transition-all duration-300 border-2 border-white/40"
           >
             <div className="relative">
               <Bot className="w-5 h-5 text-yellow-300" />
               <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full ring-2 ring-white animate-ping"></span>
             </div>
-            <span className="text-xs font-black tracking-wide pr-1">MUIT Assistant</span>
+            <span className="text-xs font-black tracking-wide pr-1">AI Chatbot</span>
             
+            {/* Tooltip on hover */}
             <span className="absolute right-0 bottom-full mb-2 hidden group-hover:block bg-slate-900 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap">
-              Ask MUIT Scan2Attend Assistant
+              Ask AI Chatbot Assistant
             </span>
           </button>
         </div>
@@ -202,41 +180,33 @@ export default function GeminiChatbot({ user }) {
           className={`fixed z-50 transition-all duration-300 ease-in-out flex flex-col bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden ${
             isExpanded 
               ? 'inset-4 sm:inset-10 w-auto h-auto' 
-              : 'bottom-6 right-4 sm:right-6 w-[92vw] sm:w-[420px] h-[600px] max-h-[85vh]'
+              : 'bottom-6 right-4 sm:right-6 w-[92vw] sm:w-[400px] h-[580px] max-h-[85vh]'
           }`}
         >
-          {/* TOP HEADER - MAHARISHI UNIVERSITY STYLE */}
-          <div className="bg-gradient-to-r from-[#0F172A] via-[#1E3A8A] to-[#2979FF] p-4 text-white flex items-center justify-between shadow-md relative overflow-hidden">
+          {/* TOP HEADER */}
+          <div className="bg-gradient-to-r from-[#2979FF] via-[#673AB7] to-[#EC4899] p-4 text-white flex items-center justify-between shadow-md relative overflow-hidden">
             <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
 
             <div className="flex items-center gap-3 z-10">
-              <div className="w-10 h-10 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center border border-white/30 text-yellow-300 shadow-inner">
-                <Bot className="w-5.5 h-5.5" />
+              <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 text-yellow-300 shadow-inner">
+                <Bot className="w-5 h-5" />
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <h3 className="font-black text-sm tracking-wide text-white">MUIT Scan2Attend Assistant</h3>
-                  <span className="bg-emerald-500/30 text-emerald-300 text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-emerald-400/30">
-                    Official
+                  <h3 className="font-black text-sm tracking-wide">AI Chatbot</h3>
+                  <span className="bg-white/20 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full backdrop-blur-xs border border-white/20">
+                    Live
                   </span>
                 </div>
-                <p className="text-[10px] text-blue-200 font-semibold flex items-center gap-1">
+                <p className="text-[10px] text-white/80 font-medium flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Maharishi University Campus Assistant
+                  Smart Campus Attendance Bot
                 </p>
               </div>
             </div>
 
-            {/* HEADER ACTIONS */}
+            {/* HEADER ACTIONS (Without API Key Icon) */}
             <div className="flex items-center gap-1 z-10">
-              <button
-                onClick={() => setShowKeyInput(!showKeyInput)}
-                title="Configure Gemini Free API Key"
-                className="p-2 rounded-xl hover:bg-white/15 text-yellow-300 transition-all"
-              >
-                <Key className="w-4 h-4" />
-              </button>
-
               <button
                 onClick={() => setIsExpanded(!isExpanded)}
                 title={isExpanded ? "Restore view" : "Expand view"}
@@ -254,38 +224,6 @@ export default function GeminiChatbot({ user }) {
             </div>
           </div>
 
-          {/* GEMINI API KEY CONFIG OVERLAY */}
-          {showKeyInput && (
-            <div className="bg-slate-900 text-white p-3 border-b border-slate-700 text-xs animate-fadeIn space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="font-bold text-yellow-300 flex items-center gap-1">
-                  <Key className="w-3.5 h-3.5" /> Gemini 1.5 Flash Free API Key
-                </span>
-                <button onClick={() => setShowKeyInput(false)} className="text-gray-400 hover:text-white">
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-              <p className="text-[10px] text-gray-300">
-                Enter your Google AI Studio free API key to enable live Gemini Flash AI responses:
-              </p>
-              <div className="flex gap-2">
-                <input
-                  type="password"
-                  value={apiKey}
-                  onChange={(e) => setApiKey(e.target.value)}
-                  placeholder="AIzaSy..."
-                  className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-blue-400"
-                />
-                <button
-                  onClick={() => saveApiKey(apiKey)}
-                  className="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg font-bold text-xs"
-                >
-                  Save
-                </button>
-              </div>
-            </div>
-          )}
-
           {/* MESSAGES SCROLL AREA */}
           <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-[#FAF8F5]">
             {messages.map((msg) => (
@@ -294,7 +232,7 @@ export default function GeminiChatbot({ user }) {
                 className={`flex gap-2.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.sender === 'bot' && (
-                  <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#1E3A8A] to-[#2979FF] flex items-center justify-center text-yellow-300 shrink-0 shadow-xs mt-0.5 border border-white/20">
+                  <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#2979FF] to-[#7C4DFF] flex items-center justify-center text-yellow-300 shrink-0 shadow-xs mt-0.5">
                     <Bot className="w-4 h-4" />
                   </div>
                 )}
@@ -309,7 +247,7 @@ export default function GeminiChatbot({ user }) {
                   >
                     {msg.text.split('\n').map((line, idx) => (
                       <p key={idx} className={idx > 0 ? 'mt-1.5' : ''}>
-                        {line.startsWith('📊') || line.startsWith('📍') || line.startsWith('⏱') || line.startsWith('📱') || line.startsWith('🏫') || line.startsWith('🔑') || line.startsWith('✨') ? (
+                        {line.startsWith('📊') || line.startsWith('📍') || line.startsWith('⏱') || line.startsWith('📱') || line.startsWith('✨') ? (
                           <strong className="font-extrabold text-[#212121] block mb-0.5">{line}</strong>
                         ) : (
                           line
@@ -339,12 +277,12 @@ export default function GeminiChatbot({ user }) {
             {/* TYPING INDICATOR */}
             {loading && (
               <div className="flex gap-2.5 items-center">
-                <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#1E3A8A] to-[#2979FF] flex items-center justify-center text-yellow-300 shrink-0 animate-pulse">
+                <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#2979FF] to-[#7C4DFF] flex items-center justify-center text-yellow-300 shrink-0 animate-pulse">
                   <Bot className="w-4 h-4" />
                 </div>
                 <div className="bg-white border border-slate-200 p-3 rounded-2xl rounded-bl-none text-xs text-slate-500 flex items-center gap-2 shadow-xs">
                   <span className="w-2 h-2 bg-[#2979FF] rounded-full animate-ping"></span>
-                  <span>MUIT Assistant is generating response...</span>
+                  <span>AI Chatbot is generating response...</span>
                 </div>
               </div>
             )}
@@ -358,7 +296,7 @@ export default function GeminiChatbot({ user }) {
               <button
                 key={i}
                 onClick={() => handleSendMessage(prompt.query)}
-                className="whitespace-nowrap px-2.5 py-1 bg-[#FAF8F5] hover:bg-blue-50 hover:text-blue-700 border border-slate-200 rounded-full text-[11px] font-semibold text-slate-600 transition-all shrink-0"
+                className="whitespace-nowrap px-2.5 py-1 bg-[#FAF8F5] hover:bg-indigo-50 hover:text-indigo-600 border border-slate-200 rounded-full text-[11px] font-semibold text-slate-600 transition-all shrink-0"
               >
                 {prompt.label}
               </button>
@@ -378,7 +316,7 @@ export default function GeminiChatbot({ user }) {
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Ask MUIT Assistant about attendance, geofence, QR..."
+                placeholder="Ask AI Chatbot about attendance, geofence..."
                 className="flex-1 bg-[#FAF8F5] border border-slate-200 rounded-2xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#2979FF] focus:bg-white transition-all font-medium"
               />
 
@@ -387,7 +325,7 @@ export default function GeminiChatbot({ user }) {
                 disabled={!inputMessage.trim() || loading}
                 className={`p-2.5 rounded-2xl text-white font-bold transition-all shadow-md ${
                   inputMessage.trim() && !loading
-                    ? 'bg-gradient-to-r from-[#1E3A8A] to-[#2979FF] hover:opacity-90 scale-102 cursor-pointer'
+                    ? 'bg-gradient-to-r from-[#2979FF] to-[#7C4DFF] hover:opacity-90 scale-102 cursor-pointer'
                     : 'bg-slate-300 cursor-not-allowed'
                 }`}
               >

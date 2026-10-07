@@ -170,8 +170,10 @@ export default function App() {
         )}
       </main>
 
-      {/* MAHARISHI UNIVERSITY STYLE AI CAMPUS CHATBOT (Located at bottom right of all views) */}
-      <GeminiChatbot user={user} />
+      {/* GEMINI AI LIVE CHATBOT (Located at lower right corner of Dashboard after login) */}
+      {user && activeTab !== 'LOGIN' && (
+        <GeminiChatbot user={user} />
+      )}
 
       {/* Modern High-End Footer for Scan2Attend */}
       {user && activeTab !== 'LOGIN' && (
