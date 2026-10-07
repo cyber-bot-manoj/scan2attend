@@ -117,9 +117,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
           <div className="relative z-10 space-y-6">
             {/* BRANDING HEADER */}
             <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 p-2 shadow-lg shadow-indigo-500/30 flex items-center justify-center flex-shrink-0 border border-white/20">
-                <img src="/scan2attend-logo.svg" alt="Scan2Attend Logo" className="w-full h-full object-contain" />
-              </div>
+              <img src="/scan2attend-logo.svg" alt="Scan2Attend Logo" className="h-12 w-12 object-contain drop-shadow-md transition-transform hover:scale-105" />
               <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-1">
                 Scan<span className="text-blue-400">2</span>Attend
               </h1>
