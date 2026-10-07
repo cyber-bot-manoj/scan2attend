@@ -115,29 +115,36 @@ export default function LoginModal({ setUser, setActiveTab }) {
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/20 rounded-full blur-2xl pointer-events-none"></div>
 
           <div className="relative z-10 space-y-6">
-            {/* BRANDING HEADER WITH CLEAR SCAN2ATTEND LOGO & TITLE */}
+            {/* BRANDING HEADER */}
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 p-2 shadow-lg shadow-indigo-500/30 flex items-center justify-center flex-shrink-0 border border-white/20">
                 <img src="/scan2attend-logo.svg" alt="Scan2Attend Logo" className="w-full h-full object-contain" />
               </div>
-              <div>
-                <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-1">
-                  Scan<span className="text-blue-400">2</span>Attend
-                </h1>
-                <p className="text-[11px] font-semibold text-blue-200 tracking-wide">
-                  Smart Attendance System
-                </p>
-              </div>
+              <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-1">
+                Scan<span className="text-blue-400">2</span>Attend
+              </h1>
             </div>
 
-            {/* HERO IMAGE INSIDE FULL BLUE BOX WITHOUT CROPPING */}
-            <div className="my-auto py-2 flex flex-col items-center justify-center">
-              <div className="relative group w-full p-2.5 rounded-2xl border-2 border-[#2979FF]/60 shadow-2xl bg-gradient-to-br from-[#1E1B4B] via-[#0F172A] to-[#1E293B] backdrop-blur-md overflow-hidden">
-                <img 
-                  src="/campus_attendance_hero.png" 
-                  alt="Scan2Attend Campus System" 
-                  className="w-full h-56 sm:h-64 object-contain object-center rounded-xl transform transition-transform duration-500 group-hover:scale-102"
-                />
+            {/* HERO IMAGE WITH ULTRA-COOL PREMIUM 3D TILT & GLOW EFFECT */}
+            <div className="my-auto py-3 flex flex-col items-center justify-center [perspective:1000px]">
+              <div className="relative group w-full transform-gpu transition-all duration-700 ease-out [transform:rotateX(6deg)_rotateY(-6deg)] group-hover:[transform:rotateX(0deg)_rotateY(0deg)_scale(1.03)]">
+                {/* 3D Ambient Glowing Aura */}
+                <div className="absolute -inset-1.5 rounded-2xl bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-600 blur-xl opacity-70 group-hover:opacity-100 transition duration-500 animate-pulse"></div>
+                
+                {/* 3D Floating Glass Box */}
+                <div className="relative p-3 rounded-2xl border-2 border-blue-400/60 shadow-[0_25px_60px_-15px_rgba(41,121,255,0.5)] bg-gradient-to-br from-[#1E1B4B]/90 via-[#0F172A]/90 to-[#1E293B]/90 backdrop-blur-xl overflow-hidden">
+                  {/* Top Glass Light Beam Reflection */}
+                  <div className="absolute -top-12 -left-12 w-40 h-40 bg-white/10 rounded-full blur-xl pointer-events-none group-hover:translate-x-32 group-hover:translate-y-32 transition-transform duration-1000"></div>
+                  
+                  <img 
+                    src="/campus_attendance_hero.png" 
+                    alt="Scan2Attend Campus System" 
+                    className="w-full h-56 sm:h-64 object-contain object-center rounded-xl relative z-10 drop-shadow-[0_15px_25px_rgba(0,0,0,0.6)]"
+                  />
+                  
+                  {/* Glossy Overlay Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/10 via-transparent to-white/10 pointer-events-none rounded-xl"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -148,10 +155,6 @@ export default function LoginModal({ setUser, setActiveTab }) {
         {/* RIGHT LOGIN FORM PANEL */}
         <div className="md:col-span-7 p-8 sm:p-10 flex flex-col justify-center bg-white">
           <div className="mb-6">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-[#2979FF] text-xs font-black mb-2">
-              <img src="/scan2attend-logo.svg" alt="Scan2Attend Logo" className="w-4 h-4 object-contain" />
-              Scan2Attend Portal
-            </div>
             <h2 className="text-2xl font-black text-[#212121]">Sign In to Your Account</h2>
             <p className="text-xs text-[#757575] mt-1 font-medium">Select your portal role</p>
           </div>
