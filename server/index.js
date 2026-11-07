@@ -66,12 +66,15 @@ const otpStore = new Map();
 
 // Real Email Transporter Builder
 const getMailTransporter = () => {
-  const emailUser = process.env.EMAIL_USER || process.env.SMTP_USER;
-  const emailPass = process.env.EMAIL_PASS || process.env.SMTP_PASS;
+  const emailUser = (process.env.EMAIL_USER || process.env.SMTP_USER || '').trim();
+  // Strip spaces in case user pasted 16-character code with spaces e.g. "abcd efgh ijkl mnop"
+  const emailPass = (process.env.EMAIL_PASS || process.env.SMTP_PASS || '').replace(/\s+/g, '').trim();
 
   if (emailUser && emailPass) {
     return nodemailer.createTransport({
-      service: process.env.SMTP_SERVICE || 'gmail',
+      host: 'smtp.gmail.com',
+      port: 465,
+      secure: true,
       auth: {
         user: emailUser,
         pass: emailPass
