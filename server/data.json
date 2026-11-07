@@ -927,6 +927,20 @@
       "section": "Section B",
       "classSection": "B.C.A - Semester V (Section B)",
       "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%232563eb\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
+    },
+    {
+      "id": "student_1794078320766",
+      "name": "RAHUL VERMA",
+      "email": "rahul.test@school.edu",
+      "password": "mypassword123",
+      "role": "STUDENT",
+      "rollNo": "2401031609999",
+      "enrollmentNo": "MUIT6480445220",
+      "mobile": "9876501234",
+      "section": "Section B",
+      "classSection": "B.C.A - Semester V (Section B)",
+      "fatherName": "STUDENT PARENT",
+      "faceProfile": "data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%232563eb\" stroke-width=\"2\"><circle cx=\"12\" cy=\"8\" r=\"5\"/><path d=\"M20 21a8 8 0 1 0-16 0\"/></svg>"
     }
   ],
   "classes": [

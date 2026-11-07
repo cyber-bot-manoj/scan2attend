@@ -32,7 +32,10 @@ function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
   const db = readDB();
-  const user = db.users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+  const user = db.users.find(u => 
+    (u.email.toLowerCase() === email.toLowerCase() || (u.email_alt && u.email_alt.toLowerCase() === email.toLowerCase())) && 
+    u.password === password
+  );
 
   if (!user) {
     return res.status(401).json({ success: false, message: 'Invalid Email or Password' });
@@ -46,10 +49,113 @@ app.post('/api/login', (req, res) => {
       email: user.email,
       role: user.role,
       rollNo: user.rollNo || null,
+      enrollmentNo: user.enrollmentNo || null,
+      fatherName: user.fatherName || null,
+      section: user.section || 'Section B',
       classSection: user.classSection || null,
       mobile: user.mobile,
       faceProfile: user.faceProfile || null
     }
+  });
+});
+
+// In-memory OTP storage
+const otpStore = new Map();
+
+// Send Email OTP endpoint
+app.post('/api/auth/send-otp', (req, res) => {
+  const { email } = req.body;
+  if (!email || !email.includes('@')) {
+    return res.status(400).json({ success: false, message: 'Valid email is required' });
+  }
+
+  const db = readDB();
+  const existingUser = db.users.find(u => 
+    u.email.toLowerCase() === email.toLowerCase() || 
+    (u.email_alt && u.email_alt.toLowerCase() === email.toLowerCase())
+  );
+  if (existingUser) {
+    return res.status(400).json({ success: false, message: 'An account with this email already exists. Please Sign In.' });
+  }
+
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  otpStore.set(email.toLowerCase(), {
+    otp,
+    expiresAt: Date.now() + 5 * 60 * 1000
+  });
+
+  console.log(`[AUTH] Verification OTP for ${email}: ${otp}`);
+
+  res.json({
+    success: true,
+    message: `Verification code sent to ${email}`,
+    otp: otp
+  });
+});
+
+// Verify OTP endpoint
+app.post('/api/auth/verify-otp', (req, res) => {
+  const { email, otp } = req.body;
+  if (!email || !otp) {
+    return res.status(400).json({ success: false, message: 'Email and OTP are required' });
+  }
+
+  const record = otpStore.get(email.toLowerCase());
+  if (!record) {
+    return res.status(400).json({ success: false, message: 'No OTP requested for this email or OTP expired. Please request a new code.' });
+  }
+
+  if (Date.now() > record.expiresAt) {
+    otpStore.delete(email.toLowerCase());
+    return res.status(400).json({ success: false, message: 'OTP has expired. Please request a new one.' });
+  }
+
+  if (record.otp !== otp.toString().trim()) {
+    return res.status(400).json({ success: false, message: 'Incorrect OTP code. Please check and try again.' });
+  }
+
+  otpStore.delete(email.toLowerCase());
+  res.json({ success: true, message: 'Email verified successfully!' });
+});
+
+// Register New Student endpoint
+app.post('/api/auth/register-student', (req, res) => {
+  const { name, email, password, rollNo, mobile, classSection } = req.body;
+  if (!name || !email || !password) {
+    return res.status(400).json({ success: false, message: 'Name, email, and password are required' });
+  }
+
+  const db = readDB();
+  const existingUser = db.users.find(u => 
+    u.email.toLowerCase() === email.toLowerCase() || 
+    (u.email_alt && u.email_alt.toLowerCase() === email.toLowerCase())
+  );
+  if (existingUser) {
+    return res.status(400).json({ success: false, message: 'User already exists with this email' });
+  }
+
+  const newStudent = {
+    id: 'student_' + Date.now(),
+    name: name.trim(),
+    email: email.trim().toLowerCase(),
+    password: password,
+    role: 'STUDENT',
+    rollNo: rollNo ? rollNo.trim() : ('240103160' + Math.floor(1000 + Math.random() * 9000)),
+    enrollmentNo: 'MUIT' + Math.floor(1000000000 + Math.random() * 9000000000),
+    mobile: mobile ? mobile.trim() : '8840034446',
+    section: 'Section B',
+    classSection: classSection ? classSection.trim() : 'B.C.A - Semester V (Section B)',
+    fatherName: 'STUDENT PARENT',
+    faceProfile: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%232563eb" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>'
+  };
+
+  db.users.push(newStudent);
+  writeDB(db);
+
+  res.json({
+    success: true,
+    message: 'Student registered successfully!',
+    user: newStudent
   });
 });
 

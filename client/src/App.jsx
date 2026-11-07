@@ -7,14 +7,8 @@ import LoginModal from './components/LoginModal';
 import Footer from './components/Footer';
 
 export default function App() {
-  const [user, setUser] = useState({
-    id: 'student_1',
-    name: 'Manoj Sharma',
-    rollNo: 'CS202601',
-    email: 'manojs082007@gmail.com',
-    role: 'STUDENT',
-    mobile: '8840034446'
-  });
+  // Start with no logged-in user so Sign In / Sign Up modal displays first
+  const [user, setUser] = useState(null);
 
   // Shared active QR session state for real-time notification & 5-min timer
   const [activeSession, setActiveSession] = useState(() => {
@@ -48,8 +42,15 @@ export default function App() {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // activeTab state: 'STUDENT', 'TEACHER', 'ADMIN', 'LOGIN'
-  const [activeTab, setActiveTab] = useState('STUDENT');
+  // activeTab state: 'LOGIN', 'STUDENT', 'TEACHER', 'ADMIN'
+  const [activeTab, setActiveTab] = useState('LOGIN');
+
+  // Enforce role synchronization
+  useEffect(() => {
+    if (user && user.role) {
+      setActiveTab(user.role);
+    }
+  }, [user]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FAF8F5] relative overflow-hidden bg-watermark-pattern">
@@ -63,7 +64,11 @@ export default function App() {
 
       {/* Main Content View Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {activeTab === 'STUDENT' && (
+        {(!user || activeTab === 'LOGIN') && (
+          <LoginModal setUser={setUser} setActiveTab={setActiveTab} />
+        )}
+
+        {user && activeTab === 'STUDENT' && (
           <StudentPanel 
             user={user} 
             activeSession={activeSession} 
@@ -72,7 +77,7 @@ export default function App() {
           />
         )}
 
-        {activeTab === 'TEACHER' && (
+        {user && activeTab === 'TEACHER' && (
           <TeacherPanel 
             user={user} 
             activeSession={activeSession} 
@@ -80,12 +85,8 @@ export default function App() {
           />
         )}
 
-        {activeTab === 'ADMIN' && (
+        {user && activeTab === 'ADMIN' && (
           <AdminPanel user={user} />
-        )}
-
-        {activeTab === 'LOGIN' && (
-          <LoginModal setUser={setUser} setActiveTab={setActiveTab} />
         )}
       </main>
 
