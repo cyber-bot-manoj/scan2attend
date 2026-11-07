@@ -39,8 +39,6 @@ export default function LoginModal({ setUser, setActiveTab }) {
   const [signUpStep, setSignUpStep] = useState(1);
   const [signUpEmail, setSignUpEmail] = useState('');
   const [otpInput, setOtpInput] = useState('');
-  const [generatedOtp, setGeneratedOtp] = useState('');
-  const [otpSentMessage, setOtpSentMessage] = useState('');
   const [otpTimer, setOtpTimer] = useState(0);
 
   // Step 3 Profile State
@@ -204,7 +202,6 @@ export default function LoginModal({ setUser, setActiveTab }) {
   const handleSendOtp = async (e) => {
     e?.preventDefault();
     setError('');
-    setOtpSentMessage('');
 
     if (!signUpEmail || !signUpEmail.includes('@') || !signUpEmail.includes('.')) {
       setError('Please enter a valid student email address');
@@ -219,27 +216,14 @@ export default function LoginModal({ setUser, setActiveTab }) {
         body: JSON.stringify({ email: signUpEmail.trim().toLowerCase() })
       });
 
-      const contentType = res.headers.get('content-type') || '';
-      if (!res.ok || !contentType.includes('application/json')) {
-        throw new Error('API route unavailable on static hosting');
-      }
-
-      const data = await res.json();
-      if (data.success) {
-        setGeneratedOtp(data.otp);
-        sessionStorage.setItem('tempOtp_' + signUpEmail.trim().toLowerCase(), data.otp);
-        setOtpSentMessage(`Verification code sent to ${signUpEmail}. Use code: ${data.otp}`);
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
         setOtpTimer(60);
         setSignUpStep(2);
       } else {
-        setError(data.message || 'Unable to send OTP. Please check email.');
+        setError(data.message || 'Unable to send OTP. Please check your email address.');
       }
     } catch (err) {
-      // Offline fallback: generate mock OTP so registration always works
-      const mockOtp = Math.floor(100000 + Math.random() * 900000).toString();
-      setGeneratedOtp(mockOtp);
-      sessionStorage.setItem('tempOtp_' + signUpEmail.trim().toLowerCase(), mockOtp);
-      setOtpSentMessage(`Verification code sent to ${signUpEmail}. Use code: ${mockOtp}`);
       setOtpTimer(60);
       setSignUpStep(2);
     } finally {
@@ -261,7 +245,6 @@ export default function LoginModal({ setUser, setActiveTab }) {
 
     setLoading(true);
     const emailKey = signUpEmail.trim().toLowerCase();
-    const storedOtp = generatedOtp || sessionStorage.getItem('tempOtp_' + emailKey);
 
     try {
       const res = await fetch('/api/auth/verify-otp', {
@@ -273,36 +256,17 @@ export default function LoginModal({ setUser, setActiveTab }) {
         })
       });
 
-      const contentType = res.headers.get('content-type') || '';
-      if (!res.ok || !contentType.includes('application/json')) {
-        throw new Error('API route unavailable on static hosting');
-      }
-
-      const data = await res.json();
-      if (data.success) {
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data.success) {
         if (!rollNo) {
           setRollNo('240103160' + Math.floor(1000 + Math.random() * 9000));
         }
         setSignUpStep(3);
       } else {
-        if (storedOtp && otpInput.trim() === storedOtp.trim()) {
-          if (!rollNo) {
-            setRollNo('240103160' + Math.floor(1000 + Math.random() * 9000));
-          }
-          setSignUpStep(3);
-        } else {
-          setError(data.message || 'Invalid or expired OTP code. Please try again.');
-        }
+        setError(data.message || 'Invalid or expired OTP code. Please enter the valid code received on your email.');
       }
     } catch (err) {
-      if (storedOtp && otpInput.trim() === storedOtp.trim()) {
-        if (!rollNo) {
-          setRollNo('240103160' + Math.floor(1000 + Math.random() * 9000));
-        }
-        setSignUpStep(3);
-      } else {
-        setError('Incorrect OTP code. Please enter the valid 6-digit code.');
-      }
+      setError('Failed to verify OTP with server. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -380,7 +344,6 @@ export default function LoginModal({ setUser, setActiveTab }) {
     setSignUpStep(1);
     setSignUpEmail('');
     setOtpInput('');
-    setGeneratedOtp('');
     setName('');
     setNewPassword('');
     setConfirmPassword('');
@@ -727,27 +690,16 @@ export default function LoginModal({ setUser, setActiveTab }) {
                     </p>
                   </div>
 
-                  {/* INTERACTIVE OTP SIMULATION / NOTIFICATION BOX */}
-                  {generatedOtp && (
-                    <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-2xl flex items-center justify-between">
-                      <div className="flex items-center gap-2.5">
-                        <Mail className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                        <div>
-                          <p className="text-[11px] text-blue-900 font-extrabold">Campus Mail Gateway Code:</p>
-                          <span className="text-base font-black font-mono tracking-widest text-blue-700">
-                            {generatedOtp}
-                          </span>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => setOtpInput(generatedOtp)}
-                        className="px-2.5 py-1 bg-blue-600 text-white rounded-lg text-[10px] font-bold hover:bg-blue-700 shadow-xs"
-                      >
-                        Auto-Fill
-                      </button>
+                  {/* REAL INBOX DISPATCH CARD */}
+                  <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-2xl flex items-start gap-2.5">
+                    <Mail className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-xs text-blue-950 font-bold">Verification code dispatched</p>
+                      <p className="text-[11px] text-blue-700 mt-0.5 leading-relaxed">
+                        We have dispatched a 6-digit verification code to <strong className="text-blue-950">{signUpEmail}</strong>. Please check your email inbox (and Spam folder) and enter the code below.
+                      </p>
                     </div>
-                  )}
+                  </div>
 
                   <div>
                     <label className="block text-xs font-bold text-[#212121] mb-1">6-Digit OTP Code</label>

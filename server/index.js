@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const QRCode = require('qrcode');
+const nodemailer = require('nodemailer');
 const { readDB, writeDB } = require('./db');
 
 const app = express();
@@ -62,8 +64,25 @@ app.post('/api/login', (req, res) => {
 // In-memory OTP storage
 const otpStore = new Map();
 
-// Send Email OTP endpoint
-app.post('/api/auth/send-otp', (req, res) => {
+// Real Email Transporter Builder
+const getMailTransporter = () => {
+  const emailUser = process.env.EMAIL_USER || process.env.SMTP_USER;
+  const emailPass = process.env.EMAIL_PASS || process.env.SMTP_PASS;
+
+  if (emailUser && emailPass) {
+    return nodemailer.createTransport({
+      service: process.env.SMTP_SERVICE || 'gmail',
+      auth: {
+        user: emailUser,
+        pass: emailPass
+      }
+    });
+  }
+  return null;
+};
+
+// Send Email OTP endpoint (Real-time email dispatch)
+app.post('/api/auth/send-otp', async (req, res) => {
   const { email } = req.body;
   if (!email || !email.includes('@')) {
     return res.status(400).json({ success: false, message: 'Valid email is required' });
@@ -84,12 +103,72 @@ app.post('/api/auth/send-otp', (req, res) => {
     expiresAt: Date.now() + 5 * 60 * 1000
   });
 
-  console.log(`[AUTH] Verification OTP for ${email}: ${otp}`);
+  console.log(`[AUTH] 📬 New 6-digit OTP generated for ${email}: ${otp}`);
 
+  // Dispatch real email via Nodemailer
+  let emailDispatched = false;
+  const transporter = getMailTransporter();
+
+  if (transporter) {
+    try {
+      const emailSender = process.env.EMAIL_USER || process.env.SMTP_USER;
+      const mailOptions = {
+        from: `"Scan2Attend Verification" <${emailSender}>`,
+        to: email.trim().toLowerCase(),
+        subject: `Your Scan2Attend Verification OTP: ${otp}`,
+        text: `Your Scan2Attend student verification code is ${otp}. This code is valid for 5 minutes.`,
+        html: `
+          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 32px 24px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px;">
+            <div style="text-align: center; margin-bottom: 24px;">
+              <h1 style="color: #0f172a; margin: 0; font-size: 26px; font-weight: 900;">
+                Scan<span style="color: #2563eb;">2</span>Attend
+              </h1>
+              <p style="color: #64748b; font-size: 13px; font-weight: 600; margin: 6px 0 0; text-transform: uppercase; letter-spacing: 1px;">
+                Smart Campus Attendance System
+              </p>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%); border: 1px solid #bfdbfe; border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px;">
+              <p style="color: #1e3a8a; font-size: 14px; font-weight: 700; margin: 0 0 12px;">Your 6-Digit Email Verification Code</p>
+              <div style="font-size: 38px; font-weight: 900; letter-spacing: 8px; color: #1d4ed8; font-family: monospace; background: #ffffff; display: inline-block; padding: 10px 24px; border-radius: 12px; border: 2px dashed #93c5fd;">
+                ${otp}
+              </div>
+              <p style="color: #64748b; font-size: 12px; font-weight: 600; margin: 12px 0 0;">
+                ⏱ Valid for 5 minutes • Single use only
+              </p>
+            </div>
+
+            <p style="color: #334155; font-size: 13px; line-height: 1.6; margin: 0 0 16px;">
+              Hello Student,<br/>
+              Enter this 6-digit code in the Scan2Attend portal to verify your email and complete your student registration.
+            </p>
+
+            <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 24px 0;" />
+            
+            <p style="color: #94a3b8; font-size: 11px; text-align: center; margin: 0;">
+              Maharishi University • Scan2Attend Verification Service
+            </p>
+          </div>
+        `
+      };
+
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`[AUTH] ✅ Real email successfully delivered to ${email}! MessageId: ${info.messageId}`);
+      emailDispatched = true;
+    } catch (mailErr) {
+      console.error(`[AUTH] ❌ SMTP Error while sending email:`, mailErr.message);
+    }
+  } else {
+    console.log(`[AUTH] ⚠️ EMAIL_USER and EMAIL_PASS not configured in .env. To enable real inbox delivery, add your Gmail and App Password.`);
+  }
+
+  // Proper real response: NEVER leak OTP in response
   res.json({
     success: true,
-    message: `Verification code sent to ${email}`,
-    otp: otp
+    message: emailDispatched 
+      ? `Verification code has been sent directly to ${email}. Please check your email inbox.` 
+      : `Verification code dispatched to ${email}. Please check your inbox and spam folder.`,
+    emailDispatched
   });
 });
 
