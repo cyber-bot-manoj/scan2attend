@@ -108,68 +108,110 @@ app.post('/api/auth/send-otp', async (req, res) => {
 
   console.log(`[AUTH] 📬 New 6-digit OTP generated for ${email}: ${otp}`);
 
-  // Dispatch real email via Nodemailer
+  // Dispatch real email via Resend API, Brevo, or Nodemailer Gmail SMTP
   let emailDispatched = false;
+  const resendApiKey = (process.env.RESEND_API_KEY || '').trim();
+  const brevoKey = (process.env.BREVO_KEY || process.env.BREVO_PASS || '').trim();
+  const brevoUser = (process.env.BREVO_USER || process.env.EMAIL_USER || '').trim();
   const transporter = getMailTransporter();
 
-  if (transporter) {
-    try {
+  const emailSubject = `Your Scan2Attend Verification OTP: ${otp}`;
+  const emailText = `Your Scan2Attend student verification code is ${otp}. This code is valid for 5 minutes.`;
+  const emailHtml = `
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 32px 24px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px;">
+      <div style="text-align: center; margin-bottom: 24px;">
+        <h1 style="color: #0f172a; margin: 0; font-size: 26px; font-weight: 900;">
+          Scan<span style="color: #2563eb;">2</span>Attend
+        </h1>
+        <p style="color: #64748b; font-size: 13px; font-weight: 600; margin: 6px 0 0; text-transform: uppercase; letter-spacing: 1px;">
+          Smart Campus Attendance System
+        </p>
+      </div>
+
+      <div style="background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%); border: 1px solid #bfdbfe; border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px;">
+        <p style="color: #1e3a8a; font-size: 14px; font-weight: 700; margin: 0 0 12px;">Your 6-Digit Email Verification Code</p>
+        <div style="font-size: 38px; font-weight: 900; letter-spacing: 8px; color: #1d4ed8; font-family: monospace; background: #ffffff; display: inline-block; padding: 10px 24px; border-radius: 12px; border: 2px dashed #93c5fd;">
+          ${otp}
+        </div>
+        <p style="color: #64748b; font-size: 12px; font-weight: 600; margin: 12px 0 0;">
+          ⏱ Valid for 5 minutes • Single use only
+        </p>
+      </div>
+
+      <p style="color: #334155; font-size: 13px; line-height: 1.6; margin: 0 0 16px;">
+        Hello Student,<br/>
+        Enter this 6-digit code in the Scan2Attend portal to verify your email and complete your student registration.
+      </p>
+
+      <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 24px 0;" />
+      
+      <p style="color: #94a3b8; font-size: 11px; text-align: center; margin: 0;">
+        Maharishi University • Scan2Attend Verification Service
+      </p>
+    </div>
+  `;
+
+  try {
+    if (resendApiKey) {
+      // 1. Try Resend API (Fastest, zero-friction, works on Vercel & localhost)
+      const { Resend } = require('resend');
+      const resendClient = new Resend(resendApiKey);
+      const fromAddress = process.env.RESEND_FROM || 'Scan2Attend <onboarding@resend.dev>';
+      const resendRes = await resendClient.emails.send({
+        from: fromAddress,
+        to: [email.trim().toLowerCase()],
+        subject: emailSubject,
+        html: emailHtml
+      });
+      if (resendRes.error) {
+        throw new Error(resendRes.error.message || 'Resend API Error');
+      }
+      console.log(`[AUTH] ✅ Real email successfully delivered via Resend to ${email}! ID: ${resendRes.data?.id}`);
+      emailDispatched = true;
+    } else if (brevoKey && brevoUser) {
+      // 2. Try Brevo SMTP (300 free emails/day to any inbox)
+      const brevoTransporter = nodemailer.createTransport({
+        host: 'smtp-relay.brevo.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: brevoUser,
+          pass: brevoKey
+        }
+      });
+      const info = await brevoTransporter.sendMail({
+        from: `"Scan2Attend Verification" <${brevoUser}>`,
+        to: email.trim().toLowerCase(),
+        subject: emailSubject,
+        text: emailText,
+        html: emailHtml
+      });
+      console.log(`[AUTH] ✅ Real email successfully delivered via Brevo to ${email}! MessageId: ${info.messageId}`);
+      emailDispatched = true;
+    } else if (transporter) {
+      // 3. Try Gmail SMTP
       const emailSender = process.env.EMAIL_USER || process.env.SMTP_USER;
-      const mailOptions = {
+      const info = await transporter.sendMail({
         from: `"Scan2Attend Verification" <${emailSender}>`,
         to: email.trim().toLowerCase(),
-        subject: `Your Scan2Attend Verification OTP: ${otp}`,
-        text: `Your Scan2Attend student verification code is ${otp}. This code is valid for 5 minutes.`,
-        html: `
-          <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 32px 24px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px;">
-            <div style="text-align: center; margin-bottom: 24px;">
-              <h1 style="color: #0f172a; margin: 0; font-size: 26px; font-weight: 900;">
-                Scan<span style="color: #2563eb;">2</span>Attend
-              </h1>
-              <p style="color: #64748b; font-size: 13px; font-weight: 600; margin: 6px 0 0; text-transform: uppercase; letter-spacing: 1px;">
-                Smart Campus Attendance System
-              </p>
-            </div>
-
-            <div style="background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%); border: 1px solid #bfdbfe; border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px;">
-              <p style="color: #1e3a8a; font-size: 14px; font-weight: 700; margin: 0 0 12px;">Your 6-Digit Email Verification Code</p>
-              <div style="font-size: 38px; font-weight: 900; letter-spacing: 8px; color: #1d4ed8; font-family: monospace; background: #ffffff; display: inline-block; padding: 10px 24px; border-radius: 12px; border: 2px dashed #93c5fd;">
-                ${otp}
-              </div>
-              <p style="color: #64748b; font-size: 12px; font-weight: 600; margin: 12px 0 0;">
-                ⏱ Valid for 5 minutes • Single use only
-              </p>
-            </div>
-
-            <p style="color: #334155; font-size: 13px; line-height: 1.6; margin: 0 0 16px;">
-              Hello Student,<br/>
-              Enter this 6-digit code in the Scan2Attend portal to verify your email and complete your student registration.
-            </p>
-
-            <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 24px 0;" />
-            
-            <p style="color: #94a3b8; font-size: 11px; text-align: center; margin: 0;">
-              Maharishi University • Scan2Attend Verification Service
-            </p>
-          </div>
-        `
-      };
-
-      const info = await transporter.sendMail(mailOptions);
-      console.log(`[AUTH] ✅ Real email successfully delivered to ${email}! MessageId: ${info.messageId}`);
+        subject: emailSubject,
+        text: emailText,
+        html: emailHtml
+      });
+      console.log(`[AUTH] ✅ Real email successfully delivered via Gmail to ${email}! MessageId: ${info.messageId}`);
       emailDispatched = true;
-    } catch (mailErr) {
-      console.error(`[AUTH] ❌ SMTP Error while sending email:`, mailErr.message);
+    } else {
+      console.log(`[AUTH] ⚠️ No email service configured in .env.`);
       return res.status(500).json({
         success: false,
-        message: `Gmail SMTP Error: ${mailErr.message}. Please check your EMAIL_USER and App Password.`
+        message: `Email service not configured. Please set RESEND_API_KEY, BREVO_KEY, or EMAIL_USER/EMAIL_PASS in .env.`
       });
     }
-  } else {
-    console.log(`[AUTH] ⚠️ EMAIL_USER and EMAIL_PASS not configured in .env. To enable real inbox delivery, add your Gmail and App Password.`);
+  } catch (deliveryErr) {
+    console.error(`[AUTH] ❌ Email dispatch error:`, deliveryErr.message);
     return res.status(500).json({
       success: false,
-      message: `Email service not configured. Please set EMAIL_USER and EMAIL_PASS in your environment.`
+      message: `Failed to deliver email: ${deliveryErr.message}`
     });
   }
 
