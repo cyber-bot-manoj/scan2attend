@@ -224,8 +224,8 @@ export default function LoginModal({ setUser, setActiveTab }) {
         setError(data.message || 'Unable to send OTP. Please check your email address.');
       }
     } catch (err) {
-      setOtpTimer(60);
-      setSignUpStep(2);
+      console.error('OTP request error:', err);
+      setError('Connection failed. Please ensure the backend server is running and try again.');
     } finally {
       setLoading(false);
     }

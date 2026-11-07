@@ -160,18 +160,24 @@ app.post('/api/auth/send-otp', async (req, res) => {
       emailDispatched = true;
     } catch (mailErr) {
       console.error(`[AUTH] ❌ SMTP Error while sending email:`, mailErr.message);
+      return res.status(500).json({
+        success: false,
+        message: `Gmail SMTP Error: ${mailErr.message}. Please check your EMAIL_USER and App Password.`
+      });
     }
   } else {
     console.log(`[AUTH] ⚠️ EMAIL_USER and EMAIL_PASS not configured in .env. To enable real inbox delivery, add your Gmail and App Password.`);
+    return res.status(500).json({
+      success: false,
+      message: `Email service not configured. Please set EMAIL_USER and EMAIL_PASS in your environment.`
+    });
   }
 
   // Proper real response: NEVER leak OTP in response
   res.json({
     success: true,
-    message: emailDispatched 
-      ? `Verification code has been sent directly to ${email}. Please check your email inbox.` 
-      : `Verification code dispatched to ${email}. Please check your inbox and spam folder.`,
-    emailDispatched
+    message: `Verification code has been sent directly to ${email}. Please check your email inbox (and Spam folder).`,
+    emailDispatched: true
   });
 });
 
