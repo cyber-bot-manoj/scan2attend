@@ -587,22 +587,6 @@ export default function LoginModal({ setUser, setActiveTab }) {
           {/* ========================================================= */}
           {authMode === 'SIGN_UP' && (
             <div>
-              {/* STEP PROGRESS INDICATOR */}
-              <div className="mb-5">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-                    Step {signUpStep} of 3: {signUpStep === 1 ? 'Email Verification' : signUpStep === 2 ? 'OTP Code' : 'Profile Setup'}
-                  </span>
-                  <span className="text-[11px] font-bold text-slate-400">Sign Up</span>
-                </div>
-                {/* 3 Step bar */}
-                <div className="grid grid-cols-3 gap-1.5">
-                  <div className={`h-1.5 rounded-full transition-all ${signUpStep >= 1 ? 'bg-emerald-500' : 'bg-slate-200'}`}></div>
-                  <div className={`h-1.5 rounded-full transition-all ${signUpStep >= 2 ? 'bg-emerald-500' : 'bg-slate-200'}`}></div>
-                  <div className={`h-1.5 rounded-full transition-all ${signUpStep >= 3 ? 'bg-emerald-500' : 'bg-slate-200'}`}></div>
-                </div>
-              </div>
-
               {/* ----------------------------------------------------- */}
               {/* SIGN UP STEP 1: ENTER EMAIL */}
               {/* ----------------------------------------------------- */}
@@ -728,7 +712,6 @@ export default function LoginModal({ setUser, setActiveTab }) {
                         </button>
                       )}
                     </span>
-                    <span className="text-[10px] text-slate-400">Valid for 5 mins</span>
                   </div>
 
                   <button
@@ -742,7 +725,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
                       </span>
                     ) : (
                       <>
-                        <CheckCircle2 className="w-4 h-4" /> Verify OTP & Set Details
+                        <CheckCircle2 className="w-4 h-4" /> Verify OTP
                       </>
                     )}
                   </button>
