@@ -33,14 +33,24 @@ function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
 // -------------------------------------------------------------
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
+  const emailLower = (email || '').trim().toLowerCase();
+
+  // Block demo student credentials
+  if (emailLower === 'student@school.edu' || emailLower === 'student') {
+    return res.status(401).json({ 
+      success: false, 
+      message: 'Demo student login is disabled. Please Sign Up to create your student account.' 
+    });
+  }
+
   const db = readDB();
   const user = db.users.find(u => 
-    (u.email.toLowerCase() === email.toLowerCase() || (u.email_alt && u.email_alt.toLowerCase() === email.toLowerCase())) && 
+    (u.email.toLowerCase() === emailLower || (u.email_alt && u.email_alt.toLowerCase() === emailLower)) && 
     u.password === password
   );
 
   if (!user) {
-    return res.status(401).json({ success: false, message: 'Invalid Email or Password' });
+    return res.status(401).json({ success: false, message: 'Invalid Email or Password. If you are a new student, please Sign Up first.' });
   }
 
   res.json({

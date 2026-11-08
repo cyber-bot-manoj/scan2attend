@@ -267,14 +267,7 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
                     )}
                   </div>
                 </>
-              ) : (
-                <button
-                  onClick={() => setActiveTab('LOGIN')}
-                  className="btn-blue py-2 px-4 text-xs font-bold shadow-sm flex items-center gap-1.5"
-                >
-                  <User className="w-3.5 h-3.5" /> Sign In / Portal Login
-                </button>
-              )}
+              ) : null}
             </div>
 
           </div>

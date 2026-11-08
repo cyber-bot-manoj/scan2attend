@@ -25,9 +25,9 @@ export default function LoginModal({ setUser, setActiveTab }) {
   // Main mode: 'SIGN_IN' or 'SIGN_UP'
   const [authMode, setAuthMode] = useState('SIGN_IN');
 
-  // Sign In State
-  const [email, setEmail] = useState('student@school.edu');
-  const [password, setPassword] = useState('student');
+  // Sign In State - Empty by default for students
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [selectedRole, setSelectedRole] = useState('STUDENT');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -68,8 +68,9 @@ export default function LoginModal({ setUser, setActiveTab }) {
       setEmail('teacher@school.edu');
       setPassword('teacher');
     } else if (role === 'STUDENT') {
-      setEmail('student@school.edu');
-      setPassword('student');
+      // Students MUST NOT have prefilled demo credentials
+      setEmail('');
+      setPassword('');
     } else {
       setEmail('admin@school.edu');
       setPassword('admin');
@@ -83,10 +84,17 @@ export default function LoginModal({ setUser, setActiveTab }) {
     e?.preventDefault();
     setError('');
     setSuccessNotice('');
-    setLoading(true);
 
     const emailTrim = email.trim();
     const emailLower = emailTrim.toLowerCase();
+
+    // Students CANNOT log in without signing up first, and demo student login is completely blocked!
+    if (emailLower === 'student@school.edu' || (selectedRole === 'STUDENT' && emailLower === 'student')) {
+      setError('Demo student credentials are disabled. Students must Sign Up first with their email and OTP.');
+      return;
+    }
+
+    setLoading(true);
 
     try {
       // 1. First check if user is in localStorage registered students cache
@@ -113,29 +121,35 @@ export default function LoginModal({ setUser, setActiveTab }) {
       if (res.ok && contentType.includes('application/json')) {
         const data = await res.json();
         if (data.success && data.user) {
+          if (data.user.role === 'STUDENT' && data.user.email === 'student@school.edu') {
+            setError('Demo student login is disabled. Please Sign Up to create your account.');
+            return;
+          }
           setUser(data.user);
           setActiveTab(data.user.role || 'STUDENT');
           return;
         } else {
-          setError(data.message || 'Invalid email or password. Please try again.');
+          setError(data.message || (selectedRole === 'STUDENT' ? 'No registered student account found with this email. Please Sign Up first.' : 'Invalid email or password.'));
           return;
         }
       } else {
-        // Fallback for default demo accounts matching data.json
+        // Fallback for default demo accounts matching data.json (TEACHER & ADMIN ONLY)
         if (
-          (emailLower === 'student@school.edu' && password === 'student') ||
           (emailLower === 'teacher@school.edu' && password === 'teacher') ||
           (emailLower === 'admin@school.edu' && password === 'admin')
         ) {
           performFallbackAuth();
         } else {
-          setError('Invalid email or password. If you are a new student, please Sign Up.');
+          setError(
+            selectedRole === 'STUDENT'
+              ? 'No registered student account found with this email. Please Sign Up first.'
+              : 'Invalid email or password. Please check your credentials.'
+          );
         }
       }
     } catch (err) {
       console.warn('Backend server unreachable, executing fallback authentication');
       if (
-        (emailLower === 'student@school.edu' && password === 'student') ||
         (emailLower === 'teacher@school.edu' && password === 'teacher') ||
         (emailLower === 'admin@school.edu' && password === 'admin')
       ) {
@@ -149,7 +163,11 @@ export default function LoginModal({ setUser, setActiveTab }) {
           setUser(matchedLocal);
           setActiveTab(matchedLocal.role || 'STUDENT');
         } else {
-          setError('Invalid Email or Password. If you are a new student, please Sign Up.');
+          setError(
+            selectedRole === 'STUDENT'
+              ? 'No registered student account found with this email. Please Sign Up first.'
+              : 'Invalid Email or Password. Please try again.'
+          );
         }
       }
     } finally {
@@ -178,18 +196,8 @@ export default function LoginModal({ setUser, setActiveTab }) {
         mobile: '+91 9876543210'
       };
     } else {
-      mockUser = {
-        id: 'student_1',
-        name: 'MANOJ SHARMA',
-        enrollmentNo: 'MUIT0124031030',
-        rollNo: '2401031601137',
-        fatherName: 'SUBHASH SHARMA',
-        email: 'student@school.edu',
-        role: 'STUDENT',
-        section: 'Section B',
-        classSection: 'B.C.A - Semester V (Section B)',
-        mobile: '8840034446'
-      };
+      setError('Student demo login is disabled. Please Sign Up with Email OTP first.');
+      return;
     }
 
     setUser(mockUser);
@@ -514,6 +522,26 @@ export default function LoginModal({ setUser, setActiveTab }) {
                 </button>
               </div>
 
+              {/* STUDENT NOTICE BANNER */}
+              {selectedRole === 'STUDENT' && (
+                <div className="mb-4 p-3 rounded-2xl bg-blue-50/80 border border-blue-200/80 text-xs text-blue-900 flex items-center justify-between">
+                  <div>
+                    <p className="font-bold text-[11px]">Students must Sign Up first</p>
+                    <p className="text-[10px] text-blue-700">Only verified registered students can sign in.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthMode('SIGN_UP');
+                      setError('');
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-xl font-bold text-[11px] shadow-sm flex items-center gap-1 transition-all"
+                  >
+                    Sign Up <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+              )}
+
               {/* LOGIN FORM */}
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
@@ -524,7 +552,13 @@ export default function LoginModal({ setUser, setActiveTab }) {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder="student@school.edu"
+                      placeholder={
+                        selectedRole === 'STUDENT'
+                          ? 'Enter your registered email'
+                          : selectedRole === 'TEACHER'
+                          ? 'teacher@school.edu'
+                          : 'admin@school.edu'
+                      }
                       className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#212121] focus:outline-none focus:border-[#2979FF] focus:bg-white font-medium transition-all"
                       required
                     />
@@ -534,7 +568,11 @@ export default function LoginModal({ setUser, setActiveTab }) {
                 <div>
                   <div className="flex justify-between items-center mb-1">
                     <label className="block text-xs font-bold text-[#212121]">Password</label>
-                    <span className="text-[10px] text-slate-400 font-medium">Demo: student / teacher / admin</span>
+                    {selectedRole === 'STUDENT' ? (
+                      <span className="text-[10px] text-emerald-600 font-bold">New student? Sign Up first</span>
+                    ) : (
+                      <span className="text-[10px] text-slate-400 font-medium">Demo: {selectedRole.toLowerCase()}</span>
+                    )}
                   </div>
                   <div className="relative">
                     <Key className="w-4 h-4 text-[#757575] absolute left-3.5 top-3.5" />
