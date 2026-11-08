@@ -32,10 +32,353 @@ import confetti from 'canvas-confetti';
 
 export default function StudentPanel({ user, activeSession, setActiveSession, setActiveTab, onNewAttendance }) {
   const [step, setStep] = useState(1); // 1: Main Dashboard, 2: Verification Flow, 3: Success Confirmation
+  // Live Real-Time Official MUIT Timetable Engine (Program: BCA, Semester: V-B, Room: B-302)
+  const [liveNow, setLiveNow] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setLiveNow(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const todayDayName = dayNames[liveNow.getDay()];
+  const [selectedDay, setSelectedDay] = useState(todayDayName === 'Sunday' ? 'Monday' : todayDayName);
+
+  // Keep selectedDay synced to today if changed, unless manually selected by user
+  const isSelectedToday = selectedDay === todayDayName;
+
+  const weeklyTimetable = {
+    Monday: [
+      {
+        id: 'MON-1',
+        subject: 'Computer Graphics (BCA501)',
+        type: 'Lecture (L)',
+        startHours: 10, startMins: 35,
+        endHours: 11, endMins: 15,
+        timeSlot: '10:35 AM - 11:15 AM',
+        room: 'Room B-302',
+        teacher: 'Mr. Dhananjay Kr. Yadav (DKY)'
+      },
+      {
+        id: 'MON-2',
+        subject: 'Cryptography & Network Security (BCA502)',
+        type: 'Lecture (L)',
+        startHours: 11, startMins: 15,
+        endHours: 12, endMins: 5,
+        timeSlot: '11:15 AM - 12:05 PM',
+        room: 'Room B-302',
+        teacher: 'Dr. Gouri Shukla (GS)'
+      },
+      {
+        id: 'MON-LUNCH',
+        subject: 'LUNCH BREAK 🍱',
+        type: 'Break',
+        startHours: 12, startMins: 5,
+        endHours: 12, endMins: 55,
+        timeSlot: '12:05 PM - 12:55 PM',
+        room: 'Cafeteria / Campus',
+        teacher: 'Lunch Break'
+      },
+      {
+        id: 'MON-3',
+        subject: 'Computer Graphics Lab (BCA511-B2) / Web Tech Lab (BCA512-B1)',
+        type: 'Practical Lab (P)',
+        startHours: 12, startMins: 55,
+        endHours: 14, endMins: 35,
+        timeSlot: '12:55 PM - 02:35 PM',
+        room: 'Lab CCL1 / Room B-106',
+        teacher: 'Dr. Gouri Shukla & Mr. Rishi Mohan Awasthi'
+      }
+    ],
+    Tuesday: [
+      {
+        id: 'TUE-1',
+        subject: 'Cryptography & Network Security (BCA502)',
+        type: 'Lecture (L)',
+        startHours: 11, startMins: 15,
+        endHours: 12, endMins: 5,
+        timeSlot: '11:15 AM - 12:05 PM',
+        room: 'Room B-302',
+        teacher: 'Dr. Gouri Shukla (GS)'
+      },
+      {
+        id: 'TUE-LUNCH',
+        subject: 'LUNCH BREAK 🍱',
+        type: 'Break',
+        startHours: 12, startMins: 5,
+        endHours: 12, endMins: 55,
+        timeSlot: '12:05 PM - 12:55 PM',
+        room: 'Cafeteria / Campus',
+        teacher: 'Lunch Break'
+      },
+      {
+        id: 'TUE-2',
+        subject: 'Computer Graphics Lab (BCA511-B1) / Web Tech Lab (BCA512-B2)',
+        type: 'Practical Lab (P)',
+        startHours: 12, startMins: 55,
+        endHours: 14, endMins: 35,
+        timeSlot: '12:55 PM - 02:35 PM',
+        room: 'Room B-103 / B-CCL3',
+        teacher: 'Dr. Gouri Shukla & Mr. Rishi Mohan Awasthi'
+      },
+      {
+        id: 'TUE-3',
+        subject: 'Minor Project (BCA504)',
+        type: 'Practical (P)',
+        startHours: 14, startMins: 35,
+        endHours: 15, endMins: 25,
+        timeSlot: '02:35 PM - 03:25 PM',
+        room: 'Room B-302',
+        teacher: 'Dr. Peeyush Pathak (PP)'
+      }
+    ],
+    Wednesday: [
+      {
+        id: 'WED-1',
+        subject: 'Computer Graphics Lab (BCA511-B2) / Web Tech Lab (BCA512-B1)',
+        type: 'Practical Lab (P)',
+        startHours: 9, startMins: 35,
+        endHours: 11, endMins: 15,
+        timeSlot: '09:35 AM - 11:15 AM',
+        room: 'Lab CCL1 / Room B-108',
+        teacher: 'Dr. Gouri Shukla & Mr. Rishi Mohan Awasthi'
+      },
+      {
+        id: 'WED-2',
+        subject: 'Web Technology (BCA503)',
+        type: 'Lecture (L)',
+        startHours: 11, startMins: 15,
+        endHours: 12, endMins: 5,
+        timeSlot: '11:15 AM - 12:05 PM',
+        room: 'Room B-302',
+        teacher: 'Mr. Rishi Mohan Awasthi (RMA)'
+      }
+    ],
+    Thursday: [
+      {
+        id: 'THU-1',
+        subject: 'Computer Graphics (BCA501)',
+        type: 'Lecture (L)',
+        startHours: 9, startMins: 35,
+        endHours: 10, endMins: 15,
+        timeSlot: '09:35 AM - 10:15 AM',
+        room: 'Room B-302',
+        teacher: 'Mr. Dhananjay Kr. Yadav (DKY)'
+      },
+      {
+        id: 'THU-2',
+        subject: 'Web Technology (BCA503)',
+        type: 'Lecture (L)',
+        startHours: 10, startMins: 35,
+        endHours: 11, endMins: 15,
+        timeSlot: '10:35 AM - 11:15 AM',
+        room: 'Room B-302',
+        teacher: 'Mr. Rishi Mohan Awasthi (RMA)'
+      },
+      {
+        id: 'THU-3',
+        subject: 'Cryptography & Network Security (BCA502)',
+        type: 'Tutorial (T)',
+        startHours: 11, startMins: 15,
+        endHours: 12, endMins: 5,
+        timeSlot: '11:15 AM - 12:05 PM',
+        room: 'Room B-302',
+        teacher: 'Dr. Gouri Shukla (GS)'
+      },
+      {
+        id: 'THU-LUNCH',
+        subject: 'LUNCH BREAK 🍱',
+        type: 'Break',
+        startHours: 12, startMins: 5,
+        endHours: 12, endMins: 55,
+        timeSlot: '12:05 PM - 12:55 PM',
+        room: 'Cafeteria / Campus',
+        teacher: 'Lunch Break'
+      },
+      {
+        id: 'THU-4',
+        subject: 'Computer Graphics Lab (BCA511-B1) / Web Tech Lab (BCA512-B2)',
+        type: 'Practical Lab (P)',
+        startHours: 12, startMins: 55,
+        endHours: 14, endMins: 35,
+        timeSlot: '12:55 PM - 02:35 PM',
+        room: 'Room B-103 / B-CCL3',
+        teacher: 'Dr. Gouri Shukla & Mr. Rishi Mohan Awasthi'
+      },
+      {
+        id: 'THU-5',
+        subject: 'Industrial Internship (ACE511)',
+        type: 'Practical (P)',
+        startHours: 14, startMins: 35,
+        endHours: 15, endMins: 25,
+        timeSlot: '02:35 PM - 03:25 PM',
+        room: 'Room B-302',
+        teacher: 'Mr. Imtiyaz Haq (IH)'
+      }
+    ],
+    Friday: [
+      {
+        id: 'FRI-1',
+        subject: 'Web Technology (BCA503)',
+        type: 'Lecture (L)',
+        startHours: 9, startMins: 35,
+        endHours: 10, endMins: 15,
+        timeSlot: '09:35 AM - 10:15 AM',
+        room: 'Room B-302',
+        teacher: 'Mr. Rishi Mohan Awasthi (RMA)'
+      },
+      {
+        id: 'FRI-2',
+        subject: 'Computer Graphics (BCA501)',
+        type: 'Lecture (L)',
+        startHours: 10, startMins: 35,
+        endHours: 11, endMins: 15,
+        timeSlot: '10:35 AM - 11:15 AM',
+        room: 'Room B-302',
+        teacher: 'Mr. Dhananjay Kr. Yadav (DKY)'
+      },
+      {
+        id: 'FRI-3',
+        subject: 'Cryptography & Network Security (BCA502)',
+        type: 'Lecture (L)',
+        startHours: 11, startMins: 15,
+        endHours: 12, endMins: 5,
+        timeSlot: '11:15 AM - 12:05 PM',
+        room: 'Room B-302',
+        teacher: 'Dr. Gouri Shukla (GS)'
+      }
+    ],
+    Saturday: [
+      {
+        id: 'SAT-1',
+        subject: 'Computer Graphics (BCA501)',
+        type: 'Tutorial (T)',
+        startHours: 9, startMins: 35,
+        endHours: 10, endMins: 15,
+        timeSlot: '09:35 AM - 10:15 AM',
+        room: 'Room B-302',
+        teacher: 'Mr. Dhananjay Kr. Yadav (DKY)'
+      },
+      {
+        id: 'SAT-2',
+        subject: 'Web Technology (BCA503)',
+        type: 'Tutorial (T)',
+        startHours: 10, startMins: 35,
+        endHours: 11, endMins: 15,
+        timeSlot: '10:35 AM - 11:15 AM',
+        room: 'Room B-302',
+        teacher: 'Mr. Rishi Mohan Awasthi (RMA)'
+      }
+    ],
+    Sunday: []
+  };
+
+  const currentMinutes = liveNow.getHours() * 60 + liveNow.getMinutes();
+  const currentDaySchedule = weeklyTimetable[selectedDay] || [];
+
+  let nextFound = false;
+  const processedTimetable = currentDaySchedule.map(item => {
+    const slotStart = item.startHours * 60 + item.startMins;
+    const slotEnd = item.endHours * 60 + item.endMins;
+
+    let status = 'UPCOMING';
+    let badgeText = 'UPCOMING 📅';
+    let badgeClass = 'bg-slate-100 text-slate-600 border-slate-200';
+    let cardBg = 'bg-slate-50 border-slate-200';
+
+    if (item.type === 'Break') {
+      badgeText = 'LUNCH BREAK 🍱';
+      badgeClass = 'bg-amber-100 text-amber-800 border-amber-300 font-bold';
+      cardBg = 'bg-amber-50/40 border-amber-200';
+    }
+
+    if (isSelectedToday && item.type !== 'Break') {
+      if (currentMinutes >= slotEnd) {
+        status = 'DONE';
+        badgeText = 'DONE 🟢';
+        badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200 font-bold';
+        cardBg = 'bg-slate-50/80 border-slate-200 opacity-80';
+      } else if (currentMinutes >= slotStart && currentMinutes < slotEnd) {
+        status = 'ONGOING';
+        badgeText = 'ONGOING ⏱️';
+        badgeClass = 'bg-blue-600 text-white shadow-xs animate-pulse font-black';
+        cardBg = 'bg-blue-50/90 border-blue-300 ring-2 ring-blue-400/50';
+      } else if (currentMinutes < slotStart) {
+        if (!nextFound) {
+          nextFound = true;
+          status = 'NEXT';
+          badgeText = 'NEXT ⏳';
+          badgeClass = 'bg-amber-100 text-amber-800 border-amber-300 font-bold';
+          cardBg = 'bg-amber-50/60 border-amber-200';
+        }
+      }
+    } else if (isSelectedToday && item.type === 'Break') {
+      if (currentMinutes >= slotStart && currentMinutes < slotEnd) {
+        badgeText = 'LUNCH NOW 🍱';
+        badgeClass = 'bg-orange-500 text-white animate-pulse font-black';
+      }
+    }
+
+    return { ...item, status, badgeText, badgeClass, cardBg };
+  });
+
+  const ongoingClass = processedTimetable.find(c => c.status === 'ONGOING');
+  const nextClass = processedTimetable.find(c => c.status === 'NEXT');
+
   const [selectedNotification, setSelectedNotification] = useState(null);
-  const [studentLat, setStudentLat] = useState(28.6139);
-  const [studentLng, setStudentLng] = useState(77.2090);
-  const [distanceMeters, setDistanceMeters] = useState(18); // Default 18m (Inside 50m fence)
+
+  const noticeItems = [
+    {
+      title: 'Class QR Session Active',
+      time: 'Just Now',
+      type: 'LIVE CLASS ALERT',
+      summary: 'Mr. Dhananjay Kr. Yadav generated 5-minute QR for Computer Graphics (BCA501).',
+      details: 'Mr. Dhananjay Kr. Yadav generated a live 5-minute dynamic QR code session for Computer Graphics (BCA501) in Room B-302. Please scan the QR code before the 5-minute timer expires to record your attendance.',
+      icon: <Bell className="w-3.5 h-3.5 text-blue-600" />
+    },
+    {
+      title: 'Parent SMS Dispatch Delivered',
+      time: '10m ago',
+      type: 'PARENT SMS GATEWAY',
+      summary: 'Confirmation SMS dispatched to registered parent mobile +91 8840034446.',
+      details: 'Official attendance verification notification SMS successfully dispatched to registered parent mobile number +91 8840034446. Cryptographic status tag: DELIVERED.',
+      icon: <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
+    },
+    {
+      title: 'GPS Geofence Perimeter Verified',
+      time: '25m ago',
+      type: 'GEOFENCE RADAR',
+      summary: '50m Geofence perimeter check for MUIT Lucknow (26.9303° N, 80.9278° E).',
+      details: 'Real-time GPS Haversine distance calculator verified student location at Maharishi University of Information Technology (MUIT), IIM Road, Lucknow (26.9303° N, 80.9278° E).',
+      icon: <MapPin className="w-3.5 h-3.5 text-purple-600" />
+    },
+    {
+      title: 'Mid-Term Practical & Viva Schedule',
+      time: 'Today',
+      type: 'ACADEMIC AFFAIRS',
+      summary: 'BCA Semester V-B mid-term practical examination date sheet released.',
+      details: 'Office of Academic Affairs: Mid-term practical examinations for BCA Semester V-B (Room B-302) are scheduled from Oct 12 to Oct 16. Attendance audit compliance mandatory.',
+      icon: <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+    },
+    {
+      title: 'Minor Project Synopsis Deadline',
+      time: '2 days ago',
+      type: 'DEPT NOTICE',
+      summary: 'Minor Project (BCA504) synopsis submission under Dr. Peeyush Pathak.',
+      details: 'Department of Computer Science: All BCA V-B students must submit their Minor Project (BCA504) synopsis under Dr. Peeyush Pathak before Friday 5:00 PM.',
+      icon: <ShieldCheck className="w-3.5 h-3.5 text-indigo-600" />
+    }
+  ];
+
+  // MUIT Lucknow Campus Reference Coordinates (IIM Road, Lucknow)
+  const MUIT_CAMPUS_LAT = 26.9302879;
+  const MUIT_CAMPUS_LNG = 80.9278433;
+
+  const [studentLat, setStudentLat] = useState(26.9302879);
+  const [studentLng, setStudentLng] = useState(80.9278433);
+  const [distanceMeters, setDistanceMeters] = useState(0); // Real distance from MUIT Campus
   const [faceSnapshot, setFaceSnapshot] = useState(null);
   const [livenessChecked, setLivenessChecked] = useState(false);
   const [scannedQrString, setScannedQrString] = useState('');
@@ -43,11 +386,51 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   const [errorMessage, setErrorMessage] = useState('');
   const [pipelineResults, setPipelineResults] = useState(null);
   const [liveRecord, setLiveRecord] = useState(null);
+    // Full Semester Attendance History Log (w.e.f. 27 July 2026 Semester Commencement)
+  const [semesterFilterSubject, setSemesterFilterSubject] = useState('ALL');
+  const [showFullReportModal, setShowFullReportModal] = useState(false);
+  const [selectedAuditRecord, setSelectedAuditRecord] = useState(null);
+
   const [attendanceLogs, setAttendanceLogs] = useState([
-    { id: '1', subject: 'Data Structures (CS301)', time: 'Today • 09:00 AM', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-771829' },
-    { id: '2', subject: 'Database Systems (CS302)', time: 'Yesterday • 02:00 PM', status: 'LATE', distance: '32m', hash: 'AUDIT-2026-REC-551940' },
-    { id: '3', subject: 'Web Engineering (CS305)', time: '18 Aug • 11:00 AM', status: 'PRESENT', distance: '18m', hash: 'AUDIT-2026-REC-332910' }
+    { id: 'REC-901', subject: 'Computer Graphics (BCA501)', date: '29 Sep 2026', time: '09:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-901827' },
+    { id: 'REC-902', subject: 'Cryptography and Network Security (BCA502)', date: '28 Sep 2026', time: '11:15 AM', teacher: 'Dr. Gouri Shukla', room: 'Room B-302', status: 'PRESENT', distance: '12m', hash: 'AUDIT-2026-REC-891920' },
+    { id: 'REC-903', subject: 'Computer Graphics Lab (BCA511)', date: '28 Sep 2026', time: '12:55 PM', teacher: 'Dr. Gouri Shukla', room: 'Lab CCL1', status: 'PRESENT', distance: '10m', hash: 'AUDIT-2026-REC-882910' },
+    { id: 'REC-904', subject: 'Web Technology (BCA503)', date: '26 Sep 2026', time: '10:35 AM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-302', status: 'PRESENT', distance: '16m', hash: 'AUDIT-2026-REC-871239' },
+    { id: 'REC-905', subject: 'Computer Graphics (BCA501)', date: '25 Sep 2026', time: '10:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '18m', hash: 'AUDIT-2026-REC-861029' },
+    { id: 'REC-906', subject: 'Cryptography and Network Security (BCA502)', date: '25 Sep 2026', time: '11:15 AM', teacher: 'Dr. Gouri Shukla', room: 'Room B-302', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-851940' },
+    { id: 'REC-907', subject: 'Industrial Internship (ACE511)', date: '24 Sep 2026', time: '02:35 PM', teacher: 'Mr. Imtiyaz Haq', room: 'Room B-302', status: 'PRESENT', distance: '12m', hash: 'AUDIT-2026-REC-841920' },
+    { id: 'REC-908', subject: 'Web Technology (BCA503)', date: '23 Sep 2026', time: '11:15 AM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-302', status: 'PRESENT', distance: '10m', hash: 'AUDIT-2026-REC-831920' },
+    { id: 'REC-909', subject: 'Minor Project (BCA504)', date: '22 Sep 2026', time: '02:35 PM', teacher: 'Dr. Peeyush Pathak', room: 'Room B-302', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-821940' },
+    { id: 'REC-910', subject: 'Computer Graphics (BCA501)', date: '21 Sep 2026', time: '10:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '11m', hash: 'AUDIT-2026-REC-811029' },
+    { id: 'REC-911', subject: 'Cryptography and Network Security (BCA502)', date: '19 Sep 2026', time: '11:15 AM', teacher: 'Dr. Gouri Shukla', room: 'Room B-302', status: 'PRESENT', distance: '15m', hash: 'AUDIT-2026-REC-801940' },
+    { id: 'REC-912', subject: 'Web Technology Lab (BCA512)', date: '18 Sep 2026', time: '12:55 PM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-108', status: 'PRESENT', distance: '10m', hash: 'AUDIT-2026-REC-791920' },
+    { id: 'REC-913', subject: 'Computer Graphics (BCA501)', date: '17 Sep 2026', time: '09:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-781029' },
+    { id: 'REC-914', subject: 'Web Technology (BCA503)', date: '16 Sep 2026', time: '11:15 AM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-302', status: 'PRESENT', distance: '13m', hash: 'AUDIT-2026-REC-771920' },
+    { id: 'REC-915', subject: 'Cryptography and Network Security (BCA502)', date: '15 Sep 2026', time: '11:15 AM', teacher: 'Dr. Gouri Shukla', room: 'Room B-302', status: 'ABSENT', distance: '68m (Geofence Exceeded)', hash: 'AUDIT-2026-REC-761940' },
+    { id: 'REC-916', subject: 'Computer Graphics Lab (BCA511)', date: '14 Sep 2026', time: '12:55 PM', teacher: 'Dr. Gouri Shukla', room: 'Lab CCL1', status: 'PRESENT', distance: '10m', hash: 'AUDIT-2026-REC-751910' },
+    { id: 'REC-917', subject: 'Computer Graphics (BCA501)', date: '12 Sep 2026', time: '09:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '12m', hash: 'AUDIT-2026-REC-741029' },
+    { id: 'REC-918', subject: 'Web Technology (BCA503)', date: '11 Sep 2026', time: '09:35 AM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-302', status: 'PRESENT', distance: '16m', hash: 'AUDIT-2026-REC-731920' },
+    { id: 'REC-919', subject: 'Minor Project (BCA504)', date: '08 Sep 2026', time: '02:35 PM', teacher: 'Dr. Peeyush Pathak', room: 'Room B-302', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-721940' },
+    { id: 'REC-920', subject: 'Computer Graphics (BCA501)', date: '07 Sep 2026', time: '10:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '11m', hash: 'AUDIT-2026-REC-711029' },
+    { id: 'REC-921', subject: 'Industrial Internship (ACE511)', date: '03 Sep 2026', time: '02:35 PM', teacher: 'Mr. Imtiyaz Haq', room: 'Room B-302', status: 'PRESENT', distance: '12m', hash: 'AUDIT-2026-REC-701920' },
+    { id: 'REC-922', subject: 'Computer Graphics (BCA501)', date: '02 Sep 2026', time: '10:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '10m', hash: 'AUDIT-2026-REC-691029' },
+    { id: 'REC-923', subject: 'Cryptography and Network Security (BCA502)', date: '01 Sep 2026', time: '11:15 AM', teacher: 'Dr. Gouri Shukla', room: 'Room B-302', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-681940' },
+    { id: 'REC-924', subject: 'Web Technology (BCA503)', date: '28 Aug 2026', time: '09:35 AM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-302', status: 'PRESENT', distance: '13m', hash: 'AUDIT-2026-REC-671920' },
+    { id: 'REC-925', subject: 'Computer Graphics Lab (BCA511)', date: '26 Aug 2026', time: '09:35 AM', teacher: 'Dr. Gouri Shukla', room: 'Lab CCL1', status: 'PRESENT', distance: '10m', hash: 'AUDIT-2026-REC-661910' },
+    { id: 'REC-926', subject: 'Computer Graphics (BCA501)', date: '24 Aug 2026', time: '10:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '12m', hash: 'AUDIT-2026-REC-651029' },
+    { id: 'REC-927', subject: 'Cryptography and Network Security (BCA502)', date: '21 Aug 2026', time: '11:15 AM', teacher: 'Dr. Gouri Shukla', room: 'Room B-302', status: 'ABSENT', distance: '72m (Geofence Exceeded)', hash: 'AUDIT-2026-REC-641940' },
+    { id: 'REC-928', subject: 'Web Technology (BCA503)', date: '19 Aug 2026', time: '11:15 AM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-302', status: 'PRESENT', distance: '15m', hash: 'AUDIT-2026-REC-631920' },
+    { id: 'REC-929', subject: 'Computer Graphics (BCA501)', date: '17 Aug 2026', time: '10:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '11m', hash: 'AUDIT-2026-REC-621029' },
+    { id: 'REC-930', subject: 'Computer Graphics (BCA501)', date: '13 Aug 2026', time: '09:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-611029' },
+    { id: 'REC-931', subject: 'Cryptography and Network Security (BCA502)', date: '10 Aug 2026', time: '11:15 AM', teacher: 'Dr. Gouri Shukla', room: 'Room B-302', status: 'PRESENT', distance: '12m', hash: 'AUDIT-2026-REC-601940' },
+    { id: 'REC-932', subject: 'Web Technology (BCA503)', date: '07 Aug 2026', time: '09:35 AM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-302', status: 'PRESENT', distance: '16m', hash: 'AUDIT-2026-REC-591920' },
+    { id: 'REC-933', subject: 'Computer Graphics Lab (BCA511)', date: '05 Aug 2026', time: '09:35 AM', teacher: 'Dr. Gouri Shukla', room: 'Lab CCL1', status: 'PRESENT', distance: '10m', hash: 'AUDIT-2026-REC-581910' },
+    { id: 'REC-934', subject: 'Computer Graphics (BCA501)', date: '03 Aug 2026', time: '10:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '11m', hash: 'AUDIT-2026-REC-571029' },
+    { id: 'REC-935', subject: 'Cryptography and Network Security (BCA502)', date: '31 Jul 2026', time: '11:15 AM', teacher: 'Dr. Gouri Shukla', room: 'Room B-302', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-561940' },
+    { id: 'REC-936', subject: 'Web Technology (BCA503)', date: '29 Jul 2026', time: '11:15 AM', teacher: 'Mr. Rishi Mohan Awasthi', room: 'Room B-302', status: 'PRESENT', distance: '15m', hash: 'AUDIT-2026-REC-551920' },
+    { id: 'REC-937', subject: 'Computer Graphics (BCA501)', date: '27 Jul 2026', time: '10:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '12m', hash: 'AUDIT-2026-REC-541029' }
   ]);
+
   const [voiceAlertPlaying, setVoiceAlertPlaying] = useState(false);
   const [hasMarkedAttendance, setHasMarkedAttendance] = useState(false);
   const lastVoiceRef = useRef(null);
@@ -176,6 +559,59 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
     return R * c;
   };
 
+  // Helper: Request live GPS location from browser
+  const refreshLiveGps = () => {
+    gpsStatusRef.current = 'LIVE_GPS';
+    setGpsLoading(true);
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          setStudentLat(lat);
+          setStudentLng(lng);
+
+          const targetLat = (activeSession && activeSession.latitude) ? activeSession.latitude : MUIT_CAMPUS_LAT;
+          const targetLng = (activeSession && activeSession.longitude) ? activeSession.longitude : MUIT_CAMPUS_LNG;
+          const realDist = Math.round(calculateHaversineDistance(lat, lng, targetLat, targetLng));
+          setDistanceMeters(realDist);
+          setGpsStatus('LIVE_GPS');
+          if (realDist <= 50) {
+            setGpsMessage(`Geofence Verified: ${realDist}m from MUIT Campus (Inside 50m Perimeter)`);
+          } else {
+            setGpsMessage(`Area se bahar: ${realDist}m away from MUIT Campus (Limit: 50m)`);
+          }
+          setGpsLoading(false);
+        },
+        (err) => {
+          console.warn('Geolocation refresh error:', err);
+          setGpsStatus('DENIED');
+          setGpsMessage('Location permission blocked in browser settings. Please allow location access.');
+          setGpsLoading(false);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    } else {
+      setGpsStatus('DENIED');
+      setGpsMessage('Browser does not support Geolocation.');
+      setGpsLoading(false);
+    }
+  };
+
+  // Helper: Test Simulation mode for demonstration (Inside / Outside Campus)
+  const simulateGpsLocation = (lat, lng, dist, mode) => {
+    gpsStatusRef.current = 'SIMULATED';
+    setStudentLat(lat);
+    setStudentLng(lng);
+    setDistanceMeters(dist);
+    setGpsStatus('SIMULATED');
+    if (dist <= 50) {
+      setGpsMessage(`Simulation Mode: ${dist}m from MUIT Classroom • Inside 50m Perimeter`);
+    } else {
+      setGpsMessage(`Simulation Mode: Area se bahar (${dist}m away from MUIT Campus • Limit: 50m)`);
+    }
+  };
+
   // Automatically watch browser GPS location continuously in real-time
   useEffect(() => {
     let watchId;
@@ -190,18 +626,24 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           setStudentLat(lat);
           setStudentLng(lng);
 
-          // Manual 50m Geofence range active as requested by user
-          const dist = 14; // Fixed 14m inside 50m range (Manual Mode)
-          setDistanceMeters(dist);
+          // Calculate real Haversine distance from MUIT Lucknow coordinates
+          const targetLat = (activeSession && activeSession.latitude) ? activeSession.latitude : MUIT_CAMPUS_LAT;
+          const targetLng = (activeSession && activeSession.longitude) ? activeSession.longitude : MUIT_CAMPUS_LNG;
+          const realDist = Math.round(calculateHaversineDistance(lat, lng, targetLat, targetLng));
+          setDistanceMeters(realDist);
           setGpsStatus('LIVE_GPS');
-          setGpsMessage(`50m Geofence: Manual Mode Active (14m Away • Valid Inside 50m Range)`);
+          if (realDist <= 50) {
+            setGpsMessage(`Geofence Verified: ${realDist}m from MUIT Campus (Inside 50m Perimeter)`);
+          } else {
+            setGpsMessage(`Area se bahar: ${realDist}m away from MUIT Campus (Limit: 50m)`);
+          }
           setGpsLoading(false);
         },
         (err) => {
           console.warn('Auto GPS watch error:', err);
           if (gpsStatusRef.current !== 'SIMULATED') {
             setGpsStatus('DENIED');
-            setGpsMessage('Location permission blocked in browser settings.');
+            setGpsMessage('Location permission blocked in browser settings. Please allow location access.');
           }
           setGpsLoading(false);
         },
@@ -281,7 +723,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   // Dedicated Print Function for Digital Student ID Card Only
   const handlePrintDigitalIdCard = () => {
     const studentName = user ? user.name : 'Manoj Sharma';
-    const rollNo = user ? (user.rollNo || 'CS202601') : 'CS202601';
+    const rollNo = user ? (user.rollNo || '2401031601137') : '2401031601137';
     const printWindow = window.open('', '_blank', 'width=600,height=700');
     if (!printWindow) return;
 
@@ -432,10 +874,6 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                 </svg>
                 <div style="font-size: 8px; color: #94a3b8; margin-top: 2px;">MUIT-GATE-2026-SCAN</div>
               </div>
-
-              <div style="background: rgba(16,185,129,0.2); color: #6ee7b7; padding: 3px 8px; border-radius: 99px; font-weight: bold;">
-                VALID TILL 2026
-              </div>
             </div>
           </div>
           <script>
@@ -520,10 +958,9 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
       let timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       let fullTimestamp = `${new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' })} • ${timeNow}`;
 
-      const targetLat = activeSession ? activeSession.latitude || 28.6139 : 28.6139;
-      const targetLng = activeSession ? activeSession.longitude || 77.2090 : 77.2090;
-      const payloadLat = isWithinGeofence ? targetLat : (targetLat + 0.006);
-      const payloadLng = isWithinGeofence ? targetLng : (targetLng + 0.006);
+      // Use student's real GPS coordinates
+      const payloadLat = studentLat;
+      const payloadLng = studentLng;
 
       try {
         const res = await fetch('/api/attendance/mark', {
@@ -549,18 +986,19 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
       const passRecord = {
         id: recordId,
         hash: recordId,
-        subject: 'Advanced AI (CS401)',
-        instructor: 'Dr. Rajesh Sharma',
-        room: 'Lab 402',
+        subject: activeSession?.className || 'Computer Graphics (BCA501)',
+        instructor: 'Mr. Dhananjay Kr. Yadav (DKY)',
+        room: 'Room B-302 • MUIT Lucknow',
         studentName: user ? user.name : 'Manoj Sharma',
-        rollNo: user ? user.rollNo : 'CS202601',
+        rollNo: user ? user.rollNo : '2401031601137',
         course: 'B.C.A • Semester 5',
         timestamp: fullTimestamp,
         timeAgo: 'Just Now',
         status: finalStatus,
-        distance: `${distanceMeters}m`,
-        livenessScore: '99.4% (Verified)',
-        gpsCoords: `${studentLat.toFixed(4)}, ${studentLng.toFixed(4)}`,
+        distance: `${distanceMeters}m ${isWithinGeofence ? '(Inside Geofence)' : '(Area Se Bahar • Limit: 50m)'}`,
+        livenessScore: isFaceVerified ? '99.4% (Verified)' : 'Failed',
+        gpsCoords: `${studentLat.toFixed(5)}, ${studentLng.toFixed(5)}`,
+        reason: !isWithinGeofence ? `Geofence Violation: Area se bahar (${distanceMeters}m from MUIT Lucknow Campus)` : undefined,
         smsStatus: `Dispatched to ${user ? user.mobile : '8840034446'}`
       };
 
@@ -572,7 +1010,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
       setAttendanceLogs(prev => [
         {
           id: String(Date.now()),
-          subject: 'Advanced AI (CS401)',
+          subject: 'Computer Graphics (BCA501)',
           time: `Today • ${timeNow}`,
           status: finalStatus,
           distance: `${distanceMeters}m`,
@@ -625,10 +1063,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                   {user ? user.name : 'Manoj Sharma'}
                 </h2>
                 <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-[11px] font-mono font-extrabold">
-                  ID: {user ? (user.rollNo || 'CS202601') : 'CS202601'}
-                </span>
-                <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-black">
-                  VERIFIED STUDENT
+                  ID: {user ? (user.rollNo || '2401031601137') : '2401031601137'}
                 </span>
               </div>
 
@@ -651,13 +1086,6 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               </span>
             </div>
 
-            <div className="p-3 bg-slate-800/80 rounded-2xl border border-slate-700/80 text-center px-4 shadow-sm">
-              <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Geofence Status</span>
-              <span className={`text-xs font-extrabold flex items-center justify-center gap-1 mt-0.5 ${isWithinGeofence ? 'text-emerald-400' : 'text-red-400'}`}>
-                <span className={`w-2 h-2 rounded-full ${isWithinGeofence ? 'bg-emerald-500 animate-pulse' : 'bg-red-500'}`}></span> 
-                {isWithinGeofence ? `${distanceMeters}m Radius Active` : `Outside Range (${distanceMeters}m)`}
-              </span>
-            </div>
           </div>
 
         </div>
@@ -677,7 +1105,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                   LIVE 5-MINUTE CLASS SESSION
                 </span>
                 <span className="text-xs text-blue-100 font-bold">
-                  {activeSession?.className || 'Advanced AI (CS401)'}
+                  {activeSession?.className || 'Computer Graphics (BCA501)'}
                 </span>
               </div>
               <p className="text-xs font-bold mt-1 text-white">
@@ -713,39 +1141,101 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <MapPin className="w-4 h-4 text-blue-600" /> GPS Geofence Radar
               </span>
-              <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
-                isWithinGeofence ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'
+              <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border ${
+                isWithinGeofence 
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                  : 'bg-red-50 text-red-700 border-red-200 animate-pulse'
               }`}>
-                {isWithinGeofence ? 'INSIDE GEOFENCE 🟢' : 'OUTSIDE RANGE 🔴'}
+                {isWithinGeofence ? '● Inside Perimeter' : '● Area Se Bahar'}
               </span>
             </div>
 
             {/* Radar Box */}
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 to-indigo-950 text-white space-y-3 relative overflow-hidden border border-slate-800 shadow-md">
+            <div className={`p-4 rounded-2xl text-white space-y-3 relative overflow-hidden border shadow-md transition-all ${
+              isWithinGeofence
+                ? 'bg-gradient-to-br from-slate-900 via-indigo-950 to-emerald-950 border-emerald-800/50'
+                : 'bg-gradient-to-br from-slate-900 via-slate-950 to-red-950 border-red-800/60'
+            }`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-red-400 animate-bounce" />
-                  <span className="text-xs font-extrabold text-white">Lab 402 • Academic Block</span>
+                  <MapPin className={`w-4 h-4 ${isWithinGeofence ? 'text-emerald-400 animate-bounce' : 'text-red-400 animate-ping'}`} />
+                  <div>
+                    <span className="text-xs font-black text-white block">MUIT Lucknow Campus</span>
+                    <span className="text-[10px] text-slate-400">Room B-302 • IIM Road</span>
+                  </div>
                 </div>
-                <span className="text-[10px] font-mono bg-blue-500/30 text-blue-300 px-2 py-0.5 rounded-md border border-blue-400/30">
+                <span className={`text-[11px] font-mono px-2.5 py-1 rounded-lg border font-black ${
+                  isWithinGeofence
+                    ? 'bg-emerald-500/30 text-emerald-300 border-emerald-400/40'
+                    : 'bg-red-500/30 text-red-300 border-red-400/40'
+                }`}>
                   {distanceMeters}m Away
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300 font-mono pt-1 border-t border-slate-800">
-                <div>Your Lat: <strong className="text-white block font-sans text-xs">{studentLat.toFixed(4)}° N</strong></div>
-                <div>Your Lng: <strong className="text-white block font-sans text-xs">{studentLng.toFixed(4)}° E</strong></div>
+                <div>Your Lat: <strong className="text-white block font-sans text-xs">{studentLat.toFixed(5)}° N</strong></div>
+                <div>Your Lng: <strong className="text-white block font-sans text-xs">{studentLng.toFixed(5)}° E</strong></div>
               </div>
 
-              <div className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-semibold pt-0.5">
-                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                <span>50m Radius Geofence Perimeter Verified</span>
+              <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-400 font-mono pt-1 border-t border-slate-800/60">
+                <div>Campus Lat: <span className="text-slate-300">26.93028° N</span></div>
+                <div>Campus Lng: <span className="text-slate-300">80.92784° E</span></div>
+              </div>
+
+              <div className={`flex items-center gap-1.5 text-[11px] font-bold pt-1 border-t border-slate-800/80 ${
+                isWithinGeofence ? 'text-emerald-400' : 'text-red-400'
+              }`}>
+                {isWithinGeofence ? (
+                  <>
+                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                    <span>50m Radius Geofence Verified • Present Allowed</span>
+                  </>
+                ) : (
+                  <>
+                    <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
+                    <span>Area se bahar! Limit 50m exceeded • Absent lagegi</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
 
-          <div className="pt-1 text-[11px] text-slate-500 text-center font-bold border-t border-slate-100">
-            Current Distance: <strong className="text-slate-900 font-mono">{distanceMeters} Meters</strong>
+          {/* Quick Simulation / Testing Controls */}
+          <div className="space-y-2 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-slate-500 font-bold">Current Distance:</span>
+              <strong className={`font-mono text-xs ${isWithinGeofence ? 'text-emerald-600' : 'text-red-600'}`}>
+                {distanceMeters} Meters {isWithinGeofence ? '(Inside 50m)' : '(Outside 50m)'}
+              </strong>
+            </div>
+
+            <div className="flex items-center gap-1.5 pt-1">
+              <button
+                type="button"
+                onClick={refreshLiveGps}
+                title="Re-poll live GPS location from browser"
+                className="flex-1 py-1.5 px-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition-all flex items-center justify-center gap-1 border border-slate-300"
+              >
+                <RefreshCw className={`w-3 h-3 text-blue-600 ${gpsLoading ? 'animate-spin' : ''}`} /> Live GPS
+              </button>
+              <button
+                type="button"
+                onClick={() => simulateGpsLocation(26.9302879, 80.9278433, 12, 'INSIDE')}
+                title="Test condition: Inside MUIT campus (12m away)"
+                className="flex-1 py-1.5 px-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[10px] font-bold transition-all flex items-center justify-center gap-1 border border-emerald-200"
+              >
+                <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Test Inside
+              </button>
+              <button
+                type="button"
+                onClick={() => simulateGpsLocation(26.9380000, 80.9350000, 850, 'OUTSIDE')}
+                title="Test condition: Outside MUIT campus (850m away)"
+                className="flex-1 py-1.5 px-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 text-[10px] font-bold transition-all flex items-center justify-center gap-1 border border-red-200"
+              >
+                <AlertCircle className="w-3 h-3 text-red-600" /> Test Outside
+              </button>
+            </div>
           </div>
         </div>
 
@@ -755,9 +1245,6 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
             <div className="flex justify-between items-center">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <QrCode className="w-4 h-4 text-indigo-600" /> QR Verification Gateway
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold">
-                READY
               </span>
             </div>
 
@@ -785,102 +1272,156 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           </button>
         </div>
 
-        {/* CARD 3: CLASS LIVE TIMETABLE */}
-        <div className="card-3d p-6 space-y-4 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
-          <div className="space-y-3">
+        {/* CARD 3: CLASS LIVE TIMETABLE (COMPACT BALANCED LAYOUT) */}
+        <div className="card-3d p-5 space-y-3 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
+          <div className="space-y-2.5">
+            
+            {/* Header */}
             <div className="flex justify-between items-center">
-              <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Calendar className="w-4 h-4 text-purple-600" /> Class Live Timetable
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-[10px] font-bold">
-                TODAY'S SCHEDULE
-              </span>
+              <div>
+                <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4 text-purple-600" /> Class Live Timetable
+                </span>
+              </div>
+              
             </div>
 
-            <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                <div>
-                  <p className="font-extrabold text-slate-900">Data Structures (CS301)</p>
-                  <p className="text-[10px] text-slate-500 font-medium">09:00 AM - 10:00 AM • Room 305</p>
-                </div>
-                <span className="px-2.5 py-0.5 rounded-full text-[9px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  DONE 🟢
-                </span>
+            {/* Day Selector & Clock Strip */}
+            <div className="flex items-center justify-between gap-1.5 border-b border-slate-200 pb-2">
+              <div className="flex items-center gap-1 overflow-x-auto text-[10px] font-bold pr-1">
+                {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map(day => (
+                  <button
+                    key={day}
+                    onClick={() => setSelectedDay(day)}
+                    className={`px-2 py-0.5 rounded-md transition-all shrink-0 ${
+                      selectedDay === day
+                        ? 'bg-purple-600 text-white font-black shadow-xs'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    {day.slice(0, 3)}
+                  </button>
+                ))}
               </div>
+              
+            </div>
 
-              <div className="p-2.5 rounded-xl bg-blue-50/80 border border-blue-200 flex items-center justify-between text-xs">
-                <div>
-                  <p className="font-extrabold text-blue-950 flex items-center gap-1.5">
-                    Advanced AI (CS401)
-                    <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping"></span>
-                  </p>
-                  <p className="text-[10px] text-blue-700 font-medium">10:00 AM - 11:00 AM • Lab 402</p>
+            {/* Timetable Scroll List (Compact Height) */}
+            <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+              {processedTimetable.length > 0 ? (
+                processedTimetable.map(item => (
+                  <div key={item.id} className={`p-2 rounded-xl border flex items-center justify-between text-[11px] transition-all ${item.cardBg}`}>
+                    <div className="pr-2 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <p className={`font-extrabold truncate ${item.status === 'ONGOING' ? 'text-blue-950' : 'text-slate-900'}`}>
+                          {item.subject}
+                        </p>
+                        {item.status === 'ONGOING' && <span className="w-2 h-2 rounded-full bg-blue-600 animate-ping shrink-0"></span>}
+                      </div>
+                      <p className="text-[10px] text-slate-500 font-medium truncate">
+                        {item.timeSlot} • {item.room} • {item.teacher}
+                      </p>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] border ${item.badgeClass} shrink-0`}>
+                      {item.badgeText}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="p-3 text-center text-xs text-slate-500 font-medium bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                  🎉 No scheduled classes for {selectedDay}
                 </div>
-                <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-blue-600 text-white shadow-xs animate-pulse">
-                  ONGOING ⏱️
-                </span>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                <div>
-                  <p className="font-extrabold text-slate-800">Database Systems (CS302)</p>
-                  <p className="text-[10px] text-slate-500 font-medium">11:15 AM - 12:15 PM • Lab 401</p>
-                </div>
-                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
-                  NEXT
-                </span>
-              </div>
-
-              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                <div>
-                  <p className="font-extrabold text-slate-800">Web Engineering (CS305)</p>
-                  <p className="text-[10px] text-slate-500 font-medium">01:30 PM - 02:30 PM • Room 204</p>
-                </div>
-                <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
-                  UPCOMING
-                </span>
-              </div>
+              )}
             </div>
           </div>
 
-          <div className="p-2.5 bg-slate-900 text-white rounded-xl text-[11px] font-bold text-center flex items-center justify-between px-3 border border-slate-800 shadow-md">
-            <span>Current Class: <strong className="text-yellow-300 font-mono">Advanced AI (CS401)</strong></span>
-            <span className="text-[10px] text-blue-300 font-mono">Lab 402</span>
+          {/* Dynamic Footer */}
+          <div className="p-2 bg-slate-900 text-white rounded-xl text-[10px] font-bold text-center flex items-center justify-between px-3 border border-slate-800 shadow-sm mt-1">
+            {!isSelectedToday ? (
+              <span className="w-full text-center text-purple-300 font-medium">
+                Viewing schedule for <strong>{selectedDay}</strong>
+              </span>
+            ) : ongoingClass ? (
+              <>
+                <span className="truncate pr-2">Current Class: <strong className="text-yellow-300 font-mono">{ongoingClass.subject}</strong></span>
+                <span className="text-[9px] text-emerald-400 font-mono font-bold bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-500/30 shrink-0">
+                  LIVE • {ongoingClass.room}
+                </span>
+              </>
+            ) : nextClass ? (
+              <>
+                <span className="truncate pr-2">Next Class: <strong className="text-indigo-300 font-mono">{nextClass.subject}</strong></span>
+                <span className="text-[9px] text-amber-300 font-mono shrink-0">Starts {nextClass.timeSlot.split(' - ')[0]}</span>
+              </>
+            ) : (
+              <span className="w-full text-center text-emerald-400 font-bold">
+                🎉 All Classes Completed for {todayDayName}
+              </span>
+            )}
           </div>
         </div>
 
-        {/* CARD 4: ATTENDANCE HISTORY & AUDIT HASH STREAM */}
-        <div className="card-3d p-6 space-y-4 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
-          <div className="space-y-3">
+        {/* CARD 4: SEMESTER LIVE ATTENDANCE HISTORY & AUDIT STREAM */}
+        <div className="card-3d p-5 space-y-3 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
+          <div className="space-y-2.5">
+            
+            {/* Card Header */}
             <div className="flex justify-between items-center">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <FileText className="w-4 h-4 text-emerald-600" /> Attendance History
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold">
-                RECENT LOGS
-              </span>
             </div>
 
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              {attendanceLogs.map((log, idx) => (
-                <div key={log.id || idx} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                  <div>
-                    <p className="font-extrabold text-slate-900">{log.subject}</p>
-                    <p className="text-[10px] text-slate-500 font-medium">{log.time} • {log.distance}</p>
-                  </div>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
-                    log.status === 'PRESENT' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200'
-                  }`}>
-                    {log.status}
-                  </span>
-                </div>
+            {/* Subject Quick Filter Pills */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b border-slate-200 text-[10px] font-bold">
+              {['ALL', 'BCA501', 'BCA502', 'BCA503', 'BCA511'].map(sub => (
+                <button
+                  key={sub}
+                  onClick={() => setSemesterFilterSubject(sub)}
+                  className={`px-2 py-0.5 rounded-md transition-all shrink-0 ${
+                    semesterFilterSubject === sub
+                      ? 'bg-emerald-600 text-white font-black shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {sub}
+                </button>
               ))}
             </div>
+
+            {/* Attendance Logs List */}
+            <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+              {attendanceLogs
+                .filter(log => semesterFilterSubject === 'ALL' || log.subject.includes(semesterFilterSubject))
+                .map((log, idx) => (
+                  <div
+                    key={log.id || idx}
+                    onClick={() => setSelectedAuditRecord(log)}
+                    className="p-2 rounded-xl bg-slate-50 border border-slate-200/90 flex items-center justify-between text-[11px] hover:border-emerald-400 cursor-pointer transition-all"
+                  >
+                    <div className="pr-2 min-w-0">
+                      <p className="font-extrabold text-slate-900 truncate">{log.subject}</p>
+                      <p className="text-[10px] text-slate-500 font-medium truncate">
+                        {log.date} • {log.time} • {log.distance}
+                      </p>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-[9px] font-black border shrink-0 ${
+                      log.status === 'PRESENT' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-red-50 text-red-700 border-red-200'
+                    }`}>
+                      {log.status}
+                    </span>
+                  </div>
+                ))}
+            </div>
           </div>
 
-          <div className="pt-1 text-[11px] text-slate-500 text-center font-semibold border-t border-slate-100">
-            Audit Stream Signed via SHA-256 Hashes
-          </div>
+          {/* Full Report Modal Launcher Button */}
+          <button
+            onClick={() => setShowFullReportModal(true)}
+            className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-[11px] transition-all shadow-md flex items-center justify-center gap-1.5 mt-1"
+          >
+            <BarChart2 className="w-3.5 h-3.5" /> View Official Semester Attendance Report
+          </button>
         </div>
 
         {/* CARD 5: 3D DIGITAL STUDENT ID CARD (MAHARISHI UNIVERSITY OF INFORMATION TECHNOLOGY) */}
@@ -889,9 +1430,6 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
             <div className="flex justify-between items-center">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <Award className="w-4 h-4 text-amber-500" /> Digital Student ID Card
-              </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-black">
-                MUIT OFFICIAL • VALID
               </span>
             </div>
 
@@ -915,7 +1453,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                   </div>
                 </div>
                 <span className="text-[9px] font-mono font-bold bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded border border-amber-400/30">
-                  CS202601
+                  2401031601137
                 </span>
               </div>
 
@@ -935,7 +1473,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
 
                 <div className="space-y-0.5 text-xs">
                   <h4 className="text-sm font-black text-white tracking-wide uppercase">Manoj Sharma</h4>
-                  <p className="text-[10px] text-amber-300 font-mono font-extrabold">Roll No: CS202601</p>
+                  <p className="text-[10px] text-amber-300 font-mono font-extrabold">Roll No: 2401031601137</p>
                   <p className="text-[10px] text-slate-300 font-medium">B.C.A • Computer Applications</p>
                   <p className="text-[9px] text-slate-400">Semester 5 • Blood Group: O+</p>
                   <p className="text-[9px] text-slate-400 font-mono">Mobile: +91 8840034446</p>
@@ -972,10 +1510,6 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                   </div>
                   <span className="text-[8px]">MUIT GATE PASS</span>
                 </div>
-
-                <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9px] font-extrabold px-2 py-0.5 rounded-full">
-                  VALID TILL 2026
-                </span>
               </div>
 
             </div>
@@ -989,91 +1523,47 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           </button>
         </div>
 
-        {/* CARD 6: RECENT NOTIFICATIONS & PARENT SMS ALERT GATEWAY */}
+        {/* CARD 6: RECENT NOTIFICATIONS & OFFICIAL MUIT NOTICE BOARD VERTICAL TICKER */}
         <div className="card-3d p-6 space-y-4 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Bell className="w-4 h-4 text-amber-500" /> Recent Live Notifications & SMS
+                <Bell className="w-4 h-4 text-amber-500 animate-bounce" /> Notice Board
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold">
-                2 NEW ALERTS
-              </span>
+              
             </div>
 
-            <div className="space-y-2 max-h-48 overflow-y-auto">
-              <div 
-                onClick={() => setSelectedNotification({
-                  title: 'Class QR Session Active',
-                  time: 'Just Now',
-                  type: 'LIVE CLASS ALERT',
-                  details: 'Dr. Rajesh Sharma generated a live 5-minute dynamic QR code session for Advanced AI (CS401) in Lab 402. Please scan the QR code before the 5-minute timer expires to record your attendance.'
-                })}
-                className="p-2.5 rounded-xl bg-blue-50/70 border border-blue-200 cursor-pointer hover:bg-blue-100/80 transition-all space-y-1"
-              >
-                <div className="flex justify-between font-extrabold text-slate-900 text-xs">
-                  <span className="flex items-center gap-1">
-                    <Bell className="w-3 h-3 text-blue-600" /> Class QR Session Active
-                  </span>
-                  <span className="text-[10px] text-blue-600 font-mono font-bold">Just Now</span>
-                </div>
-                <p className="text-[10px] text-slate-600 font-medium line-clamp-1">
-                  Teacher generated 5-minute QR for Advanced AI (CS401). Click to read full alert.
-                </p>
-              </div>
-
-              <div 
-                onClick={() => setSelectedNotification({
-                  title: 'Parent SMS Dispatch Delivered',
-                  time: '10m ago',
-                  type: 'PARENT SMS GATEWAY',
-                  details: 'Official attendance verification notification SMS successfully dispatched to registered parent mobile number +91 8840034446. Cryptographic status tag: DELIVERED.'
-                })}
-                className="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200 cursor-pointer hover:bg-emerald-100/80 transition-all space-y-1"
-              >
-                <div className="flex justify-between font-extrabold text-slate-900 text-xs">
-                  <span className="flex items-center gap-1">
-                    <Smartphone className="w-3 h-3 text-emerald-600" /> Parent SMS Delivered
-                  </span>
-                  <span className="text-[10px] text-emerald-700 font-mono font-bold">10m ago</span>
-                </div>
-                <p className="text-[10px] text-slate-600 font-medium line-clamp-1">
-                  Confirmation SMS dispatched to +91 8840034446 for student Manoj Sharma.
-                </p>
-              </div>
-
-              <div 
-                onClick={() => setSelectedNotification({
-                  title: 'GPS Geofence Perimeter Verified',
-                  time: '25m ago',
-                  type: 'GEOFENCE RADAR',
-                  details: 'Real-time GPS Haversine distance calculator verified student location at 18 meters from classroom center point (28.6139° N, 77.2090° E), well within the 50m campus perimeter.'
-                })}
-                className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100 transition-all space-y-1"
-              >
-                <div className="flex justify-between font-extrabold text-slate-800 text-xs">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3 text-purple-600" /> GPS Geofence Verified
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-mono">25m ago</span>
-                </div>
-                <p className="text-[10px] text-slate-500 font-medium line-clamp-1">
-                  50m Geofence perimeter check passed for Lab 402 (28.6139° N, 77.2090° E).
-                </p>
+            {/* Continuous Vertical Ticker (Official MUIT Portal Upward Scroll Effect) */}
+            <div className="notice-ticker-wrapper rounded-2xl bg-slate-50 border border-slate-200/90 p-2 shadow-inner">
+              <div className="notice-ticker-content">
+                {[...noticeItems, ...noticeItems].map((item, idx) => (
+                  <div
+                    key={idx}
+                    onClick={() => setSelectedNotification(item)}
+                    className="p-2.5 rounded-xl bg-white border border-slate-200/80 cursor-pointer hover:border-blue-400 hover:shadow-md transition-all space-y-1 group"
+                  >
+                    <div className="flex justify-between font-extrabold text-slate-900 text-xs">
+                      <span className="flex items-center gap-1.5 text-slate-900 group-hover:text-blue-600 transition-colors">
+                        {item.icon} {item.title}
+                      </span>
+                      <span className="text-[10px] text-blue-600 font-mono font-bold">{item.time}</span>
+                    </div>
+                    <p className="text-[10px] text-slate-600 font-medium line-clamp-1">
+                      {item.summary}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="p-2 bg-slate-50 rounded-xl border border-slate-200 text-[10px] flex items-center justify-between font-mono text-slate-600 px-3">
-              <span>Carrier: <strong>SMS Gateway Active</strong></span>
-              <span>+91 8840034446</span>
-            </div>
+            
           </div>
 
           <button
-            onClick={() => alert('📲 SMS Alert dispatched to +91 8840034446!')}
-            className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black transition-all shadow-md flex items-center justify-center gap-1.5"
+            onClick={() => alert('📢 Notice Board sync complete!')}
+            className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black transition-all shadow-md flex items-center justify-center gap-1.5"
           >
-            <Smartphone className="w-3.5 h-3.5" /> SMS Alert
+            <Bell className="w-3.5 h-3.5" /> Notice Board
           </button>
         </div>
 
@@ -1129,7 +1619,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs font-black uppercase tracking-wider inline-block mb-1">
                 Step 2 of 3: AI Face & Geofence Verification
               </span>
-              <h3 className="text-xl font-black text-white">Advanced AI (CS401)</h3>
+              <h3 className="text-xl font-black text-white">{activeSession?.className || 'Computer Graphics (BCA501)'}</h3>
               <p className="text-xs text-slate-400">Position your face inside webcam frame for 3D liveness check</p>
             </div>
 
@@ -1160,6 +1650,31 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               )}
             </div>
 
+            {/* Live Geofence Status in Step 2 */}
+            <div className={`p-3 rounded-2xl border text-xs flex items-start gap-2.5 ${
+              isWithinGeofence
+                ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-200'
+                : 'bg-red-950/80 border-red-500/60 text-red-200'
+            }`}>
+              {isWithinGeofence ? (
+                <>
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 mt-0.5 shrink-0" />
+                  <div>
+                    <strong className="block text-emerald-300 font-bold">Geofence Verified ({distanceMeters}m Away)</strong>
+                    <span>Aap MUIT Lucknow campus perimeter ke andar hain. Attendance PRESENT mark hogi.</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 shrink-0" />
+                  <div>
+                    <strong className="block text-red-300 font-bold">⚠️ Area Se Bahar ({distanceMeters}m Away)</strong>
+                    <span>Aap MUIT Campus geofence (50m) ke bahar hain. Attendance submit karne par automatically <strong>ABSENT</strong> mark hogi.</span>
+                  </div>
+                </>
+              )}
+            </div>
+
             {/* Buttons */}
             <div className="space-y-3">
               {isCameraActive && (
@@ -1175,9 +1690,17 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                 <button
                   onClick={submitAttendancePipeline}
                   disabled={submitting}
-                  className="w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black shadow-lg flex items-center justify-center gap-2"
+                  className={`w-full py-3 rounded-xl text-white text-xs font-black shadow-lg flex items-center justify-center gap-2 transition-all ${
+                    isWithinGeofence
+                      ? 'bg-emerald-600 hover:bg-emerald-700'
+                      : 'bg-red-600 hover:bg-red-700'
+                  }`}
                 >
-                  {submitting ? 'Verifying Pipeline...' : '✅ Confirm & Mark Attendance'}
+                  {submitting 
+                    ? 'Verifying Pipeline...' 
+                    : isWithinGeofence 
+                      ? '✅ Confirm & Mark Attendance (PRESENT)' 
+                      : '⚠️ Submit Attendance (Mark as ABSENT)'}
                 </button>
               )}
             </div>
@@ -1218,9 +1741,13 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                 {liveRecord.status === 'PRESENT' ? 'VERIFICATION PASSED • PRESENT 🟢' : 'VERIFICATION FAILED • ABSENT 🔴'}
               </span>
               <h2 className="text-2xl font-black text-white tracking-tight mt-3">
-                {liveRecord.status === 'PRESENT' ? 'Attendance Marked Successfully!' : 'Attendance Recorded as Absent'}
+                {liveRecord.status === 'PRESENT' ? 'Attendance Marked Successfully!' : 'Attendance Recorded as ABSENT'}
               </h2>
-              <p className="text-xs text-slate-400 mt-1">Cryptographic Record Signed & Saved to Campus Ledger</p>
+              <p className="text-xs text-slate-400 mt-1">
+                {liveRecord.status === 'PRESENT' 
+                  ? 'Cryptographic Record Signed & Saved to Campus Ledger' 
+                  : `Geofence Violation: Aap MUIT Lucknow Campus area se bahar hain (${distanceMeters}m door, limit 50m).`}
+              </p>
             </div>
 
             <div className="p-4 bg-slate-950/80 rounded-2xl border border-slate-800 text-xs text-left space-y-2.5 font-mono shadow-inner">
@@ -1277,6 +1804,223 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
 
           </div>
 
+        </div>
+      )}
+
+
+      {/* OFFICIAL MUIT SEMESTER ATTENDANCE REPORT MODAL (https://stdlogin.muituniversity.in/Student/AttendanceReport) */}
+      {showFullReportModal && (
+        <div className="fixed inset-0 z-[99999] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="max-w-4xl w-full bg-white text-slate-900 border border-slate-200 rounded-3xl p-6 relative shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+            
+            {/* Header */}
+            <div className="flex justify-between items-start border-b border-slate-200 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-200 shadow-inner">
+                  <BarChart2 className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-900 tracking-tight">
+                    Official Semester Attendance Audit Report
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Maharishi University of Information Technology • BCA Semester V-B (w.e.f. 27 July 2026)
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowFullReportModal(false)}
+                className="p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Student Stats Summary Bar */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-center">
+              <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Total Conducted</span>
+                <span className="text-lg font-black text-slate-900 font-mono">48 Classes</span>
+              </div>
+              <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <span className="text-[10px] text-emerald-600 font-bold uppercase block">Attended (Present)</span>
+                <span className="text-lg font-black text-emerald-600 font-mono">46 Classes</span>
+              </div>
+              <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <span className="text-[10px] text-red-500 font-bold uppercase block">Total Absent</span>
+                <span className="text-lg font-black text-red-600 font-mono">2 Classes</span>
+              </div>
+              <div className="p-2 bg-emerald-600 text-white rounded-xl shadow-md">
+                <span className="text-[10px] text-emerald-100 font-bold uppercase block">Attendance Ratio</span>
+                <span className="text-lg font-black text-white font-mono">95.8% (Eligible)</span>
+              </div>
+            </div>
+
+            {/* Subject-Wise Attendance Percentage Table */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                Subject-Wise Attendance Audit Breakdown
+              </h4>
+              <div className="border border-slate-200 rounded-2xl overflow-hidden text-xs">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-200 text-[11px]">
+                      <th className="p-3">Course Code</th>
+                      <th className="p-3">Subject Name</th>
+                      <th className="p-3">Faculty</th>
+                      <th className="p-3 text-center">Held</th>
+                      <th className="p-3 text-center">Attended</th>
+                      <th className="p-3 text-right">Percentage</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 font-medium text-slate-800">
+                    <tr className="hover:bg-slate-50/80">
+                      <td className="p-3 font-mono font-bold text-blue-600">BCA501</td>
+                      <td className="p-3 font-bold">Computer Graphics</td>
+                      <td className="p-3 text-slate-600">Mr. Dhananjay Kr. Yadav (DKY)</td>
+                      <td className="p-3 text-center font-mono">13</td>
+                      <td className="p-3 text-center font-mono text-emerald-600 font-bold">13</td>
+                      <td className="p-3 text-right font-mono font-black text-emerald-600">100.0%</td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/80">
+                      <td className="p-3 font-mono font-bold text-blue-600">BCA502</td>
+                      <td className="p-3 font-bold">Cryptography & Network Security</td>
+                      <td className="p-3 text-slate-600">Dr. Gouri Shukla (GS)</td>
+                      <td className="p-3 text-center font-mono">12</td>
+                      <td className="p-3 text-center font-mono text-emerald-600 font-bold">10</td>
+                      <td className="p-3 text-right font-mono font-black text-emerald-600">83.3%</td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/80">
+                      <td className="p-3 font-mono font-bold text-blue-600">BCA503</td>
+                      <td className="p-3 font-bold">Web Technology</td>
+                      <td className="p-3 text-slate-600">Mr. Rishi Mohan Awasthi (RMA)</td>
+                      <td className="p-3 text-center font-mono">11</td>
+                      <td className="p-3 text-center font-mono text-emerald-600 font-bold">11</td>
+                      <td className="p-3 text-right font-mono font-black text-emerald-600">100.0%</td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/80">
+                      <td className="p-3 font-mono font-bold text-blue-600">BCA511</td>
+                      <td className="p-3 font-bold">Computer Graphics Lab</td>
+                      <td className="p-3 text-slate-600">Dr. Gouri Shukla (GS)</td>
+                      <td className="p-3 text-center font-mono">5</td>
+                      <td className="p-3 text-center font-mono text-emerald-600 font-bold">5</td>
+                      <td className="p-3 text-right font-mono font-black text-emerald-600">100.0%</td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/80">
+                      <td className="p-3 font-mono font-bold text-blue-600">BCA504</td>
+                      <td className="p-3 font-bold">Minor Project</td>
+                      <td className="p-3 text-slate-600">Dr. Peeyush Pathak (PP)</td>
+                      <td className="p-3 text-center font-mono">4</td>
+                      <td className="p-3 text-center font-mono text-emerald-600 font-bold">4</td>
+                      <td className="p-3 text-right font-mono font-black text-emerald-600">100.0%</td>
+                    </tr>
+                    <tr className="hover:bg-slate-50/80">
+                      <td className="p-3 font-mono font-bold text-blue-600">ACE511</td>
+                      <td className="p-3 font-bold">Industrial Internship</td>
+                      <td className="p-3 text-slate-600">Mr. Imtiyaz Haq (IH)</td>
+                      <td className="p-3 text-center font-mono">3</td>
+                      <td className="p-3 text-center font-mono text-emerald-600 font-bold">3</td>
+                      <td className="p-3 text-right font-mono font-black text-emerald-600">100.0%</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Complete Day-by-Day Historical Log List */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                Full Historical Attendance Audit Logs (Jul 27 - Sep 29, 2026)
+              </h4>
+              <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                {attendanceLogs.map((log) => (
+                  <div key={log.id} className="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs hover:border-blue-300">
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <p className="font-extrabold text-slate-900">{log.subject}</p>
+                        <span className="text-[10px] font-mono text-slate-500 font-bold">{log.room}</span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 font-medium mt-0.5">
+                        {log.date} • {log.time} • Instructor: {log.teacher} • Distance: {log.distance}
+                      </p>
+                      <p className="text-[9px] font-mono text-blue-600 mt-0.5">
+                        Cryptographic Hash: {log.hash}
+                      </p>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-black border ${
+                      log.status === 'PRESENT' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-red-100 text-red-800 border-red-300'
+                    }`}>
+                      {log.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer buttons */}
+            <div className="pt-2 border-t border-slate-200 flex justify-end gap-3">
+              <button
+                onClick={() => setShowFullReportModal(false)}
+                className="px-5 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-xs"
+              >
+                Close Report
+              </button>
+              <button
+                onClick={() => window.print()}
+                className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md flex items-center gap-1.5"
+              >
+                <Printer className="w-4 h-4" /> Print Official Report
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* SINGLE AUDIT RECORD PROOF MODAL */}
+      {selectedAuditRecord && (
+        <div className="fixed inset-0 z-[99999] bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 animate-fadeIn">
+          <div className="max-w-md w-full bg-white text-slate-900 rounded-3xl p-6 space-y-4 shadow-2xl border border-slate-200">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-5 h-5 text-emerald-600" />
+                <h3 className="text-base font-black text-slate-900">Cryptographic Verification Record</h3>
+              </div>
+              <button
+                onClick={() => setSelectedAuditRecord(null)}
+                className="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+              <div className="flex justify-between items-center">
+                <h4 className="text-sm font-black text-slate-900">{selectedAuditRecord.subject}</h4>
+                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${
+                  selectedAuditRecord.status === 'PRESENT' ? 'bg-emerald-100 text-emerald-800 border-emerald-300' : 'bg-red-100 text-red-800 border-red-300'
+                }`}>
+                  {selectedAuditRecord.status}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 font-medium pt-2 border-t border-slate-200">
+                <div>Date: <strong className="text-slate-900 block font-mono">{selectedAuditRecord.date}</strong></div>
+                <div>Time: <strong className="text-slate-900 block font-mono">{selectedAuditRecord.time}</strong></div>
+                <div>Instructor: <strong className="text-slate-900 block">{selectedAuditRecord.teacher}</strong></div>
+                <div>Geofence Distance: <strong className="text-slate-900 block font-mono">{selectedAuditRecord.distance}</strong></div>
+                <div className="col-span-2">Verification Mode: <strong className="text-slate-900 block">GPS Geofence + Dynamic 5-Min QR + AI Face Liveness</strong></div>
+                <div className="col-span-2">SHA-256 Audit Hash: <strong className="text-blue-600 block font-mono text-[10px]">{selectedAuditRecord.hash}</strong></div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setSelectedAuditRecord(null)}
+              className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs shadow-md"
+            >
+              Close Verification Proof
+            </button>
+          </div>
         </div>
       )}
 

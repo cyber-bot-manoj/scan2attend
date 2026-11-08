@@ -15,14 +15,14 @@ app.use(express.json({ limit: '10mb' }));
 function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
   if (!lat1 || !lon1 || !lat2 || !lon2) return 0;
   const R = 6371e3; // Earth radius in meters
-  const φ1 = (lat1 * Math.PI) / 180;
-  const φ2 = (lat2 * Math.PI) / 180;
-  const Δφ = ((lat2 - lat1) * Math.PI) / 180;
-  const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+  const rad1 = (lat1 * Math.PI) / 180;
+  const rad2 = (lat2 * Math.PI) / 180;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
 
   const a =
-    Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
-    Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(rad1) * Math.cos(rad2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   return Math.round(R * c);
@@ -506,21 +506,23 @@ app.post('/api/attendance/mark', (req, res) => {
     });
   }
 
-  // STEP 2: GEOFENCING CHECK (within 50 meters)
-  const classLat = qrData.latitude || 28.6139;
-  const classLng = qrData.longitude || 77.2090;
-  // Manual 50m geofence range override active (set to 14m inside 50m boundary)
-  const rawDistance = calculateDistanceMeters(studentLat, studentLng, classLat, classLng);
-  const distanceMeters = 14; // Manual Mode Active (Inside 50m range)
+  // STEP 2: GEOFENCING CHECK (within campus boundary, default 50m)
+  // Campus Coordinates: Maharishi University of Information Technology (MUIT), Lucknow
+  const classLat = qrData.latitude || 26.9302879;
+  const classLng = qrData.longitude || 80.9278433;
+  const allowedRadius = qrData.radiusMeters || 50;
 
-  if (distanceMeters > 50) {
+  // Real distance calculation based on student's live GPS coordinates
+  const distanceMeters = calculateDistanceMeters(studentLat, studentLng, classLat, classLng);
+
+  if (distanceMeters > allowedRadius) {
     const absentRecord = {
       id: 'att_absent_' + Date.now(),
       studentId: student.id,
       studentName: student.name,
       rollNo: student.rollNo,
-      classId: qrData.classId || 'class_101',
-      subject: qrData.subject || 'Advanced AI',
+      classId: qrData.classId || 'bca501',
+      subject: qrData.subject || 'Computer Graphics (BCA501)',
       sessionId: qrData.sessionId || ('session_' + Date.now()),
       timestamp: new Date().toISOString(),
       location: {
@@ -530,7 +532,7 @@ app.post('/api/attendance/mark', (req, res) => {
       },
       faceSnapshot: faceSnapshot || '/student_profile_avatar.png',
       status: 'ABSENT',
-      reason: `Geofence Violation: ${distanceMeters}m from classroom (Limit: 50m)`
+      reason: `Geofence Violation: Area se bahar (${distanceMeters}m from MUIT Lucknow campus, Limit: ${allowedRadius}m)`
     };
 
     db.attendance.unshift(absentRecord);
@@ -541,7 +543,7 @@ app.post('/api/attendance/mark', (req, res) => {
       recipientName: student.name,
       mobile: student.mobile,
       type: 'GEOFENCE_ABSENCE_ALERT',
-      message: `Alert: ${student.name} attempted attendance from outside geofence (${distanceMeters}m away). Attendance automatically recorded as ABSENT.`,
+      message: `Alert: ${student.name} attempted attendance from outside geofence (${distanceMeters}m away from MUIT Campus). Attendance automatically recorded as ABSENT.`,
       status: 'DELIVERED',
       timestamp: new Date().toISOString()
     };
@@ -554,10 +556,10 @@ app.post('/api/attendance/mark', (req, res) => {
       step: 'GEOFENCING CHECK',
       reason: 'Out of Range',
       distanceMeters,
-      allowedMeters: 50,
+      allowedMeters: allowedRadius,
       student,
       attendanceRecord: absentRecord,
-      message: `Attendance Automatically Marked ABSENT (Geofence Violation: ${distanceMeters}m away from classroom)`
+      message: `Attendance Automatically Marked ABSENT (Area se bahar: ${distanceMeters}m away from MUIT Campus)`
     });
   }
 

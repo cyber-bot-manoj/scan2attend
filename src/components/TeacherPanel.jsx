@@ -97,6 +97,10 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
       classId: selectedClassId,
       className,
       subject: className,
+      latitude: 26.9302879,
+      longitude: 80.9278433,
+      radiusMeters: 50,
+      campus: 'MUIT Lucknow',
       sessionId: `qr_${generatedAt}`,
       expiresAt: expiresAt,
       secretHash: `SEC_${generatedAt}_${selectedClassId.toUpperCase()}`
@@ -423,8 +427,8 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300 font-mono pt-1 border-t border-slate-800">
-                <div>Latitude: <strong className="text-white block font-sans text-xs">28.6139° N</strong></div>
-                <div>Longitude: <strong className="text-white block font-sans text-xs">77.2090° E</strong></div>
+                <div>Latitude: <strong className="text-white block font-sans text-xs">26.9303° N</strong></div>
+                <div>Longitude: <strong className="text-white block font-sans text-xs">80.9278° E</strong></div>
               </div>
 
               <div className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-semibold pt-0.5">
@@ -436,7 +440,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
 
           <div className="pt-2">
             <button
-              onClick={() => alert('📍 Geofence coordinates updated to Room B-302 (28.6139, 77.2090) with 50m radius.')}
+              onClick={() => alert('📍 Geofence coordinates calibrated to MUIT Lucknow - Room B-302 (26.9303, 80.9278) with 50m radius.')}
               className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold transition-colors border border-slate-200 flex items-center justify-center gap-1.5"
             >
               <Radio className="w-3.5 h-3.5 text-blue-600" /> Recalibrate Geofence Radar

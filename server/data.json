@@ -948,11 +948,11 @@
       "subject": "Computer Graphics",
       "code": "BCA501",
       "section": "BCA - Sem V B",
-      "room": "Room B-302",
+      "room": "Room B-302 • MUIT Lucknow",
       "teacherId": "teacher_1",
       "teacherName": "Mr. Dhananjay Kr. Yadav (DKY)",
-      "latitude": 28.6139,
-      "longitude": 77.209,
+      "latitude": 26.9302879,
+      "longitude": 80.9278433,
       "radiusMeters": 50
     },
     {
@@ -960,11 +960,11 @@
       "subject": "Cryptography and Network Security",
       "code": "BCA502",
       "section": "BCA - Sem V B",
-      "room": "Room B-302",
+      "room": "Room B-302 • MUIT Lucknow",
       "teacherId": "teacher_2",
       "teacherName": "Dr. Gouri Shukla (GS)",
-      "latitude": 28.6139,
-      "longitude": 77.209,
+      "latitude": 26.9302879,
+      "longitude": 80.9278433,
       "radiusMeters": 50
     },
     {
@@ -972,11 +972,11 @@
       "subject": "Web Technology",
       "code": "BCA503",
       "section": "BCA - Sem V B",
-      "room": "Room B-302",
+      "room": "Room B-302 • MUIT Lucknow",
       "teacherId": "teacher_3",
       "teacherName": "Mr. Rishi Mohan Awasthi (RMA)",
-      "latitude": 28.6139,
-      "longitude": 77.209,
+      "latitude": 26.9302879,
+      "longitude": 80.9278433,
       "radiusMeters": 50
     },
     {
@@ -984,11 +984,11 @@
       "subject": "Minor Project",
       "code": "BCA504",
       "section": "BCA - Sem V B",
-      "room": "Room B-302",
+      "room": "Room B-302 • MUIT Lucknow",
       "teacherId": "teacher_4",
       "teacherName": "Dr. Peeyush Pathak (PP)",
-      "latitude": 28.6139,
-      "longitude": 77.209,
+      "latitude": 26.9302879,
+      "longitude": 80.9278433,
       "radiusMeters": 50
     },
     {
@@ -996,11 +996,11 @@
       "subject": "Computer Graphics Lab",
       "code": "BCA511",
       "section": "BCA - Sem V B",
-      "room": "Lab CCL1 / B-103",
+      "room": "Lab CCL1 / B-103 • MUIT Lucknow",
       "teacherId": "teacher_2",
       "teacherName": "Dr. Gouri Shukla (GS)",
-      "latitude": 28.6139,
-      "longitude": 77.209,
+      "latitude": 26.9302879,
+      "longitude": 80.9278433,
       "radiusMeters": 50
     },
     {
@@ -1008,11 +1008,11 @@
       "subject": "Web Technology Lab",
       "code": "BCA512",
       "section": "BCA - Sem V B",
-      "room": "Lab B-108 / B-CCL3",
+      "room": "Lab B-108 / B-CCL3 • MUIT Lucknow",
       "teacherId": "teacher_3",
       "teacherName": "Mr. Rishi Mohan Awasthi (RMA)",
-      "latitude": 28.6139,
-      "longitude": 77.209,
+      "latitude": 26.9302879,
+      "longitude": 80.9278433,
       "radiusMeters": 50
     },
     {
@@ -1020,11 +1020,11 @@
       "subject": "Industrial Internship",
       "code": "ACE511",
       "section": "BCA - Sem V B",
-      "room": "Room B-302",
+      "room": "Room B-302 • MUIT Lucknow",
       "teacherId": "teacher_5",
       "teacherName": "Mr. Imtiyaz Haq (IH)",
-      "latitude": 28.6139,
-      "longitude": 77.209,
+      "latitude": 26.9302879,
+      "longitude": 80.9278433,
       "radiusMeters": 50
     }
   ],

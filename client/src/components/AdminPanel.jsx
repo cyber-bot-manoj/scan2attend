@@ -31,9 +31,10 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
     smsLogs: []
   });
 
-  const [selectedClassId, setSelectedClassId] = useState('cs401');
-  const [geoLat, setGeoLat] = useState('28.6139');
-  const [geoLng, setGeoLng] = useState('77.2090');
+  const [selectedClassId, setSelectedClassId] = useState('bca501');
+  const [selectedSubjectFilter, setSelectedSubjectFilter] = useState('bca501');
+  const [geoLat, setGeoLat] = useState('26.9302879');
+  const [geoLng, setGeoLng] = useState('80.9278433');
   const [geoRadius, setGeoRadius] = useState('50');
   const [geoMessage, setGeoMessage] = useState('');
   const [qrExpiryDuration, setQrExpiryDuration] = useState(5); // Minutes
@@ -77,50 +78,97 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
         })
       });
       const resData = await res.json();
-      setGeoMessage('📍 Geofence coordinates successfully updated for Lab 402!');
+      setGeoMessage('📍 Geofence coordinates successfully updated for Room B-302!');
       setTimeout(() => setGeoMessage(''), 3000);
     } catch (err) {
-      setGeoMessage('📍 Geofence updated locally (Lab 402, 50m radius)');
+      setGeoMessage('📍 Geofence updated locally (Room B-302, 50m radius)');
       setTimeout(() => setGeoMessage(''), 3000);
     }
   };
 
-  const master30StudentAuditRecords = [
-    { id: 'REC-01', studentName: 'Manoj Sharma', rollNo: 'CS202601', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:19:46 AM', distanceMeters: 14, status: 'PRESENT', hash: 'AUDIT-2026-REC-469063' },
-    { id: 'REC-02', studentName: 'Priya Singh', rollNo: 'CS202602', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:18:10 AM', distanceMeters: 12, status: 'PRESENT', hash: 'AUDIT-2026-REC-112934' },
-    { id: 'REC-03', studentName: 'Rohan Mehta', rollNo: 'CS202603', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:17:55 AM', distanceMeters: 68, status: 'ABSENT', hash: 'AUDIT-2026-REC-992381' },
-    { id: 'REC-04', studentName: 'Ananya Sharma', rollNo: 'CS202604', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:17:02 AM', distanceMeters: 9, status: 'PRESENT', hash: 'AUDIT-2026-REC-584920' },
-    { id: 'REC-05', studentName: 'Vikramaditya Verma', rollNo: 'CS202605', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:16:30 AM', distanceMeters: 15, status: 'PRESENT', hash: 'AUDIT-2026-REC-392019' },
-    { id: 'REC-06', studentName: 'Sneha Gupta', rollNo: 'CS202606', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:15:45 AM', distanceMeters: 11, status: 'PRESENT', hash: 'AUDIT-2026-REC-884012' },
-    { id: 'REC-07', studentName: 'Ishaan Patel', rollNo: 'CS202607', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:15:10 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-739201' },
-    { id: 'REC-08', studentName: 'Kavya Deshmukh', rollNo: 'CS202608', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:14:35 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-483920' },
-    { id: 'REC-09', studentName: 'Aditya Reddy', rollNo: 'CS202609', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:14:00 AM', distanceMeters: 74, status: 'ABSENT', hash: 'AUDIT-2026-REC-294018' },
-    { id: 'REC-10', studentName: 'Diya Roy', rollNo: 'CS202610', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:13:20 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-673029' },
-    { id: 'REC-11', studentName: 'Rahul Nair', rollNo: 'CS202611', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:12:50 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-940281' },
-    { id: 'REC-12', studentName: 'Tanvi Joshi', rollNo: 'CS202612', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:12:15 AM', distanceMeters: 8, status: 'PRESENT', hash: 'AUDIT-2026-REC-184029' },
-    { id: 'REC-13', studentName: 'Amit Kumar', rollNo: 'CS202613', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:11:40 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-592018' },
-    { id: 'REC-14', studentName: 'Neha Agarwal', rollNo: 'CS202614', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:11:05 AM', distanceMeters: 14, status: 'PRESENT', hash: 'AUDIT-2026-REC-830291' },
-    { id: 'REC-15', studentName: 'Harsh Vardhan', rollNo: 'CS202615', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:10:30 AM', distanceMeters: 82, status: 'ABSENT', hash: 'AUDIT-2026-REC-492018' },
-    { id: 'REC-16', studentName: 'Pooja Mishra', rollNo: 'CS202616', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:10:00 AM', distanceMeters: 17, status: 'PRESENT', hash: 'AUDIT-2026-REC-382019' },
-    { id: 'REC-17', studentName: 'Siddharth Rao', rollNo: 'CS202617', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:09:20 AM', distanceMeters: 12, status: 'PRESENT', hash: 'AUDIT-2026-REC-749201' },
-    { id: 'REC-18', studentName: 'Shreya Pandey', rollNo: 'CS202618', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:08:50 AM', distanceMeters: 15, status: 'PRESENT', hash: 'AUDIT-2026-REC-194028' },
-    { id: 'REC-19', studentName: 'Arjun Kapoor', rollNo: 'CS202619', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:08:15 AM', distanceMeters: 21, status: 'PRESENT', hash: 'AUDIT-2026-REC-683029' },
-    { id: 'REC-20', studentName: 'Riya Sen', rollNo: 'CS202620', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:07:40 AM', distanceMeters: 11, status: 'PRESENT', hash: 'AUDIT-2026-REC-492810' },
-    { id: 'REC-21', studentName: 'Yash Malhotra', rollNo: 'CS202621', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:07:05 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-839201' },
-    { id: 'REC-22', studentName: 'Anjali Yadav', rollNo: 'CS202622', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:06:30 AM', distanceMeters: 9, status: 'PRESENT', hash: 'AUDIT-2026-REC-284019' },
-    { id: 'REC-23', studentName: 'Karan Sharma', rollNo: 'CS202623', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:05:55 AM', distanceMeters: 18, status: 'PRESENT', hash: 'AUDIT-2026-REC-739281' },
-    { id: 'REC-24', studentName: 'Meera Rajput', rollNo: 'CS202624', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:05:20 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-592810' },
-    { id: 'REC-25', studentName: 'Abhinav Saxena', rollNo: 'CS202625', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:04:45 AM', distanceMeters: 55, status: 'ABSENT', hash: 'AUDIT-2026-REC-184920' },
-    { id: 'REC-26', studentName: 'Swati Tripathi', rollNo: 'CS202626', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:04:10 AM', distanceMeters: 14, status: 'PRESENT', hash: 'AUDIT-2026-REC-839102' },
-    { id: 'REC-27', studentName: 'Vivek Choudhary', rollNo: 'CS202627', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:03:35 AM', distanceMeters: 12, status: 'PRESENT', hash: 'AUDIT-2026-REC-492019' },
-    { id: 'REC-28', studentName: 'Divya Thakur', rollNo: 'CS202628', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:03:00 AM', distanceMeters: 17, status: 'PRESENT', hash: 'AUDIT-2026-REC-284910' },
-    { id: 'REC-29', studentName: 'Gaurav Bhatia', rollNo: 'CS202629', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:02:25 AM', distanceMeters: 20, status: 'PRESENT', hash: 'AUDIT-2026-REC-739182' },
-    { id: 'REC-30', studentName: 'Simran Kaur', rollNo: 'CS202630', subject: 'Advanced AI (CS401)', timestamp: 'Sep 02, 2026, 12:01:50 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-392810' }
+  
+  const subjectNameMap = {
+    bca501: 'Computer Graphics (BCA501)',
+    bca502: 'Cryptography & Network Security (BCA502)',
+    bca503: 'Web Technology (BCA503)',
+    bca504: 'Minor Project (BCA504)',
+    bca511: 'Computer Graphics Lab (BCA511)',
+    bca512: 'Web Technology Lab (BCA512)',
+    ace511: 'Industrial Internship (ACE511)'
+  };
+  const activeSelectedSubjectName = subjectNameMap[selectedSubjectFilter] || 'Computer Graphics (BCA501)';
+
+    const master65StudentAuditRecords = [
+    { id: 'REC-01', studentName: 'MANOJ SHARMA', rollNo: '2401031601137', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:59:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-469000' },
+    { id: 'REC-02', studentName: 'ANSH GUPTA', rollNo: '2401031601046', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:58:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-469137' },
+    { id: 'REC-03', studentName: 'AYUSH SRIVASTAVA', rollNo: '2401031601077', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:57:15 AM', distanceMeters: 69, status: 'ABSENT', hash: 'AUDIT-2026-REC-469274' },
+    { id: 'REC-04', studentName: 'AYUSHI GUPTA', rollNo: '2401031601079', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:56:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-469411' },
+    { id: 'REC-05', studentName: 'BADRINATH GUPTA', rollNo: '2401031601080', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:55:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-469548' },
+    { id: 'REC-06', studentName: 'BHAVISHYA PRATAP SINGH', rollNo: '2401031601081', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:54:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-469685' },
+    { id: 'REC-07', studentName: 'CHAMAN', rollNo: '2401031601082', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:53:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-469822' },
+    { id: 'REC-08', studentName: 'CHANDRA PRAKASH SAH', rollNo: '2401031601083', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:52:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-469959' },
+    { id: 'REC-09', studentName: 'CHANDRANSH SINGH', rollNo: '2401031601085', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:51:15 AM', distanceMeters: 81, status: 'ABSENT', hash: 'AUDIT-2026-REC-470096' },
+    { id: 'REC-10', studentName: 'DARKHSHA KHATOON', rollNo: '2401031601086', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:50:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-470233' },
+    { id: 'REC-11', studentName: 'DEEPAK', rollNo: '2401031601087', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:49:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-470370' },
+    { id: 'REC-12', studentName: 'DHAIRYA DIXIT', rollNo: '2401031601091', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:48:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-470507' },
+    { id: 'REC-13', studentName: 'DIVANCI SAXENA', rollNo: '2401031601264', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:47:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-470644' },
+    { id: 'REC-14', studentName: 'DIVYANSH SRIVASTAVA', rollNo: '2401031601094', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:46:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-470781' },
+    { id: 'REC-15', studentName: 'DIVYANSHU PATEL', rollNo: '2401031601095', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:45:15 AM', distanceMeters: 63, status: 'ABSENT', hash: 'AUDIT-2026-REC-470918' },
+    { id: 'REC-16', studentName: 'EKANSHI SHARAN SRIVASTAVA', rollNo: '2401031601098', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:44:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-471055' },
+    { id: 'REC-17', studentName: 'EKATA', rollNo: '2401031601099', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:43:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-471192' },
+    { id: 'REC-18', studentName: 'GARIMA SINGH', rollNo: '2401031601101', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:42:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-471329' },
+    { id: 'REC-19', studentName: 'GAURAV RAWAT', rollNo: '2401031601102', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:41:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-471466' },
+    { id: 'REC-20', studentName: 'GAURAV SHARMA', rollNo: '2401031601103', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:40:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-471603' },
+    { id: 'REC-21', studentName: 'HARSH TRIVEDI', rollNo: '2401031601105', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:39:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-471740' },
+    { id: 'REC-22', studentName: 'HARSHIT PANDEY', rollNo: '2401031601283', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:38:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-471877' },
+    { id: 'REC-23', studentName: 'HARSHIT SHUKLA', rollNo: '2401031601107', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:37:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-472014' },
+    { id: 'REC-24', studentName: 'HEMANT KUMAR PANDEY', rollNo: '2401031601108', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:36:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-472151' },
+    { id: 'REC-25', studentName: 'HIMANSHU KUMAR', rollNo: '2401031601110', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:35:15 AM', distanceMeters: 73, status: 'ABSENT', hash: 'AUDIT-2026-REC-472288' },
+    { id: 'REC-26', studentName: 'HIMANSHU SRIVASTAVA', rollNo: '2401031601262', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:34:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-472425' },
+    { id: 'REC-27', studentName: 'INDRAJEET SAHANI', rollNo: '2401031601260', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:33:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-472562' },
+    { id: 'REC-28', studentName: 'ISHIKA GAUR', rollNo: '2401031601111', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:32:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-472699' },
+    { id: 'REC-29', studentName: 'ISHITA DIXIT', rollNo: '2401031601112', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:31:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-472836' },
+    { id: 'REC-30', studentName: 'ISHITA GUPTA', rollNo: '2401031601113', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:30:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-472973' },
+    { id: 'REC-31', studentName: 'ISHU AMAN', rollNo: '2401031601263', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:29:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-473110' },
+    { id: 'REC-32', studentName: 'JAVED HUSAIN', rollNo: '2401031601115', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:28:15 AM', distanceMeters: 62, status: 'ABSENT', hash: 'AUDIT-2026-REC-473247' },
+    { id: 'REC-33', studentName: 'JAY SHUKLA', rollNo: '2401031601116', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:27:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-473384' },
+    { id: 'REC-34', studentName: 'KARISHMA SINGH', rollNo: '2401031601119', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:26:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-473521' },
+    { id: 'REC-35', studentName: 'KASHIF ANSARI', rollNo: '2401031601120', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:25:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-473658' },
+    { id: 'REC-36', studentName: 'KASHISH CHAURASIA', rollNo: '2401031601121', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:24:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-473795' },
+    { id: 'REC-37', studentName: 'KAUSHAL KUMAR BHARTI', rollNo: '2401031601122', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:23:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-473932' },
+    { id: 'REC-38', studentName: 'KAVYANSHI SRIVASTAVA', rollNo: '2401031601123', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:22:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-474069' },
+    { id: 'REC-39', studentName: 'KHAN MOHD JUNED NOOR MOHAMMED', rollNo: '2401031601125', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:21:15 AM', distanceMeters: 81, status: 'ABSENT', hash: 'AUDIT-2026-REC-474206' },
+    { id: 'REC-40', studentName: 'KHUSHI KANNOUJIYA', rollNo: '2401031601127', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:20:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-474343' },
+    { id: 'REC-41', studentName: 'KOMAL SINGH', rollNo: '2401031601129', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:19:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-474480' },
+    { id: 'REC-42', studentName: 'KULDEEP MAURYA', rollNo: '2401031601130', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:18:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-474617' },
+    { id: 'REC-43', studentName: 'KUNAL PATEL', rollNo: '2401031601293', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:17:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-474754' },
+    { id: 'REC-44', studentName: 'MANDAVI SINGH', rollNo: '2401031601134', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:16:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-474891' },
+    { id: 'REC-45', studentName: 'MANEESH SINGH', rollNo: '2401031601135', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:15:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-475028' },
+    { id: 'REC-46', studentName: 'MANSI YADAV', rollNo: '2401031601138', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:14:15 AM', distanceMeters: 70, status: 'ABSENT', hash: 'AUDIT-2026-REC-475165' },
+    { id: 'REC-47', studentName: 'MEDHA PANDEY', rollNo: '2401031601139', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:13:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-475302' },
+    { id: 'REC-48', studentName: 'MOHAMMAD ABDULLA', rollNo: '2401031601140', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:12:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-475439' },
+    { id: 'REC-49', studentName: 'MOHAN SINGH', rollNo: '2401031601287', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:11:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-475576' },
+    { id: 'REC-50', studentName: 'MOHD TAUSIF KHAN', rollNo: '2401031601142', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:10:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-475713' },
+    { id: 'REC-51', studentName: 'MONU', rollNo: '2401031601144', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:09:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-475850' },
+    { id: 'REC-52', studentName: 'MUJAHID HUSAIN', rollNo: '2401031601145', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:08:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-475987' },
+    { id: 'REC-53', studentName: 'NANDINI KESHARWANI', rollNo: '2401031601147', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:07:15 AM', distanceMeters: 59, status: 'ABSENT', hash: 'AUDIT-2026-REC-476124' },
+    { id: 'REC-54', studentName: 'NILESH KUMAR SINGH', rollNo: '2401031601151', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:06:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-476261' },
+    { id: 'REC-55', studentName: 'NISHANT MISHRA', rollNo: '2401031601152', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:05:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-476398' },
+    { id: 'REC-56', studentName: 'NITESH KUMAR CHAUHAN', rollNo: '2401031601153', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:04:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-476535' },
+    { id: 'REC-57', studentName: 'NITIN RAJPOOT', rollNo: '2401031601288', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:03:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-476672' },
+    { id: 'REC-58', studentName: 'RAVI JAISWAL', rollNo: '2401031601176', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:02:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-476809' },
+    { id: 'REC-59', studentName: 'RITIK VERMA', rollNo: '2401031601182', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:01:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-476946' },
+    { id: 'REC-60', studentName: 'SHANTANU MISHRA', rollNo: '2401031601203', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 12:00:15 AM', distanceMeters: 78, status: 'ABSENT', hash: 'AUDIT-2026-REC-477083' },
+    { id: 'REC-61', studentName: 'SHIVANSHI TRIPATHI', rollNo: '2401031601214', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 11:59:15 AM', distanceMeters: 10, status: 'PRESENT', hash: 'AUDIT-2026-REC-477220' },
+    { id: 'REC-62', studentName: 'SHREESH MISHRA', rollNo: '2401031601216', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 11:58:15 AM', distanceMeters: 13, status: 'PRESENT', hash: 'AUDIT-2026-REC-477357' },
+    { id: 'REC-63', studentName: 'YASH SRIVASTAVA', rollNo: '2401031601316', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 11:57:15 AM', distanceMeters: 16, status: 'PRESENT', hash: 'AUDIT-2026-REC-477494' },
+    { id: 'REC-64', studentName: 'YASHIKA UPADHYAY', rollNo: '2401031601251', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 11:56:15 AM', distanceMeters: 19, status: 'PRESENT', hash: 'AUDIT-2026-REC-477631' },
+    { id: 'REC-65', studentName: 'Kuldeep Maurya', rollNo: '2401031601130', subject: 'Computer Graphics (BCA501)', timestamp: 'Sep 02, 2026, 11:55:15 AM', distanceMeters: 22, status: 'PRESENT', hash: 'AUDIT-2026-REC-477768' }
   ];
 
   const exportComprehensiveReport = () => {
     let csvHeader = "Record ID,Student Name,Roll No,Subject,Timestamp,Distance (m),Status,Audit Hash\n";
-    const recordsToExport = (globalAttendanceRecords && globalAttendanceRecords.length > 0) ? globalAttendanceRecords : ((data.attendance && data.attendance.length > 0) ? data.attendance : master30StudentAuditRecords);
+    const recordsToExport = (globalAttendanceRecords && globalAttendanceRecords.length > 0) ? globalAttendanceRecords : ((data.attendance && data.attendance.length > 0) ? data.attendance : master65StudentAuditRecords);
 
     let csvRows = recordsToExport.map(r => 
       `"${r.id}","${r.studentName}","${r.rollNo}","${r.subject}","${r.timestamp}","${r.distanceMeters || 15}","${r.status}","${r.hash || 'AUDIT-HASH'}"`
@@ -165,18 +213,13 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                   </h1>
                 </div>
                 <p className="text-xs text-slate-300 font-medium">
-                  Unified Campus Attendance Engine • Server Cluster ID: <span className="font-mono text-amber-200 font-bold">NODE-2026-ADM</span>
+                  Server Cluster ID: <span className="font-mono text-amber-200 font-bold">NODE-2026-ADM</span>
                 </p>
               </div>
             </div>
 
             {/* Admin Metric Chips Bar */}
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
-              <div className="px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs font-semibold text-slate-200 flex items-center gap-1.5 shadow-sm">
-                <Server className="w-3.5 h-3.5 text-emerald-400" />
-                <span>System Uptime: <strong className="text-emerald-400 font-mono">99.9%</strong></span>
-              </div>
-
               <div className="px-3.5 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs font-semibold text-slate-200 flex items-center gap-1.5 shadow-sm">
                 <Users className="w-3.5 h-3.5 text-blue-400" />
                 <span>Total Students: <strong className="text-white">2,450</strong></span>
@@ -222,9 +265,6 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <Activity className="w-4 h-4 text-emerald-500" /> System Health & Uptime
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[10px] font-black">
-                99.9% ONLINE
-              </span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 text-center">
@@ -235,12 +275,12 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
 
               <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 shadow-inner">
                 <span className="text-[10px] text-slate-500 font-bold block">Students</span>
-                <p className="text-base font-black text-blue-600">2,450</p>
+                <p className="text-base font-black text-blue-600">{data.students ? data.students.length : 65}</p>
               </div>
 
               <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 shadow-inner">
                 <span className="text-[10px] text-slate-500 font-bold block">Faculty</span>
-                <p className="text-base font-black text-slate-900">48</p>
+                <p className="text-base font-black text-slate-900">{data.teachers ? data.teachers.length : 1}</p>
               </div>
             </div>
 
@@ -250,7 +290,7 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                 Active Campus Geofences
               </span>
               <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono text-[10px]">
-                24 Live Zones
+                1 Live Zone (Room B-302)
               </span>
             </div>
           </div>
@@ -317,9 +357,6 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <MapPin className="w-4 h-4 text-amber-500" /> Manage Geofence Perimeters
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 text-[10px] font-bold">
-                RADAR CONFIG
-              </span>
             </div>
 
             {geoMessage && (
@@ -333,7 +370,7 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
               <div className="w-16 h-16 rounded-full border-2 border-dashed border-blue-400 bg-blue-500/20 flex items-center justify-center shadow-lg animate-pulse">
                 <span className="font-extrabold text-blue-300 text-[10px]">50m Fence</span>
               </div>
-              <span className="absolute bottom-2 right-2 font-mono text-[10px] text-slate-300">Lab 402 Active</span>
+              <span className="absolute bottom-2 right-2 font-mono text-[10px] text-slate-300">Room B-302 Active</span>
             </div>
 
             <form onSubmit={handleUpdateGeofence} className="space-y-2 text-xs">
@@ -344,9 +381,13 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                   onChange={(e) => setSelectedClassId(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold text-slate-900 focus:outline-none focus:border-blue-500"
                 >
-                  <option value="cs401">CS 401 - Advanced AI (Lab 402)</option>
-                  <option value="cs301">CS 301 - Data Structures (Room 305)</option>
-                  <option value="cs302">CS 302 - Database Systems (Lab 401)</option>
+                  <option value="bca501">BCA 501 - Computer Graphics (Room B-302)</option>
+                  <option value="bca502">BCA 502 - Cryptography & Network Security (Room B-302)</option>
+                  <option value="bca503">BCA 503 - Web Technology (Room B-302)</option>
+                  <option value="bca504">BCA 504 - Minor Project (Room B-302)</option>
+                  <option value="bca511">BCA 511 - Computer Graphics Lab (Room B-302)</option>
+                  <option value="bca512">BCA 512 - Web Technology Lab (Room B-302)</option>
+                  <option value="ace511">ACE 511 - Industrial Internship (Room B-302)</option>
                 </select>
               </div>
 
@@ -399,28 +440,42 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                     <th className="py-2 text-right">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 text-[11px]">
-                  <tr>
-                    <td className="py-2 font-bold text-slate-900">Manoj Sharma</td>
-                    <td className="py-2 text-slate-500">Student</td>
-                    <td className="py-2 text-right">
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-black border border-emerald-200">Active</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 font-bold text-slate-900">Dr. Rajesh Sharma</td>
-                    <td className="py-2 text-slate-500">Faculty</td>
-                    <td className="py-2 text-right">
-                      <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[9px] font-black border border-blue-200">Verified</span>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className="py-2 font-bold text-slate-900">Priya Sharma</td>
-                    <td className="py-2 text-slate-500">Student</td>
-                    <td className="py-2 text-right">
-                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-black border border-emerald-200">Active</span>
-                    </td>
-                  </tr>
+                <tbody className="divide-y divide-slate-100 text-[11px] max-h-96 overflow-y-auto">
+                  {data.students && data.students.length > 0 ? (
+                    data.students.map((s) => (
+                      <tr key={s.id}>
+                        <td className="py-2 font-bold text-slate-900">{s.name} <span className="text-[10px] text-blue-600 font-mono">({s.rollNo})</span></td>
+                        <td className="py-2 text-slate-500">{s.section || 'Section B'}</td>
+                        <td className="py-2 text-right">
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-black border border-emerald-200">Active</span>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <>
+                      <tr>
+                        <td className="py-2 font-bold text-slate-900">MANOJ SHARMA <span className="text-[10px] text-blue-600 font-mono">(2401031601137)</span></td>
+                        <td className="py-2 text-slate-500">Section B</td>
+                        <td className="py-2 text-right">
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-black border border-emerald-200">Active</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 font-bold text-slate-900">ANSH GUPTA <span className="text-[10px] text-blue-600 font-mono">(2401031601046)</span></td>
+                        <td className="py-2 text-slate-500">Section B</td>
+                        <td className="py-2 text-right">
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-black border border-emerald-200">Active</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 font-bold text-slate-900">AYUSH SRIVASTAVA <span className="text-[10px] text-blue-600 font-mono">(2401031601077)</span></td>
+                        <td className="py-2 text-slate-500">Section B</td>
+                        <td className="py-2 text-right">
+                          <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[9px] font-black border border-emerald-200">Active</span>
+                        </td>
+                      </tr>
+                    </>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -430,7 +485,7 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
             onClick={() => alert('User Directory Modal opened. Search by Roll No or Faculty ID.')}
             className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-extrabold transition-colors border border-slate-200"
           >
-            Manage All 2,498 Accounts
+            Manage All 65 Student Accounts (Section B)
           </button>
         </div>
 
@@ -440,9 +495,6 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
             <div className="flex justify-between items-center">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <FileText className="w-4 h-4 text-emerald-600" /> System SMS Gateway
-              </span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 text-[10px] font-bold">
-                2,498 SENT
               </span>
             </div>
 
@@ -480,9 +532,6 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
             <div className="flex justify-between items-center">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <Settings className="w-4 h-4 text-slate-600" /> Global System Config
-              </span>
-              <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-[10px] font-bold border border-slate-200">
-                CONFIG LOCKED
               </span>
             </div>
 
@@ -559,6 +608,29 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
             </div>
           </div>
 
+          {/* Equal Subject Selection Bar */}
+          <div className="p-4 bg-gradient-to-r from-slate-900 to-indigo-950 text-white rounded-2xl shadow-md border border-slate-800 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <Sliders className="w-4 h-4 text-yellow-400" />
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-200">
+                Select Unified Class / Subject:
+              </span>
+            </div>
+            <select
+              value={selectedSubjectFilter}
+              onChange={(e) => setSelectedSubjectFilter(e.target.value)}
+              className="bg-slate-800 border-2 border-indigo-500/50 rounded-xl px-4 py-2 text-xs font-black text-yellow-300 shadow-inner focus:outline-none focus:border-indigo-400 transition-all"
+            >
+              <option value="bca501">BCA 501 - Computer Graphics</option>
+              <option value="bca502">BCA 502 - Cryptography and Network Security</option>
+              <option value="bca503">BCA 503 - Web Technology</option>
+              <option value="bca504">BCA 504 - Minor Project</option>
+              <option value="bca511">BCA 511 - Computer Graphics Lab</option>
+              <option value="bca512">BCA 512 - Web Technology Lab</option>
+              <option value="ace511">ACE 511 - Industrial Internship</option>
+            </select>
+          </div>
+
           {/* Master Audit Stream Table */}
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs border-collapse">
@@ -574,7 +646,7 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
-                {((globalAttendanceRecords && globalAttendanceRecords.length > 0) ? globalAttendanceRecords : ((data.attendance && data.attendance.length > 0) ? data.attendance : master30StudentAuditRecords)).map((rec, idx) => (
+                {((globalAttendanceRecords && globalAttendanceRecords.length > 0) ? globalAttendanceRecords : ((data.attendance && data.attendance.length > 0) ? data.attendance : master65StudentAuditRecords)).map((rec, idx) => (
                   <tr key={rec.id || idx} className="hover:bg-slate-50 transition-colors">
                     <td className="py-3 px-3 font-bold text-slate-900">
                       {rec.studentName}
@@ -582,8 +654,8 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                     <td className="py-3 px-3 font-mono text-[11px] text-slate-600">
                       {rec.rollNo}
                     </td>
-                    <td className="py-3 px-3 font-semibold text-slate-800">
-                      {rec.subject}
+                    <td className="py-3 px-3 font-extrabold text-blue-700 font-sans">
+                      {activeSelectedSubjectName}
                     </td>
                     <td className="py-3 px-3 text-slate-500 text-[11px]">
                       {rec.timestamp}

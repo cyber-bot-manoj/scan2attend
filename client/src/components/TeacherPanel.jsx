@@ -29,13 +29,14 @@ import {
 
 export default function TeacherPanel({ user, activeSession, setActiveSession, globalAttendanceRecords = [] }) {
   const [classes, setClasses] = useState([]);
-  const [selectedClassId, setSelectedClassId] = useState('cs401');
+  const [selectedClassId, setSelectedClassId] = useState('bca501');
   const [timeLeft, setTimeLeft] = useState(0); // 5 minutes (300s)
   const [filterStatus, setFilterStatus] = useState('ALL'); // 'ALL', 'PRESENT', 'ABSENT'
   const [loading, setLoading] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
-  const [customSmsText, setCustomSmsText] = useState('Reminder: Advanced AI (CS401) lecture starts now. Please scan class QR code.');
+  const [customSmsText, setCustomSmsText] = useState('Reminder: BCA V-B lecture starts now in Room B-302. Please scan class QR code.');
   const [smsSentNotice, setSmsSentNotice] = useState(false);
+  const [showAllFeedModal, setShowAllFeedModal] = useState(false);
 
   // Initial classes setup
   useEffect(() => {
@@ -81,12 +82,25 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
     setLoading(true);
     const generatedAt = Date.now();
     const expiresAt = generatedAt + 300000; // Exactly 5 minutes (300s)
-    const className = selectedClassId === 'cs401' ? 'Advanced AI (CS401)' : selectedClassId === 'cs301' ? 'Data Structures (CS301)' : 'Database Systems (CS302)';
+    const classNameMap = {
+      bca501: 'Computer Graphics (BCA501)',
+      bca502: 'Cryptography & Network Security (BCA502)',
+      bca503: 'Web Technology (BCA503)',
+      bca504: 'Minor Project (BCA504)',
+      bca511: 'Computer Graphics Lab (BCA511)',
+      bca512: 'Web Technology Lab (BCA512)',
+      ace511: 'Industrial Internship (ACE511)'
+    };
+    const className = classNameMap[selectedClassId] || 'Computer Graphics (BCA501)';
 
     const payloadObj = {
       classId: selectedClassId,
       className,
       subject: className,
+      latitude: 26.9302879,
+      longitude: 80.9278433,
+      radiusMeters: 50,
+      campus: 'MUIT Lucknow',
       sessionId: `qr_${generatedAt}`,
       expiresAt: expiresAt,
       secretHash: `SEC_${generatedAt}_${selectedClassId.toUpperCase()}`
@@ -156,40 +170,87 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
 
   // Default demo records if globalAttendanceRecords is empty
   const attendanceList = globalAttendanceRecords.length > 0 ? globalAttendanceRecords : [
-    { id: 'att_demo_01', studentName: 'Manoj Sharma', rollNo: 'CS202601', timestamp: '10:14:22 AM', distanceMeters: 14, status: 'PRESENT', livenessScore: '99.4%' },
-    { id: 'att_demo_02', studentName: 'Priya Singh', rollNo: 'CS202602', timestamp: '10:13:05 AM', distanceMeters: 12, status: 'PRESENT', livenessScore: '98.8%' },
-    { id: 'att_demo_03', studentName: 'Rohan Mehta', rollNo: 'CS202603', timestamp: '10:12:40 AM', distanceMeters: 68, status: 'ABSENT', livenessScore: 'Geofence Exceeded (68m)' },
-    { id: 'att_demo_04', studentName: 'Ananya Sharma', rollNo: 'CS202604', timestamp: '10:11:18 AM', distanceMeters: 9, status: 'PRESENT', livenessScore: '99.7%' },
-    { id: 'att_demo_05', studentName: 'Vikramaditya Verma', rollNo: 'CS202605', timestamp: '10:10:45 AM', distanceMeters: 15, status: 'PRESENT', livenessScore: '99.1%' },
-    { id: 'att_demo_06', studentName: 'Sneha Gupta', rollNo: 'CS202606', timestamp: '10:10:12 AM', distanceMeters: 11, status: 'PRESENT', livenessScore: '98.5%' },
-    { id: 'att_demo_07', studentName: 'Ishaan Patel', rollNo: 'CS202607', timestamp: '10:09:30 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '99.3%' },
-    { id: 'att_demo_08', studentName: 'Kavya Deshmukh', rollNo: 'CS202608', timestamp: '10:09:02 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '97.9%' },
-    { id: 'att_demo_09', studentName: 'Aditya Reddy', rollNo: 'CS202609', timestamp: '10:08:20 AM', distanceMeters: 74, status: 'ABSENT', livenessScore: 'Geofence Exceeded (74m)' },
-    { id: 'att_demo_10', studentName: 'Diya Roy', rollNo: 'CS202610', timestamp: '10:07:50 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '99.6%' },
-    { id: 'att_demo_11', studentName: 'Rahul Nair', rollNo: 'CS202611', timestamp: '10:07:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '98.7%' },
-    { id: 'att_demo_12', studentName: 'Tanvi Joshi', rollNo: 'CS202612', timestamp: '10:06:40 AM', distanceMeters: 8, status: 'PRESENT', livenessScore: '99.8%' },
-    { id: 'att_demo_13', studentName: 'Amit Kumar', rollNo: 'CS202613', timestamp: '10:06:10 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '99.0%' },
-    { id: 'att_demo_14', studentName: 'Neha Agarwal', rollNo: 'CS202614', timestamp: '10:05:35 AM', distanceMeters: 14, status: 'PRESENT', livenessScore: '98.9%' },
-    { id: 'att_demo_15', studentName: 'Harsh Vardhan', rollNo: 'CS202615', timestamp: '10:05:00 AM', distanceMeters: 82, status: 'ABSENT', livenessScore: 'Geofence Exceeded (82m)' },
-    { id: 'att_demo_16', studentName: 'Pooja Mishra', rollNo: 'CS202616', timestamp: '10:04:30 AM', distanceMeters: 17, status: 'PRESENT', livenessScore: '99.2%' },
-    { id: 'att_demo_17', studentName: 'Siddharth Rao', rollNo: 'CS202617', timestamp: '10:04:00 AM', distanceMeters: 12, status: 'PRESENT', livenessScore: '99.5%' },
-    { id: 'att_demo_18', studentName: 'Shreya Pandey', rollNo: 'CS202618', timestamp: '10:03:25 AM', distanceMeters: 15, status: 'PRESENT', livenessScore: '98.4%' },
-    { id: 'att_demo_19', studentName: 'Arjun Kapoor', rollNo: 'CS202619', timestamp: '10:02:50 AM', distanceMeters: 21, status: 'PRESENT', livenessScore: '99.1%' },
-    { id: 'att_demo_20', studentName: 'Riya Sen', rollNo: 'CS202620', timestamp: '10:02:15 AM', distanceMeters: 11, status: 'PRESENT', livenessScore: '99.6%' },
-    { id: 'att_demo_21', studentName: 'Yash Malhotra', rollNo: 'CS202621', timestamp: '10:01:40 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '98.2%' },
-    { id: 'att_demo_22', studentName: 'Anjali Yadav', rollNo: 'CS202622', timestamp: '10:01:05 AM', distanceMeters: 9, status: 'PRESENT', livenessScore: '99.9%' },
-    { id: 'att_demo_23', studentName: 'Karan Sharma', rollNo: 'CS202623', timestamp: '10:00:30 AM', distanceMeters: 18, status: 'PRESENT', livenessScore: '98.6%' },
-    { id: 'att_demo_24', studentName: 'Meera Rajput', rollNo: 'CS202624', timestamp: '09:59:55 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '99.3%' },
-    { id: 'att_demo_25', studentName: 'Abhinav Saxena', rollNo: 'CS202625', timestamp: '09:59:20 AM', distanceMeters: 55, status: 'ABSENT', livenessScore: 'Geofence Exceeded (55m)' },
-    { id: 'att_demo_26', studentName: 'Swati Tripathi', rollNo: 'CS202626', timestamp: '09:58:45 AM', distanceMeters: 14, status: 'PRESENT', livenessScore: '99.0%' },
-    { id: 'att_demo_27', studentName: 'Vivek Choudhary', rollNo: 'CS202627', timestamp: '09:58:10 AM', distanceMeters: 12, status: 'PRESENT', livenessScore: '99.4%' },
-    { id: 'att_demo_28', studentName: 'Divya Thakur', rollNo: 'CS202628', timestamp: '09:57:35 AM', distanceMeters: 17, status: 'PRESENT', livenessScore: '98.7%' },
-    { id: 'att_demo_29', studentName: 'Gaurav Bhatia', rollNo: 'CS202629', timestamp: '09:57:00 AM', distanceMeters: 20, status: 'PRESENT', livenessScore: '99.1%' },
-    { id: 'att_demo_30', studentName: 'Simran Kaur', rollNo: 'CS202630', timestamp: '09:56:25 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '99.8%' }
+    { id: 'att_demo_01', studentName: 'MANOJ SHARMA', rollNo: '2401031601137', timestamp: '12:59:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '97.5%' },
+    { id: 'att_demo_02', studentName: 'ANSH GUPTA', rollNo: '2401031601046', timestamp: '12:58:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '97.6%' },
+    { id: 'att_demo_03', studentName: 'AYUSH SRIVASTAVA', rollNo: '2401031601077', timestamp: '12:57:15 AM', distanceMeters: 69, status: 'ABSENT', livenessScore: 'Geofence Exceeded (69m)' },
+    { id: 'att_demo_04', studentName: 'AYUSHI GUPTA', rollNo: '2401031601079', timestamp: '12:56:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '97.8%' },
+    { id: 'att_demo_05', studentName: 'BADRINATH GUPTA', rollNo: '2401031601080', timestamp: '12:55:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '97.9%' },
+    { id: 'att_demo_06', studentName: 'BHAVISHYA PRATAP SINGH', rollNo: '2401031601081', timestamp: '12:54:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '98.0%' },
+    { id: 'att_demo_07', studentName: 'CHAMAN', rollNo: '2401031601082', timestamp: '12:53:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '98.1%' },
+    { id: 'att_demo_08', studentName: 'CHANDRA PRAKASH SAH', rollNo: '2401031601083', timestamp: '12:52:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '98.2%' },
+    { id: 'att_demo_09', studentName: 'CHANDRANSH SINGH', rollNo: '2401031601085', timestamp: '12:51:15 AM', distanceMeters: 81, status: 'ABSENT', livenessScore: 'Geofence Exceeded (81m)' },
+    { id: 'att_demo_10', studentName: 'DARKHSHA KHATOON', rollNo: '2401031601086', timestamp: '12:50:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '98.4%' },
+    { id: 'att_demo_11', studentName: 'DEEPAK', rollNo: '2401031601087', timestamp: '12:49:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '98.5%' },
+    { id: 'att_demo_12', studentName: 'DHAIRYA DIXIT', rollNo: '2401031601091', timestamp: '12:48:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '98.6%' },
+    { id: 'att_demo_13', studentName: 'DIVANCI SAXENA', rollNo: '2401031601264', timestamp: '12:47:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '98.7%' },
+    { id: 'att_demo_14', studentName: 'DIVYANSH SRIVASTAVA', rollNo: '2401031601094', timestamp: '12:46:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '98.8%' },
+    { id: 'att_demo_15', studentName: 'DIVYANSHU PATEL', rollNo: '2401031601095', timestamp: '12:45:15 AM', distanceMeters: 63, status: 'ABSENT', livenessScore: 'Geofence Exceeded (63m)' },
+    { id: 'att_demo_16', studentName: 'EKANSHI SHARAN SRIVASTAVA', rollNo: '2401031601098', timestamp: '12:44:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '99.0%' },
+    { id: 'att_demo_17', studentName: 'EKATA', rollNo: '2401031601099', timestamp: '12:43:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '99.1%' },
+    { id: 'att_demo_18', studentName: 'GARIMA SINGH', rollNo: '2401031601101', timestamp: '12:42:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '99.2%' },
+    { id: 'att_demo_19', studentName: 'GAURAV RAWAT', rollNo: '2401031601102', timestamp: '12:41:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '99.3%' },
+    { id: 'att_demo_20', studentName: 'GAURAV SHARMA', rollNo: '2401031601103', timestamp: '12:40:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '99.4%' },
+    { id: 'att_demo_21', studentName: 'HARSH TRIVEDI', rollNo: '2401031601105', timestamp: '12:39:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '99.5%' },
+    { id: 'att_demo_22', studentName: 'HARSHIT PANDEY', rollNo: '2401031601283', timestamp: '12:38:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '99.6%' },
+    { id: 'att_demo_23', studentName: 'HARSHIT SHUKLA', rollNo: '2401031601107', timestamp: '12:37:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '99.7%' },
+    { id: 'att_demo_24', studentName: 'HEMANT KUMAR PANDEY', rollNo: '2401031601108', timestamp: '12:36:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '99.8%' },
+    { id: 'att_demo_25', studentName: 'HIMANSHU KUMAR', rollNo: '2401031601110', timestamp: '12:35:15 AM', distanceMeters: 73, status: 'ABSENT', livenessScore: 'Geofence Exceeded (73m)' },
+    { id: 'att_demo_26', studentName: 'HIMANSHU SRIVASTAVA', rollNo: '2401031601262', timestamp: '12:34:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '97.6%' },
+    { id: 'att_demo_27', studentName: 'INDRAJEET SAHANI', rollNo: '2401031601260', timestamp: '12:33:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '97.7%' },
+    { id: 'att_demo_28', studentName: 'ISHIKA GAUR', rollNo: '2401031601111', timestamp: '12:32:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '97.8%' },
+    { id: 'att_demo_29', studentName: 'ISHITA DIXIT', rollNo: '2401031601112', timestamp: '12:31:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '97.9%' },
+    { id: 'att_demo_30', studentName: 'ISHITA GUPTA', rollNo: '2401031601113', timestamp: '12:30:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '98.0%' },
+    { id: 'att_demo_31', studentName: 'ISHU AMAN', rollNo: '2401031601263', timestamp: '12:29:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '98.1%' },
+    { id: 'att_demo_32', studentName: 'JAVED HUSAIN', rollNo: '2401031601115', timestamp: '12:28:15 AM', distanceMeters: 62, status: 'ABSENT', livenessScore: 'Geofence Exceeded (62m)' },
+    { id: 'att_demo_33', studentName: 'JAY SHUKLA', rollNo: '2401031601116', timestamp: '12:27:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '98.3%' },
+    { id: 'att_demo_34', studentName: 'KARISHMA SINGH', rollNo: '2401031601119', timestamp: '12:26:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '98.4%' },
+    { id: 'att_demo_35', studentName: 'KASHIF ANSARI', rollNo: '2401031601120', timestamp: '12:25:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '98.5%' },
+    { id: 'att_demo_36', studentName: 'KASHISH CHAURASIA', rollNo: '2401031601121', timestamp: '12:24:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '98.6%' },
+    { id: 'att_demo_37', studentName: 'KAUSHAL KUMAR BHARTI', rollNo: '2401031601122', timestamp: '12:23:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '98.7%' },
+    { id: 'att_demo_38', studentName: 'KAVYANSHI SRIVASTAVA', rollNo: '2401031601123', timestamp: '12:22:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '98.8%' },
+    { id: 'att_demo_39', studentName: 'KHAN MOHD JUNED NOOR MOHAMMED', rollNo: '2401031601125', timestamp: '12:21:15 AM', distanceMeters: 81, status: 'ABSENT', livenessScore: 'Geofence Exceeded (81m)' },
+    { id: 'att_demo_40', studentName: 'KHUSHI KANNOUJIYA', rollNo: '2401031601127', timestamp: '12:20:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '99.0%' },
+    { id: 'att_demo_41', studentName: 'KOMAL SINGH', rollNo: '2401031601129', timestamp: '12:19:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '99.1%' },
+    { id: 'att_demo_42', studentName: 'KULDEEP MAURYA', rollNo: '2401031601130', timestamp: '12:18:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '99.2%' },
+    { id: 'att_demo_43', studentName: 'KUNAL PATEL', rollNo: '2401031601293', timestamp: '12:17:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '99.3%' },
+    { id: 'att_demo_44', studentName: 'MANDAVI SINGH', rollNo: '2401031601134', timestamp: '12:16:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '99.4%' },
+    { id: 'att_demo_45', studentName: 'MANEESH SINGH', rollNo: '2401031601135', timestamp: '12:15:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '99.5%' },
+    { id: 'att_demo_46', studentName: 'MANSI YADAV', rollNo: '2401031601138', timestamp: '12:14:15 AM', distanceMeters: 70, status: 'ABSENT', livenessScore: 'Geofence Exceeded (70m)' },
+    { id: 'att_demo_47', studentName: 'MEDHA PANDEY', rollNo: '2401031601139', timestamp: '12:13:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '99.7%' },
+    { id: 'att_demo_48', studentName: 'MOHAMMAD ABDULLA', rollNo: '2401031601140', timestamp: '12:12:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '99.8%' },
+    { id: 'att_demo_49', studentName: 'MOHAN SINGH', rollNo: '2401031601287', timestamp: '12:11:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '97.5%' },
+    { id: 'att_demo_50', studentName: 'MOHD TAUSIF KHAN', rollNo: '2401031601142', timestamp: '12:10:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '97.6%' },
+    { id: 'att_demo_51', studentName: 'MONU', rollNo: '2401031601144', timestamp: '12:09:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '97.7%' },
+    { id: 'att_demo_52', studentName: 'MUJAHID HUSAIN', rollNo: '2401031601145', timestamp: '12:08:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '97.8%' },
+    { id: 'att_demo_53', studentName: 'NANDINI KESHARWANI', rollNo: '2401031601147', timestamp: '12:07:15 AM', distanceMeters: 59, status: 'ABSENT', livenessScore: 'Geofence Exceeded (59m)' },
+    { id: 'att_demo_54', studentName: 'NILESH KUMAR SINGH', rollNo: '2401031601151', timestamp: '12:06:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '98.0%' },
+    { id: 'att_demo_55', studentName: 'NISHANT MISHRA', rollNo: '2401031601152', timestamp: '12:05:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '98.1%' },
+    { id: 'att_demo_56', studentName: 'NITESH KUMAR CHAUHAN', rollNo: '2401031601153', timestamp: '12:04:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '98.2%' },
+    { id: 'att_demo_57', studentName: 'NITIN RAJPOOT', rollNo: '2401031601288', timestamp: '12:03:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '98.3%' },
+    { id: 'att_demo_58', studentName: 'RAVI JAISWAL', rollNo: '2401031601176', timestamp: '12:02:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '98.4%' },
+    { id: 'att_demo_59', studentName: 'RITIK VERMA', rollNo: '2401031601182', timestamp: '12:01:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '98.5%' },
+    { id: 'att_demo_60', studentName: 'SHANTANU MISHRA', rollNo: '2401031601203', timestamp: '12:00:15 AM', distanceMeters: 78, status: 'ABSENT', livenessScore: 'Geofence Exceeded (78m)' },
+    { id: 'att_demo_61', studentName: 'SHIVANSHI TRIPATHI', rollNo: '2401031601214', timestamp: '11:59:15 AM', distanceMeters: 10, status: 'PRESENT', livenessScore: '98.7%' },
+    { id: 'att_demo_62', studentName: 'SHREESH MISHRA', rollNo: '2401031601216', timestamp: '11:58:15 AM', distanceMeters: 13, status: 'PRESENT', livenessScore: '98.8%' },
+    { id: 'att_demo_63', studentName: 'YASH SRIVASTAVA', rollNo: '2401031601316', timestamp: '11:57:15 AM', distanceMeters: 16, status: 'PRESENT', livenessScore: '98.9%' },
+    { id: 'att_demo_64', studentName: 'YASHIKA UPADHYAY', rollNo: '2401031601251', timestamp: '11:56:15 AM', distanceMeters: 19, status: 'PRESENT', livenessScore: '99.0%' },
+    { id: 'att_demo_65', studentName: 'Kuldeep Maurya', rollNo: '2401031601130', timestamp: '11:55:15 AM', distanceMeters: 22, status: 'PRESENT', livenessScore: '99.1%' }
   ];
 
+  
+  const classNameMap = {
+    bca501: 'Computer Graphics (BCA501)',
+    bca502: 'Cryptography & Network Security (BCA502)',
+    bca503: 'Web Technology (BCA503)',
+    bca504: 'Minor Project (BCA504)',
+    bca511: 'Computer Graphics Lab (BCA511)',
+    bca512: 'Web Technology Lab (BCA512)',
+    ace511: 'Industrial Internship (ACE511)'
+  };
+  const activeSelectedSubjectName = classNameMap[selectedClassId] || 'Computer Graphics (BCA501)';
+
   const presentCount = attendanceList.filter(r => r.status === 'PRESENT').length;
-  const totalEnrolled = 30;
+  const totalEnrolled = 65;
   const attendancePercentage = Math.round((presentCount / totalEnrolled) * 100);
 
   const handleSendSms = () => {
@@ -228,7 +289,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative">
                 <img 
-                  src="/faculty_rajesh_sharma.jpg" 
+                  src="/faculty_dhananjay_yadav.jpg" 
                   alt="Faculty Profile" 
                   className="w-14 h-14 rounded-2xl object-cover border-2 border-amber-400/60 shadow-lg ring-2 ring-amber-500/20"
                   onError={(e) => {
@@ -236,7 +297,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
                   }}
                 />
                 <div className="w-14 h-14 rounded-2xl bg-indigo-600/30 border-2 border-indigo-400/40 hidden items-center justify-center text-white font-black text-xl shadow-lg">
-                  RS
+                  DKY
                 </div>
                 <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-slate-900 rounded-full"></span>
               </div>
@@ -244,11 +305,8 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                    {user ? user.name : 'Dr. Rajesh Sharma'}
+                    {user ? user.name : 'Mr. Dhananjay Kr. Yadav'}
                   </h1>
-                  <span className="px-2.5 py-0.5 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-[10px] font-extrabold flex items-center gap-1">
-                    <ShieldCheck className="w-3 h-3 text-indigo-400" /> Senior Faculty
-                  </span>
                 </div>
                 <p className="text-xs text-slate-300 font-medium">
                   Department of Computer Science • ID: <span className="font-mono text-indigo-200 font-bold">FAC-8049</span>
@@ -266,11 +324,6 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               <div className="px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs font-semibold text-slate-200 flex items-center gap-1.5 shadow-sm">
                 <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Today's Rate: <strong className="text-emerald-400 font-mono">{attendancePercentage}%</strong></span>
-              </div>
-
-              <div className="px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs font-semibold text-slate-200 flex items-center gap-1.5 shadow-sm">
-                <Radio className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
-                <span>Geofence: <strong className="text-purple-300">50m Radar Active</strong></span>
               </div>
             </div>
           </div>
@@ -310,7 +363,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
                 </span>
               </div>
               <p className="text-xs font-bold mt-1 text-white">
-                Students in <span className="underline decoration-yellow-300 font-mono">Lab 402</span> have active geofence & QR verification countdown.
+                Students in <span className="underline decoration-yellow-300 font-mono">Room B-302</span> have active geofence & QR verification countdown.
               </p>
             </div>
           </div>
@@ -342,9 +395,6 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <Sliders className="w-4 h-4 text-blue-600" /> Class & Geofence Config
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 text-[10px] font-bold">
-                GPS LOCKED
-              </span>
             </div>
 
             <div>
@@ -354,9 +404,13 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
                 onChange={(e) => setSelectedClassId(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 font-extrabold focus:outline-none focus:border-blue-500 shadow-inner transition-all"
               >
-                <option value="cs401">CS 401 - Section A (Advanced AI)</option>
-                <option value="cs301">CS 301 - Section B (Data Structures)</option>
-                <option value="cs302">CS 302 - Section A (Database Systems)</option>
+                <option value="bca501">BCA 501 - Computer Graphics (Mr. Dhananjay Kr. Yadav)</option>
+                <option value="bca502">BCA 502 - Cryptography and Network Security (Dr. Gouri Shukla)</option>
+                <option value="bca503">BCA 503 - Web Technology (Mr. Rishi Mohan Awasthi)</option>
+                <option value="bca504">BCA 504 - Minor Project (Dr. Peeyush Pathak)</option>
+                <option value="bca511">BCA 511 - Computer Graphics Lab (Dr. Gouri Shukla)</option>
+                <option value="bca512">BCA 512 - Web Technology Lab (Mr. Rishi Mohan Awasthi)</option>
+                <option value="ace511">ACE 511 - Industrial Internship (Mr. Imtiyaz Haq)</option>
               </select>
             </div>
 
@@ -365,7 +419,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-red-400 animate-bounce" />
-                  <span className="text-xs font-extrabold text-white">Lab 402 • Academic Block</span>
+                  <span className="text-xs font-extrabold text-white">Room B-302 • Academic Block</span>
                 </div>
                 <span className="text-[10px] font-mono bg-blue-500/30 text-blue-300 px-2 py-0.5 rounded-md border border-blue-400/30">
                   50m Radius
@@ -373,8 +427,8 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300 font-mono pt-1 border-t border-slate-800">
-                <div>Latitude: <strong className="text-white block font-sans text-xs">28.6139° N</strong></div>
-                <div>Longitude: <strong className="text-white block font-sans text-xs">77.2090° E</strong></div>
+                <div>Latitude: <strong className="text-white block font-sans text-xs">26.9303° N</strong></div>
+                <div>Longitude: <strong className="text-white block font-sans text-xs">80.9278° E</strong></div>
               </div>
 
               <div className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-semibold pt-0.5">
@@ -386,7 +440,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
 
           <div className="pt-2">
             <button
-              onClick={() => alert('📍 Geofence coordinates updated to Lab 402 (28.6139, 77.2090) with 50m radius.')}
+              onClick={() => alert('📍 Geofence coordinates calibrated to MUIT Lucknow - Room B-302 (26.9303, 80.9278) with 50m radius.')}
               className="w-full py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-extrabold transition-colors border border-slate-200 flex items-center justify-center gap-1.5"
             >
               <Radio className="w-3.5 h-3.5 text-blue-600" /> Recalibrate Geofence Radar
@@ -402,13 +456,6 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <UserCheck className="w-4 h-4 text-emerald-600" /> Live Attendance Feed
               </span>
-              <button 
-                onClick={handleExportCsv}
-                title="Export CSV Report"
-                className="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold flex items-center gap-1 hover:bg-emerald-100 transition-colors"
-              >
-                <FileSpreadsheet className="w-3.5 h-3.5" /> CSV
-              </button>
             </div>
 
             {/* Filter Pills */}
@@ -433,10 +480,11 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               </button>
             </div>
 
-            {/* Real-time Feed Scroll Box */}
-            <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
+            {/* Real-time Feed Scroll Box (Fixed Height Equal to Side Cards) */}
+            <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
               {attendanceList
                 .filter(r => filterStatus === 'ALL' ? true : r.status === filterStatus)
+                .slice(0, 6)
                 .map((rec, i) => (
                   <div key={rec.id || i} className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-2 hover:bg-white transition-colors">
                     <div>
@@ -445,7 +493,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
                         <span className="text-[10px] text-slate-500 font-mono font-normal">({rec.rollNo})</span>
                       </p>
                       <p className="text-[10px] text-slate-500 font-medium mt-0.5">
-                        {rec.timestamp} • {rec.distanceMeters || 14}m away
+                        <strong className="text-blue-600 font-sans">{activeSelectedSubjectName}</strong> • {rec.timestamp} • {rec.distanceMeters || 14}m away
                       </p>
                     </div>
 
@@ -462,8 +510,16 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
 
           </div>
 
-          <div className="pt-1 text-[11px] text-slate-500 text-center font-semibold border-t border-slate-100">
-            Total Class Strength: <strong className="text-slate-900">{totalEnrolled} Students</strong>
+          <div className="space-y-2 pt-1 border-t border-slate-100">
+            <button
+              onClick={() => setShowAllFeedModal(true)}
+              className="w-full py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-black transition-all border border-blue-200 flex items-center justify-center gap-1.5 shadow-xs"
+            >
+              <Maximize2 className="w-3.5 h-3.5" /> Show More / View All 65 Students
+            </button>
+            <div className="text-[11px] text-slate-500 text-center font-semibold">
+              Total Class Strength: <strong className="text-slate-900">{totalEnrolled} Students</strong>
+            </div>
           </div>
         </div>
 
@@ -473,11 +529,6 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
             <div className="flex justify-between items-center text-left">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <QrCode className="w-4 h-4 text-indigo-600" /> QR Session Engine
-              </span>
-              <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-extrabold border ${
-                isExpired ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-600 border-emerald-200'
-              }`}>
-                {isExpired ? 'EXPIRED' : `${formattedTime}`}
               </span>
             </div>
 
@@ -538,9 +589,6 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <LineChart className="w-4 h-4 text-blue-600" /> Semester Analytics
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-600 border border-blue-200 text-[10px] font-bold">
-                +3.1% GROWTH
-              </span>
             </div>
 
             <div className="flex items-baseline justify-between pt-1">
@@ -590,11 +638,11 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
 
           <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5 text-xs">
             <div className="flex justify-between items-center text-[11px] font-bold">
-              <span className="text-slate-800">CS401 (Advanced AI):</span>
+              <span className="text-slate-800">BCA501 (Computer Graphics):</span>
               <span className="text-emerald-600 font-mono">95.2% (Peak)</span>
             </div>
             <div className="flex justify-between items-center text-[11px] font-bold">
-              <span className="text-slate-800">CS301 (Data Structures):</span>
+              <span className="text-slate-800">BCA503 (Web Technology):</span>
               <span className="text-blue-600 font-mono">92.8% (Stable)</span>
             </div>
           </div>
@@ -606,9 +654,6 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
             <div className="flex justify-between items-center">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <MessageSquare className="w-4 h-4 text-indigo-600" /> Faculty SMS Broadcast
-              </span>
-              <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 text-[10px] font-bold">
-                READY
               </span>
             </div>
 
@@ -646,9 +691,6 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <BellRing className="w-4 h-4 text-amber-500" /> Academic Notices
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-200 text-[10px] font-bold">
-                2 NEW
-              </span>
             </div>
 
             <div className="p-3.5 rounded-2xl bg-amber-50/60 border border-amber-200/80 text-xs space-y-1.5">
@@ -675,6 +717,93 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
 
       </div>
 
+      
+      {/* SHOW MORE FULL MODAL — ALL 65 STUDENTS LIVE FEED */}
+      {showAllFeedModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="max-w-3xl w-full bg-white rounded-3xl p-6 space-y-4 shadow-2xl border border-slate-200 max-h-[90vh] flex flex-col">
+            
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <div>
+                <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                  <UserCheck className="w-5 h-5 text-emerald-600" />
+                  Complete Class Roster — All 65 Students
+                </h3>
+                <p className="text-xs text-slate-500 font-bold mt-0.5">
+                  <span className="text-blue-600 font-sans">{activeSelectedSubjectName}</span> • Room B-302 • Section B
+                </p>
+              </div>
+              <button
+                onClick={() => setShowAllFeedModal(false)}
+                className="p-2 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Filter Pills inside Modal */}
+            <div className="grid grid-cols-3 gap-2 bg-slate-100 p-1.5 rounded-xl text-xs font-extrabold">
+              <button
+                onClick={() => setFilterStatus('ALL')}
+                className={`py-2 rounded-lg transition-all ${filterStatus === 'ALL' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+              >
+                All ({attendanceList.length})
+              </button>
+              <button
+                onClick={() => setFilterStatus('PRESENT')}
+                className={`py-2 rounded-lg transition-all ${filterStatus === 'PRESENT' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+              >
+                Present ({presentCount})
+              </button>
+              <button
+                onClick={() => setFilterStatus('ABSENT')}
+                className={`py-2 rounded-lg transition-all ${filterStatus === 'ABSENT' ? 'bg-red-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'}`}
+              >
+                Absent ({attendanceList.length - presentCount})
+              </button>
+            </div>
+
+            {/* Scrollable List of All 65 Students */}
+            <div className="flex-1 overflow-y-auto space-y-2 pr-1">
+              {attendanceList
+                .filter(r => filterStatus === 'ALL' ? true : r.status === filterStatus)
+                .map((rec, i) => (
+                  <div key={rec.id || i} className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-3 hover:bg-blue-50/50 transition-colors">
+                    <div>
+                      <p className="font-black text-slate-900 text-xs flex items-center gap-2">
+                        {i + 1}. {rec.studentName}
+                        <span className="text-[11px] text-blue-600 font-mono font-bold">({rec.rollNo})</span>
+                      </p>
+                      <p className="text-[10px] text-slate-500 font-medium mt-0.5">
+                        <strong className="text-slate-700 font-sans">{activeSelectedSubjectName}</strong> • {rec.timestamp} • {rec.distanceMeters || 14}m away
+                      </p>
+                    </div>
+
+                    <span className={`px-3 py-1 rounded-full text-xs font-black border ${
+                      rec.status === 'PRESENT' 
+                        ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
+                        : 'bg-red-50 text-red-700 border-red-200'
+                    }`}>
+                      {rec.status === 'PRESENT' ? 'PRESENT 🟢' : 'ABSENT 🔴'}
+                    </span>
+                  </div>
+                ))}
+            </div>
+
+            <div className="pt-3 border-t border-slate-200 flex justify-between items-center text-xs font-bold">
+              <span>Total Enrolled: <strong className="text-slate-900 font-mono text-sm">{totalEnrolled} Students</strong></span>
+              <button
+                onClick={() => setShowAllFeedModal(false)}
+                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-950 text-white rounded-xl font-black text-xs transition-colors shadow-md"
+              >
+                Close Roster
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
       {/* FULLSCREEN SMARTBOARD PROJECTION MODAL FOR CLASSROOMS */}
       {showQrModal && (
         <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-xl flex items-center justify-center p-4 animate-fadeIn">
@@ -692,7 +821,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 mb-2">
                 <Sparkles className="w-3.5 h-3.5 text-yellow-300" /> Classroom Projection Mode
               </span>
-              <h2 className="text-2xl font-black text-white">Advanced AI (CS401) • Lab 402</h2>
+              <h2 className="text-2xl font-black text-white">{activeSession?.className || 'Computer Graphics (BCA501)'} • Room B-302</h2>
               <p className="text-xs text-slate-400 mt-1">Scan this QR code using student portal on your mobile device</p>
             </div>
 

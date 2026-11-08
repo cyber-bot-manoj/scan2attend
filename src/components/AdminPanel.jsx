@@ -33,8 +33,8 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
 
   const [selectedClassId, setSelectedClassId] = useState('bca501');
   const [selectedSubjectFilter, setSelectedSubjectFilter] = useState('bca501');
-  const [geoLat, setGeoLat] = useState('28.6139');
-  const [geoLng, setGeoLng] = useState('77.2090');
+  const [geoLat, setGeoLat] = useState('26.9302879');
+  const [geoLng, setGeoLng] = useState('80.9278433');
   const [geoRadius, setGeoRadius] = useState('50');
   const [geoMessage, setGeoMessage] = useState('');
   const [qrExpiryDuration, setQrExpiryDuration] = useState(5); // Minutes
