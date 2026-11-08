@@ -151,60 +151,76 @@ app.post('/api/auth/send-otp', async (req, res) => {
     </div>
   `;
 
-  try {
-    if (resendApiKey) {
-      // 1. Try Resend API (Fastest, zero-friction, works on Vercel & localhost)
-      const { Resend } = require('resend');
-      const resendClient = new Resend(resendApiKey);
-      const fromAddress = process.env.RESEND_FROM || 'Scan2Attend <onboarding@resend.dev>';
-      const resendRes = await resendClient.emails.send({
-        from: fromAddress,
-        to: [email.trim().toLowerCase()],
-        subject: emailSubject,
-        html: emailHtml
-      });
-      if (resendRes.error) {
-        throw new Error(resendRes.error.message || 'Resend API Error');
+    // 1. Try Brevo SMTP first (Can send to ANY student email without custom domain requirement)
+    if (brevoKey && brevoUser) {
+      try {
+        const brevoTransporter = nodemailer.createTransport({
+          host: 'smtp-relay.brevo.com',
+          port: 587,
+          secure: false,
+          auth: {
+            user: brevoUser,
+            pass: brevoKey
+          }
+        });
+        const info = await brevoTransporter.sendMail({
+          from: `"Scan2Attend Verification" <${brevoUser}>`,
+          to: email.trim().toLowerCase(),
+          subject: emailSubject,
+          text: emailText,
+          html: emailHtml
+        });
+        console.log(`[AUTH] ✅ Real email successfully delivered via Brevo to ${email}! MessageId: ${info.messageId}`);
+        emailDispatched = true;
+      } catch (brevoErr) {
+        console.warn(`[AUTH] ⚠️ Brevo delivery encountered error: ${brevoErr.message}. Attempting fallback...`);
       }
-      console.log(`[AUTH] ✅ Real email successfully delivered via Resend to ${email}! ID: ${resendRes.data?.id}`);
-      emailDispatched = true;
-    } else if (brevoKey && brevoUser) {
-      // 2. Try Brevo SMTP (300 free emails/day to any inbox)
-      const brevoTransporter = nodemailer.createTransport({
-        host: 'smtp-relay.brevo.com',
-        port: 587,
-        secure: false,
-        auth: {
-          user: brevoUser,
-          pass: brevoKey
+    }
+
+    // 2. Fallback to Resend API (Works for account owner or verified domains)
+    if (!emailDispatched && resendApiKey) {
+      try {
+        const { Resend } = require('resend');
+        const resendClient = new Resend(resendApiKey);
+        const fromAddress = process.env.RESEND_FROM || 'Scan2Attend <onboarding@resend.dev>';
+        const resendRes = await resendClient.emails.send({
+          from: fromAddress,
+          to: [email.trim().toLowerCase()],
+          subject: emailSubject,
+          html: emailHtml
+        });
+        if (resendRes.error) {
+          throw new Error(resendRes.error.message || 'Resend API Error');
         }
-      });
-      const info = await brevoTransporter.sendMail({
-        from: `"Scan2Attend Verification" <${brevoUser}>`,
-        to: email.trim().toLowerCase(),
-        subject: emailSubject,
-        text: emailText,
-        html: emailHtml
-      });
-      console.log(`[AUTH] ✅ Real email successfully delivered via Brevo to ${email}! MessageId: ${info.messageId}`);
-      emailDispatched = true;
-    } else if (transporter) {
-      // 3. Try Gmail SMTP
-      const emailSender = process.env.EMAIL_USER || process.env.SMTP_USER;
-      const info = await transporter.sendMail({
-        from: `"Scan2Attend Verification" <${emailSender}>`,
-        to: email.trim().toLowerCase(),
-        subject: emailSubject,
-        text: emailText,
-        html: emailHtml
-      });
-      console.log(`[AUTH] ✅ Real email successfully delivered via Gmail to ${email}! MessageId: ${info.messageId}`);
-      emailDispatched = true;
-    } else {
-      console.log(`[AUTH] ⚠️ No email service configured in .env.`);
+        console.log(`[AUTH] ✅ Real email successfully delivered via Resend to ${email}! ID: ${resendRes.data?.id}`);
+        emailDispatched = true;
+      } catch (resendErr) {
+        console.warn(`[AUTH] ⚠️ Resend delivery encountered error: ${resendErr.message}. Attempting fallback...`);
+      }
+    }
+
+    // 3. Fallback to Gmail SMTP if configured
+    if (!emailDispatched && transporter) {
+      try {
+        const emailSender = process.env.EMAIL_USER || process.env.SMTP_USER;
+        const info = await transporter.sendMail({
+          from: `"Scan2Attend Verification" <${emailSender}>`,
+          to: email.trim().toLowerCase(),
+          subject: emailSubject,
+          text: emailText,
+          html: emailHtml
+        });
+        console.log(`[AUTH] ✅ Real email successfully delivered via Gmail to ${email}! MessageId: ${info.messageId}`);
+        emailDispatched = true;
+      } catch (gmailErr) {
+        console.warn(`[AUTH] ⚠️ Gmail SMTP encountered error: ${gmailErr.message}`);
+      }
+    }
+
+    if (!emailDispatched) {
       return res.status(500).json({
         success: false,
-        message: `Email service not configured. Please set RESEND_API_KEY, BREVO_KEY, or EMAIL_USER/EMAIL_PASS in .env.`
+        message: `Failed to deliver email. Please ensure BREVO_USER and BREVO_PASS are configured in your environment variables.`
       });
     }
   } catch (deliveryErr) {
