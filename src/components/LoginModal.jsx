@@ -248,7 +248,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
     setError('');
 
     if (!otpInput || otpInput.trim().length !== 6) {
-      setError('Please enter the 6-digit OTP code sent to your email');
+      setError('Please enter the OTP code sent to your email');
       return;
     }
 
@@ -600,7 +600,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
                   <div>
                     <h3 className="text-xl font-black text-[#212121]">Verify Your Student Email</h3>
                     <p className="text-xs text-[#757575] mt-1">
-                      Enter your official or personal email. We will send a 6-digit OTP code to verify your identity.
+                      Enter your official email. We will send an OTP code to verify your identity.
                     </p>
                   </div>
 
@@ -633,7 +633,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
                     ) : (
                       <>
                         <Sparkles className="w-4 h-4" />
-                        Send 6-Digit Verification OTP
+                        Verification OTP
                         <ArrowRight className="w-4 h-4" />
                       </>
                     )}
@@ -671,7 +671,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
                       </button>
                     </div>
                     <p className="text-xs text-[#757575] mt-1">
-                      A 6-digit OTP code was sent to <strong className="text-slate-900">{signUpEmail}</strong>
+                      An OTP code was sent to <strong className="text-slate-900">{signUpEmail}</strong>
                     </p>
                   </div>
 
@@ -681,13 +681,13 @@ export default function LoginModal({ setUser, setActiveTab }) {
                     <div>
                       <p className="text-xs text-blue-950 font-bold">Verification code dispatched</p>
                       <p className="text-[11px] text-blue-700 mt-0.5 leading-relaxed">
-                        We have dispatched a 6-digit verification code to <strong className="text-blue-950">{signUpEmail}</strong>. Please check your email inbox (and Spam folder) and enter the code below.
+                        We have dispatched an OTP verification code to <strong className="text-blue-950">{signUpEmail}</strong>. Please check your email inbox (and Spam folder) and enter the code below.
                       </p>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-bold text-[#212121] mb-1">6-Digit OTP Code</label>
+                    <label className="block text-xs font-bold text-[#212121] mb-1">OTP Code</label>
                     <div className="relative">
                       <Lock className="w-4 h-4 text-[#757575] absolute left-3.5 top-3.5" />
                       <input
