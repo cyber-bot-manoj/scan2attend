@@ -18,7 +18,8 @@ import {
   Phone,
   User,
   Hash,
-  BookOpen
+  BookOpen,
+  X
 } from 'lucide-react';
 
 export default function LoginModal({ setUser, setActiveTab }) {
@@ -61,6 +62,19 @@ export default function LoginModal({ setUser, setActiveTab }) {
     }
     return () => clearInterval(interval);
   }, [otpTimer]);
+
+  // Auto-hide the registration success notice popup after 5 seconds
+  useEffect(() => {
+    let timer = null;
+    if (successNotice) {
+      timer = setTimeout(() => {
+        setSuccessNotice('');
+      }, 5000);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [successNotice]);
 
   const fillQuickAcc = (role) => {
     setSelectedRole(role);
@@ -440,11 +454,21 @@ export default function LoginModal({ setUser, setActiveTab }) {
             </button>
           </div>
 
-          {/* SUCCESS NOTICE BANNER */}
+          {/* SUCCESS NOTICE POPUP BANNER (Auto-dismisses after 5 seconds) */}
           {successNotice && (
-            <div className="mb-4 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-start gap-2.5 animate-fadeIn">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-              <span>{successNotice}</span>
+            <div className="mb-4 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-start justify-between gap-2.5 animate-fadeIn shadow-sm">
+              <div className="flex items-start gap-2.5 flex-1">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                <span className="leading-relaxed">{successNotice}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSuccessNotice('')}
+                className="text-emerald-600 hover:text-emerald-800 p-0.5 rounded-md hover:bg-emerald-100 transition-colors flex-shrink-0"
+                title="Dismiss"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
           )}
 
