@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Component } from 'react';
 import Navbar from './components/Navbar';
 import StudentPanel from './components/StudentPanel';
 import TeacherPanel from './components/TeacherPanel';
@@ -6,6 +6,39 @@ import AdminPanel from './components/AdminPanel';
 import LoginModal from './components/LoginModal';
 import GeminiChatbot from './components/GeminiChatbot';
 import Footer from './components/Footer';
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+  componentDidCatch(error, errorInfo) {
+    console.error('App caught an error:', error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center p-6 bg-[#DCE2E9]">
+          <div className="max-w-md w-full bg-white p-6 rounded-3xl shadow-xl border border-slate-200 text-center space-y-4">
+            <div className="w-12 h-12 mx-auto rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-xl">⚠️</div>
+            <h2 className="text-lg font-black text-slate-800">Something went wrong</h2>
+            <p className="text-xs text-slate-500 font-medium">An error occurred while loading this view.</p>
+            <button
+              onClick={() => { localStorage.clear(); window.location.reload(); }}
+              className="px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-bold hover:bg-blue-700"
+            >
+              Reset Session & Reload
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 export default function App() {
   // Start with no logged-in user so Login Page displays first as requested
@@ -138,37 +171,39 @@ export default function App() {
       />
 
       {/* Main Content View Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {(!user || activeTab === 'LOGIN') && (
-          <LoginModal setUser={setUser} setActiveTab={setActiveTab} />
-        )}
+      <ErrorBoundary>
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {(!user || activeTab === 'LOGIN') && (
+            <LoginModal setUser={setUser} setActiveTab={setActiveTab} />
+          )}
 
-        {user && activeTab === 'STUDENT' && (
-          <StudentPanel 
-            user={user} 
-            activeSession={activeSession} 
-            setActiveSession={setActiveSession}
-            setActiveTab={setActiveTab}
-            onNewAttendance={addGlobalAttendance}
-          />
-        )}
+          {user && activeTab === 'STUDENT' && (
+            <StudentPanel 
+              user={user} 
+              activeSession={activeSession} 
+              setActiveSession={setActiveSession}
+              setActiveTab={setActiveTab}
+              onNewAttendance={addGlobalAttendance}
+            />
+          )}
 
-        {user && activeTab === 'TEACHER' && (
-          <TeacherPanel 
-            user={user} 
-            activeSession={activeSession} 
-            setActiveSession={setActiveSession}
-            globalAttendanceRecords={globalAttendanceRecords}
-          />
-        )}
+          {user && activeTab === 'TEACHER' && (
+            <TeacherPanel 
+              user={user} 
+              activeSession={activeSession} 
+              setActiveSession={setActiveSession}
+              globalAttendanceRecords={globalAttendanceRecords}
+            />
+          )}
 
-        {user && activeTab === 'ADMIN' && (
-          <AdminPanel 
-            user={user} 
-            globalAttendanceRecords={globalAttendanceRecords}
-          />
-        )}
-      </main>
+          {user && activeTab === 'ADMIN' && (
+            <AdminPanel 
+              user={user} 
+              globalAttendanceRecords={globalAttendanceRecords}
+            />
+          )}
+        </main>
+      </ErrorBoundary>
 
       {/* GEMINI AI LIVE CHATBOT (Located at lower right corner of Dashboard after login) */}
       {user && activeTab !== 'LOGIN' && (

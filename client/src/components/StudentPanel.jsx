@@ -26,7 +26,8 @@ import {
   Send,
   X,
   Calendar,
-  BookOpen
+  BookOpen,
+  AlertCircle
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
