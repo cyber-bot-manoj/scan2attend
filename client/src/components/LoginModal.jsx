@@ -40,6 +40,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
   const [signUpEmail, setSignUpEmail] = useState('');
   const [otpInput, setOtpInput] = useState('');
   const [otpTimer, setOtpTimer] = useState(0);
+  const [showVerifiedBadge, setShowVerifiedBadge] = useState(false);
 
   // Step 3 Profile State
   const [name, setName] = useState('');
@@ -269,7 +270,11 @@ export default function LoginModal({ setUser, setActiveTab }) {
         if (!rollNo) {
           setRollNo('240103160' + Math.floor(1000 + Math.random() * 9000));
         }
+        setShowVerifiedBadge(true);
         setSignUpStep(3);
+        setTimeout(() => {
+          setShowVerifiedBadge(false);
+        }, 2000);
       } else {
         setError(data.message || 'Invalid or expired OTP code. Please enter the valid code received on your email.');
       }
@@ -744,16 +749,18 @@ export default function LoginModal({ setUser, setActiveTab }) {
                     </p>
                   </div>
 
-                  {/* VERIFIED EMAIL BADGE */}
-                  <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                      <span className="text-xs font-bold text-emerald-900">{signUpEmail}</span>
+                  {/* VERIFIED EMAIL POPUP NOTIFICATION (Shows for 2 seconds only) */}
+                  {showVerifiedBadge && (
+                    <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between animate-fadeIn transition-all duration-300">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <span className="text-xs font-bold text-emerald-900">{signUpEmail}</span>
+                      </div>
+                      <span className="text-[10px] font-black uppercase text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                        Verified
+                      </span>
                     </div>
-                    <span className="text-[10px] font-black uppercase text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-                      Verified
-                    </span>
-                  </div>
+                  )}
 
                   {/* FULL NAME */}
                   <div>
@@ -874,7 +881,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
                     ) : (
                       <>
                         <CheckCircle2 className="w-4 h-4" />
-                        Complete Registration & Proceed to Sign In
+                        Complete Registration
                       </>
                     )}
                   </button>
