@@ -1089,22 +1089,27 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <MapPin className="w-4 h-4 text-blue-600" /> GPS Geofence Radar
               </span>
-              <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span> Live GPS
-              </span>
             </div>
 
             {/* Radar Box */}
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 text-white space-y-3 relative overflow-hidden border border-slate-800 shadow-md">
+            <div className={`p-4 rounded-2xl text-white space-y-3 relative overflow-hidden border shadow-md transition-all ${
+              isWithinGeofence
+                ? 'bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 border-slate-800'
+                : 'bg-gradient-to-br from-slate-900 via-slate-950 to-red-950 border-red-800/60'
+            }`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-red-400 animate-bounce" />
+                  <MapPin className={`w-4 h-4 ${isWithinGeofence ? 'text-emerald-400 animate-bounce' : 'text-red-400 animate-ping'}`} />
                   <div>
                     <span className="text-xs font-black text-white block">MUIT Lucknow Campus</span>
                     <span className="text-[10px] text-slate-400">Room B-302 • IIM Road</span>
                   </div>
                 </div>
-                <span className="text-[10px] font-mono bg-blue-500/30 text-blue-300 px-2 py-0.5 rounded-md border border-blue-400/30">
+                <span className={`text-[10px] font-mono px-2 py-0.5 rounded-md border ${
+                  isWithinGeofence
+                    ? 'bg-blue-500/30 text-blue-300 border-blue-400/30'
+                    : 'bg-red-500/30 text-red-300 border-red-400/40'
+                }`}>
                   {distanceMeters}m Away
                 </span>
               </div>
@@ -1114,15 +1119,26 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                 <div>Your Lng: <strong className="text-white block font-sans text-xs">{studentLng.toFixed(4)}° E</strong></div>
               </div>
 
-              <div className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-semibold pt-0.5 border-t border-slate-800/80">
-                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                <span>50m Radius Geofence Perimeter Verified</span>
+              <div className={`flex items-center gap-1.5 text-[10px] font-semibold pt-0.5 border-t border-slate-800/80 ${
+                isWithinGeofence ? 'text-emerald-400' : 'text-red-400'
+              }`}>
+                {isWithinGeofence ? (
+                  <>
+                    <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                    <span>50m Radius Geofence Perimeter Verified</span>
+                  </>
+                ) : (
+                  <>
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                    <span>Area se bahar! Limit 50m exceeded</span>
+                  </>
+                )}
               </div>
             </div>
           </div>
 
           <div className="pt-1 text-[11px] text-slate-500 text-center font-bold border-t border-slate-100">
-            Current Distance: <strong className="text-slate-900 font-mono">{distanceMeters} Meters</strong>
+            Current Distance: <strong className={`font-mono ${isWithinGeofence ? 'text-slate-900' : 'text-red-600'}`}>{distanceMeters} Meters</strong>
           </div>
         </div>
 
