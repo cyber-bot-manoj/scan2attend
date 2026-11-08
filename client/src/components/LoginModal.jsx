@@ -528,9 +528,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
                 <div>
                   <div className="flex justify-between items-center mb-1">
                     <label className="block text-xs font-bold text-[#212121]">Password</label>
-                    {selectedRole === 'STUDENT' ? (
-                      <span className="text-[10px] text-emerald-600 font-bold">New student? Sign Up first</span>
-                    ) : (
+                    {selectedRole !== 'STUDENT' && (
                       <span className="text-[10px] text-slate-400 font-medium">Demo: {selectedRole.toLowerCase()}</span>
                     )}
                   </div>
