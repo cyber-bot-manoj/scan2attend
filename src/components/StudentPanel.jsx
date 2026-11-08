@@ -560,59 +560,6 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
     return R * c;
   };
 
-  // Helper: Request live GPS location from browser
-  const refreshLiveGps = () => {
-    gpsStatusRef.current = 'LIVE_GPS';
-    setGpsLoading(true);
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
-          setStudentLat(lat);
-          setStudentLng(lng);
-
-          const targetLat = (activeSession && activeSession.latitude) ? activeSession.latitude : MUIT_CAMPUS_LAT;
-          const targetLng = (activeSession && activeSession.longitude) ? activeSession.longitude : MUIT_CAMPUS_LNG;
-          const realDist = Math.round(calculateHaversineDistance(lat, lng, targetLat, targetLng));
-          setDistanceMeters(realDist);
-          setGpsStatus('LIVE_GPS');
-          if (realDist <= 50) {
-            setGpsMessage(`Geofence Verified: ${realDist}m from MUIT Campus (Inside 50m Perimeter)`);
-          } else {
-            setGpsMessage(`Area se bahar: ${realDist}m away from MUIT Campus (Limit: 50m)`);
-          }
-          setGpsLoading(false);
-        },
-        (err) => {
-          console.warn('Geolocation refresh error:', err);
-          setGpsStatus('DENIED');
-          setGpsMessage('Location permission blocked in browser settings. Please allow location access.');
-          setGpsLoading(false);
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
-    } else {
-      setGpsStatus('DENIED');
-      setGpsMessage('Browser does not support Geolocation.');
-      setGpsLoading(false);
-    }
-  };
-
-  // Helper: Test Simulation mode for demonstration (Inside / Outside Campus)
-  const simulateGpsLocation = (lat, lng, dist, mode) => {
-    gpsStatusRef.current = 'SIMULATED';
-    setStudentLat(lat);
-    setStudentLng(lng);
-    setDistanceMeters(dist);
-    setGpsStatus('SIMULATED');
-    if (dist <= 50) {
-      setGpsMessage(`Simulation Mode: ${dist}m from MUIT Classroom • Inside 50m Perimeter`);
-    } else {
-      setGpsMessage(`Simulation Mode: Area se bahar (${dist}m away from MUIT Campus • Limit: 50m)`);
-    }
-  };
-
   // Automatically watch browser GPS location continuously in real-time
   useEffect(() => {
     let watchId;
@@ -1142,101 +1089,40 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <MapPin className="w-4 h-4 text-blue-600" /> GPS Geofence Radar
               </span>
-              <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full border ${
-                isWithinGeofence 
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                  : 'bg-red-50 text-red-700 border-red-200 animate-pulse'
-              }`}>
-                {isWithinGeofence ? '● Inside Perimeter' : '● Area Se Bahar'}
+              <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span> Live GPS
               </span>
             </div>
 
             {/* Radar Box */}
-            <div className={`p-4 rounded-2xl text-white space-y-3 relative overflow-hidden border shadow-md transition-all ${
-              isWithinGeofence
-                ? 'bg-gradient-to-br from-slate-900 via-indigo-950 to-emerald-950 border-emerald-800/50'
-                : 'bg-gradient-to-br from-slate-900 via-slate-950 to-red-950 border-red-800/60'
-            }`}>
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 text-white space-y-3 relative overflow-hidden border border-slate-800 shadow-md">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <MapPin className={`w-4 h-4 ${isWithinGeofence ? 'text-emerald-400 animate-bounce' : 'text-red-400 animate-ping'}`} />
+                  <MapPin className="w-4 h-4 text-red-400 animate-bounce" />
                   <div>
                     <span className="text-xs font-black text-white block">MUIT Lucknow Campus</span>
                     <span className="text-[10px] text-slate-400">Room B-302 • IIM Road</span>
                   </div>
                 </div>
-                <span className={`text-[11px] font-mono px-2.5 py-1 rounded-lg border font-black ${
-                  isWithinGeofence
-                    ? 'bg-emerald-500/30 text-emerald-300 border-emerald-400/40'
-                    : 'bg-red-500/30 text-red-300 border-red-400/40'
-                }`}>
+                <span className="text-[10px] font-mono bg-blue-500/30 text-blue-300 px-2 py-0.5 rounded-md border border-blue-400/30">
                   {distanceMeters}m Away
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300 font-mono pt-1 border-t border-slate-800">
-                <div>Your Lat: <strong className="text-white block font-sans text-xs">{studentLat.toFixed(5)}° N</strong></div>
-                <div>Your Lng: <strong className="text-white block font-sans text-xs">{studentLng.toFixed(5)}° E</strong></div>
+                <div>Your Lat: <strong className="text-white block font-sans text-xs">{studentLat.toFixed(4)}° N</strong></div>
+                <div>Your Lng: <strong className="text-white block font-sans text-xs">{studentLng.toFixed(4)}° E</strong></div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-[10px] text-slate-400 font-mono pt-1 border-t border-slate-800/60">
-                <div>Campus Lat: <span className="text-slate-300">26.93028° N</span></div>
-                <div>Campus Lng: <span className="text-slate-300">80.92784° E</span></div>
-              </div>
-
-              <div className={`flex items-center gap-1.5 text-[11px] font-bold pt-1 border-t border-slate-800/80 ${
-                isWithinGeofence ? 'text-emerald-400' : 'text-red-400'
-              }`}>
-                {isWithinGeofence ? (
-                  <>
-                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
-                    <span>50m Radius Geofence Verified • Present Allowed</span>
-                  </>
-                ) : (
-                  <>
-                    <AlertCircle className="w-4 h-4 shrink-0 text-red-400" />
-                    <span>Area se bahar! Limit 50m exceeded • Absent lagegi</span>
-                  </>
-                )}
+              <div className="flex items-center gap-1.5 text-[10px] text-emerald-400 font-semibold pt-0.5 border-t border-slate-800/80">
+                <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                <span>50m Radius Geofence Perimeter Verified</span>
               </div>
             </div>
           </div>
 
-          {/* Quick Simulation / Testing Controls */}
-          <div className="space-y-2 pt-2 border-t border-slate-100">
-            <div className="flex items-center justify-between text-[11px]">
-              <span className="text-slate-500 font-bold">Current Distance:</span>
-              <strong className={`font-mono text-xs ${isWithinGeofence ? 'text-emerald-600' : 'text-red-600'}`}>
-                {distanceMeters} Meters {isWithinGeofence ? '(Inside 50m)' : '(Outside 50m)'}
-              </strong>
-            </div>
-
-            <div className="flex items-center gap-1.5 pt-1">
-              <button
-                type="button"
-                onClick={refreshLiveGps}
-                title="Re-poll live GPS location from browser"
-                className="flex-1 py-1.5 px-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition-all flex items-center justify-center gap-1 border border-slate-300"
-              >
-                <RefreshCw className={`w-3 h-3 text-blue-600 ${gpsLoading ? 'animate-spin' : ''}`} /> Live GPS
-              </button>
-              <button
-                type="button"
-                onClick={() => simulateGpsLocation(26.9302879, 80.9278433, 12, 'INSIDE')}
-                title="Test condition: Inside MUIT campus (12m away)"
-                className="flex-1 py-1.5 px-2 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[10px] font-bold transition-all flex items-center justify-center gap-1 border border-emerald-200"
-              >
-                <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Test Inside
-              </button>
-              <button
-                type="button"
-                onClick={() => simulateGpsLocation(26.9380000, 80.9350000, 850, 'OUTSIDE')}
-                title="Test condition: Outside MUIT campus (850m away)"
-                className="flex-1 py-1.5 px-2 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 text-[10px] font-bold transition-all flex items-center justify-center gap-1 border border-red-200"
-              >
-                <AlertCircle className="w-3 h-3 text-red-600" /> Test Outside
-              </button>
-            </div>
+          <div className="pt-1 text-[11px] text-slate-500 text-center font-bold border-t border-slate-100">
+            Current Distance: <strong className="text-slate-900 font-mono">{distanceMeters} Meters</strong>
           </div>
         </div>
 
