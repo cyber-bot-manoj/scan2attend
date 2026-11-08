@@ -112,7 +112,8 @@ app.post('/api/auth/send-otp', async (req, res) => {
   let emailDispatched = false;
   const resendApiKey = (process.env.RESEND_API_KEY || '').trim();
   const brevoKey = (process.env.BREVO_KEY || process.env.BREVO_PASS || '').trim();
-  const brevoUser = (process.env.BREVO_USER || process.env.EMAIL_USER || '').trim();
+  const brevoAuthUser = (process.env.BREVO_USER || '').trim();
+  const brevoSender = (process.env.BREVO_SENDER || process.env.EMAIL_USER || (brevoAuthUser.includes('@smtp-brevo') ? 'manojs082007@gmail.com' : brevoAuthUser)).trim();
   const transporter = getMailTransporter();
 
   const emailSubject = `Your Scan2Attend Verification OTP: ${otp}`;
@@ -153,19 +154,19 @@ app.post('/api/auth/send-otp', async (req, res) => {
 
   try {
     // 1. Try Brevo SMTP first (Can send to ANY student email without custom domain requirement)
-    if (brevoKey && brevoUser) {
+    if (brevoKey && brevoAuthUser) {
       try {
         const brevoTransporter = nodemailer.createTransport({
           host: 'smtp-relay.brevo.com',
           port: 587,
           secure: false,
           auth: {
-            user: brevoUser,
+            user: brevoAuthUser,
             pass: brevoKey
           }
         });
         const info = await brevoTransporter.sendMail({
-          from: `"Scan2Attend Verification" <${brevoUser}>`,
+          from: `"Scan2Attend Verification" <${brevoSender}>`,
           to: email.trim().toLowerCase(),
           subject: emailSubject,
           text: emailText,
