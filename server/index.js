@@ -151,6 +151,7 @@ app.post('/api/auth/send-otp', async (req, res) => {
     </div>
   `;
 
+  try {
     // 1. Try Brevo SMTP first (Can send to ANY student email without custom domain requirement)
     if (brevoKey && brevoUser) {
       try {
