@@ -28,6 +28,18 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
+  // Global Search Engine across ALL 65 Students of BCA V-B
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const [selectedResultModal, setSelectedResultModal] = useState(null);
+
+  // Live filter across all 65 student records passed from App state
+  const searchResults = searchQuery.trim() === '' ? [] : globalAttendanceRecords.filter(s => 
+    (s.studentName && s.studentName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+    (s.rollNo && s.rollNo.includes(searchQuery)) ||
+    (s.subject && s.subject.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   // Settings State with LocalStorage persistence
   const [smsAlertsEnabled, setSmsAlertsEnabled] = useState(() => {
     return localStorage.getItem('s2a_sms_alerts') !== 'false';
