@@ -24,9 +24,20 @@ import {
   Navigation
 } from 'lucide-react';
 
-export default function Navbar({ user, setUser, activeTab, setActiveTab, globalAttendanceRecords = [] }) {
+export default function Navbar({ 
+  user, 
+  setUser, 
+  activeTab, 
+  setActiveTab, 
+  globalAttendanceRecords = [],
+  showSettings: externalShowSettings,
+  setShowSettings: externalSetShowSettings
+}) {
+  const [internalShowSettings, setInternalShowSettings] = useState(false);
+  const showSettings = externalShowSettings !== undefined ? externalShowSettings : internalShowSettings;
+  const setShowSettings = externalSetShowSettings || setInternalShowSettings;
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
+  // showSettings managed via props/state
 
   // Sync modal state to body class so overlays & chatbot know a modal is open
   React.useEffect(() => {

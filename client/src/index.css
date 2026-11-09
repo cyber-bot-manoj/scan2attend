@@ -185,9 +185,4 @@ body.modal-backdrop-active .gemini-chatbot-container {
   display: none !important;
 }
 
-@media (max-width: 767px) {
-  #gemini-chatbot-root,
-  .gemini-chatbot-container {
-    display: none !important;
-  }
-}
+

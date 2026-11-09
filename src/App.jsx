@@ -151,6 +151,8 @@ export default function App() {
 
   // activeTab state: 'LOGIN', 'STUDENT', 'TEACHER', 'ADMIN'
   const [activeTab, setActiveTab] = useState('LOGIN');
+  // Shared Settings modal state so chatbot can cleanly hide when Settings is open
+  const [showSettingsModal, setShowSettingsModal] = useState(false);
 
   // Enforce strict role-based tab synchronization so user only sees their authorized portal
   useEffect(() => {
@@ -168,6 +170,8 @@ export default function App() {
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
         globalAttendanceRecords={globalAttendanceRecords}
+        showSettings={showSettingsModal}
+        setShowSettings={setShowSettingsModal}
       />
 
       {/* Main Content View Container */}
@@ -206,8 +210,9 @@ export default function App() {
       </ErrorBoundary>
 
       {/* GEMINI AI LIVE CHATBOT (Located at lower right corner of Dashboard after login) */}
-      {user && activeTab !== 'LOGIN' && (
-        <GeminiChatbot user={user} />
+      {/* GEMINI AI LIVE CHATBOT (Only shown on Student and Teacher Dashboard, hidden when Settings modal is open) */}
+      {user && (activeTab === 'STUDENT' || activeTab === 'TEACHER') && (
+        <GeminiChatbot user={user} isSettingsOpen={showSettingsModal} />
       )}
 
       {/* Modern High-End Footer for Scan2Attend */}

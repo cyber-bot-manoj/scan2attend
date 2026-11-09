@@ -16,7 +16,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 
-export default function GeminiChatbot({ user }) {
+export default function GeminiChatbot({ user, isSettingsOpen = false }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
@@ -163,26 +163,26 @@ export default function GeminiChatbot({ user }) {
     { label: '📱 SMS Alerts dispatches', query: 'How do SMS notification alerts work?' }
   ];
 
-  if (hideForModal) return null;
+  if (isSettingsOpen || hideForModal) return null;
 
   return (
     <>
       {/* FLOATING ACTION BUTTON - LOWER CORNER OF DASHBOARD */}
       {!isOpen && (
-        <div className="fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-40 animate-bounce-short">
+        <div id="gemini-chatbot-root" className="gemini-chatbot-container fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 animate-bounce-short">
           <button
             onClick={() => setIsOpen(true)}
-            className="group relative flex items-center gap-2 px-3.5 py-2.5 sm:px-4 sm:py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-full shadow-2xl hover:shadow-indigo-500/50 hover:scale-105 active:scale-95 transition-all duration-300 border-2 border-white/40 backdrop-blur-md"
+            className="group relative flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-[#2979FF] via-[#7C4DFF] to-[#FF4081] text-white rounded-full shadow-2xl hover:shadow-indigo-500/50 hover:scale-105 transition-all duration-300 border-2 border-white/40"
           >
             <div className="relative">
               <Bot className="w-5 h-5 text-yellow-300" />
               <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full ring-2 ring-white animate-ping"></span>
             </div>
-            <span className="text-xs font-black tracking-wide pr-1">AI Assistant</span>
+            <span className="text-xs font-black tracking-wide pr-1">AI Chatbot</span>
             
             {/* Tooltip on hover */}
             <span className="absolute right-0 bottom-full mb-2 hidden group-hover:block bg-slate-900 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap">
-              Ask AI Campus Assistant
+              Ask AI Chatbot Assistant
             </span>
           </button>
         </div>
@@ -194,7 +194,7 @@ export default function GeminiChatbot({ user }) {
           className={`gemini-chatbot-container fixed z-40 transition-all duration-300 ease-in-out flex flex-col bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden ${
             isExpanded 
               ? 'inset-4 sm:inset-10 w-auto h-auto' 
-              : 'bottom-20 right-3 sm:bottom-6 sm:right-6 w-[calc(100vw-1.5rem)] sm:w-[400px] h-[550px] max-h-[80vh]'
+              : 'bottom-6 right-4 sm:right-6 w-[92vw] sm:w-[400px] h-[580px] max-h-[85vh]'
           }`}
         >
           {/* TOP HEADER */}

@@ -16,7 +16,7 @@ import {
   CheckCircle2
 } from 'lucide-react';
 
-export default function GeminiChatbot({ user }) {
+export default function GeminiChatbot({ user, isSettingsOpen = false }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
@@ -163,13 +163,13 @@ export default function GeminiChatbot({ user }) {
     { label: '📱 SMS Alerts dispatches', query: 'How do SMS notification alerts work?' }
   ];
 
-  if (hideForModal) return null;
+  if (isSettingsOpen || hideForModal) return null;
 
   return (
     <>
       {/* FLOATING ACTION BUTTON - LOWER CORNER OF DASHBOARD */}
       {!isOpen && (
-        <div className="gemini-chatbot-container fixed bottom-6 right-6 z-40 animate-bounce-short hidden md:block">
+        <div id="gemini-chatbot-root" className="gemini-chatbot-container fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 animate-bounce-short">
           <button
             onClick={() => setIsOpen(true)}
             className="group relative flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-[#2979FF] via-[#7C4DFF] to-[#FF4081] text-white rounded-full shadow-2xl hover:shadow-indigo-500/50 hover:scale-105 transition-all duration-300 border-2 border-white/40"
