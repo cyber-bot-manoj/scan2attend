@@ -288,17 +288,20 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-3">
               <div className="relative">
-                <img 
-                  src="/faculty_dhananjay_yadav.jpg" 
-                  alt="Faculty Profile" 
-                  className="w-14 h-14 rounded-2xl object-cover border-2 border-amber-400/60 shadow-lg ring-2 ring-amber-500/20"
-                  onError={(e) => {
-                    e.target.src = 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80';
-                  }}
-                />
-                <div className="w-14 h-14 rounded-2xl bg-indigo-600/30 border-2 border-indigo-400/40 hidden items-center justify-center text-white font-black text-xl shadow-lg">
-                  DKY
-                </div>
+                {user && user.email !== 'teacher@school.edu' ? (
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 via-indigo-600 to-blue-700 border-2 border-purple-400/60 flex items-center justify-center text-white font-black text-xl shadow-lg ring-2 ring-purple-500/20">
+                    {user.name ? user.name.split(' ').map(n => n[0]).slice(0, 2).join('') : 'FAC'}
+                  </div>
+                ) : (
+                  <img 
+                    src="/faculty_dhananjay_yadav.jpg" 
+                    alt="Faculty Profile" 
+                    className="w-14 h-14 rounded-2xl object-cover border-2 border-amber-400/60 shadow-lg ring-2 ring-amber-500/20"
+                    onError={(e) => {
+                      e.target.src = 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80';
+                    }}
+                  />
+                )}
                 <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-slate-900 rounded-full"></span>
               </div>
 
@@ -308,8 +311,15 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
                     {user ? user.name : 'Mr. Dhananjay Kr. Yadav'}
                   </h1>
                 </div>
-                <p className="text-xs text-slate-300 font-medium">
-                  Department of Computer Science • ID: <span className="font-mono text-indigo-200 font-bold">FAC-8049</span>
+                <p className="text-xs text-slate-300 font-medium flex items-center gap-2 flex-wrap mt-0.5">
+                  <span>{(user?.department ? `Department of ${user.department}` : 'Department of Computer Science')}</span>
+                  <span>•</span>
+                  <span>ID: <strong className="font-mono text-indigo-200 font-bold">{user?.facultyId || user?.employeeId || 'FAC-8049'}</strong></span>
+                  {user?.designation && (
+                    <span className="px-2 py-0.5 rounded-full bg-purple-500/30 text-purple-200 border border-purple-400/30 text-[10px] font-bold">
+                      {user.designation}
+                    </span>
+                  )}
                 </p>
               </div>
             </div>

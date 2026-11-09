@@ -35,19 +35,29 @@ export default function LoginModal({ setUser, setActiveTab }) {
   const [successNotice, setSuccessNotice] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Sign Up State (Strictly for Students)
-  // Step 1: Enter email -> Step 2: Verify OTP -> Step 3: Enter profile details & password
+  // Sign Up Role: 'STUDENT' or 'TEACHER'
+  const [signUpRole, setSignUpRole] = useState('STUDENT');
+
+  // Sign Up Steps: 1: Enter email -> 2: Verify OTP -> 3: Enter profile details & password
   const [signUpStep, setSignUpStep] = useState(1);
   const [signUpEmail, setSignUpEmail] = useState('');
   const [otpInput, setOtpInput] = useState('');
   const [otpTimer, setOtpTimer] = useState(0);
   const [showVerifiedBadge, setShowVerifiedBadge] = useState(false);
 
-  // Step 3 Profile State
+  // Step 3 Profile State for Student
   const [name, setName] = useState('');
   const [rollNo, setRollNo] = useState('');
   const [mobile, setMobile] = useState('');
   const [classSection, setClassSection] = useState('B.C.A - Semester V (Section B)');
+
+  // Step 3 Profile State for Faculty
+  const [facultyName, setFacultyName] = useState('');
+  const [facultyId, setFacultyId] = useState('');
+  const [department, setDepartment] = useState('Computer Science');
+  const [designation, setDesignation] = useState('Assistant Professor');
+
+  // Password State
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -112,15 +122,42 @@ export default function LoginModal({ setUser, setActiveTab }) {
     setLoading(true);
 
     try {
-      // 1. First check if user is in localStorage registered students cache
-      const localRegistered = JSON.parse(localStorage.getItem('registeredStudents') || '[]');
-      const matchedLocal = localRegistered.find(
+      // 1. First check if user is in localStorage registered cache (faculty or student)
+      if (selectedRole === 'TEACHER') {
+        const localFaculty = JSON.parse(localStorage.getItem('registeredFaculty') || '[]');
+        const matchedFac = localFaculty.find(
+          (u) => (u.email && u.email.toLowerCase() === emailLower) && u.password === password
+        );
+        if (matchedFac) {
+          setUser(matchedFac);
+          setActiveTab('TEACHER');
+          setLoading(false);
+          return;
+        }
+      } else {
+        const localRegistered = JSON.parse(localStorage.getItem('registeredStudents') || '[]');
+        const matchedLocal = localRegistered.find(
+          (u) => (u.email && u.email.toLowerCase() === emailLower) && u.password === password
+        );
+        if (matchedLocal) {
+          setUser(matchedLocal);
+          setActiveTab(matchedLocal.role || 'STUDENT');
+          setLoading(false);
+          return;
+        }
+      }
+
+      // Check all cached users in localStorage
+      const allLocal = [
+        ...JSON.parse(localStorage.getItem('registeredFaculty') || '[]'),
+        ...JSON.parse(localStorage.getItem('registeredStudents') || '[]')
+      ];
+      const matchedAny = allLocal.find(
         (u) => (u.email && u.email.toLowerCase() === emailLower) && u.password === password
       );
-
-      if (matchedLocal) {
-        setUser(matchedLocal);
-        setActiveTab(matchedLocal.role || 'STUDENT');
+      if (matchedAny) {
+        setUser(matchedAny);
+        setActiveTab(matchedAny.role || (selectedRole === 'TEACHER' ? 'TEACHER' : 'STUDENT'));
         setLoading(false);
         return;
       }
@@ -129,7 +166,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
       const res = await fetch('/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: emailTrim, password })
+        body: JSON.stringify({ email: emailTrim, password, role: selectedRole })
       });
       
       const contentType = res.headers.get('content-type') || '';
@@ -141,10 +178,17 @@ export default function LoginModal({ setUser, setActiveTab }) {
             return;
           }
           setUser(data.user);
-          setActiveTab(data.user.role || 'STUDENT');
+          setActiveTab(data.user.role || (selectedRole === 'TEACHER' ? 'TEACHER' : 'STUDENT'));
           return;
         } else {
-          setError(data.message || (selectedRole === 'STUDENT' ? 'No registered student account found with this email. Please Sign Up first.' : 'Invalid email or password.'));
+          setError(
+            data.message || 
+            (selectedRole === 'STUDENT' 
+              ? 'No registered student account found with this email. Please Sign Up first.' 
+              : selectedRole === 'TEACHER'
+              ? 'No registered faculty account found with this email. Please check credentials or Sign Up first.'
+              : 'Invalid email or password.')
+          );
           return;
         }
       } else {
@@ -158,6 +202,8 @@ export default function LoginModal({ setUser, setActiveTab }) {
           setError(
             selectedRole === 'STUDENT'
               ? 'No registered student account found with this email. Please Sign Up first.'
+              : selectedRole === 'TEACHER'
+              ? 'No registered faculty account found with this email. Please check your credentials or Sign Up first.'
               : 'Invalid email or password. Please check your credentials.'
           );
         }
@@ -170,17 +216,22 @@ export default function LoginModal({ setUser, setActiveTab }) {
       ) {
         performFallbackAuth();
       } else {
-        const localRegistered = JSON.parse(localStorage.getItem('registeredStudents') || '[]');
-        const matchedLocal = localRegistered.find(
+        const allLocal = [
+          ...JSON.parse(localStorage.getItem('registeredFaculty') || '[]'),
+          ...JSON.parse(localStorage.getItem('registeredStudents') || '[]')
+        ];
+        const matchedLocal = allLocal.find(
           (u) => (u.email && u.email.toLowerCase() === emailLower) && u.password === password
         );
         if (matchedLocal) {
           setUser(matchedLocal);
-          setActiveTab(matchedLocal.role || 'STUDENT');
+          setActiveTab(matchedLocal.role || (selectedRole === 'TEACHER' ? 'TEACHER' : 'STUDENT'));
         } else {
           setError(
             selectedRole === 'STUDENT'
               ? 'No registered student account found with this email. Please Sign Up first.'
+              : selectedRole === 'TEACHER'
+              ? 'No registered faculty account found with this email. Please check credentials or Sign Up first.'
               : 'Invalid Email or Password. Please try again.'
           );
         }
@@ -200,6 +251,8 @@ export default function LoginModal({ setUser, setActiveTab }) {
         email: 'teacher@school.edu',
         role: 'TEACHER',
         department: 'Computer Science',
+        facultyId: 'FAC-8049',
+        designation: 'Assistant Professor',
         mobile: '+91 9876543211'
       };
     } else if (email.toLowerCase().includes('admin') || selectedRole === 'ADMIN') {
@@ -227,7 +280,11 @@ export default function LoginModal({ setUser, setActiveTab }) {
     setError('');
 
     if (!signUpEmail || !signUpEmail.includes('@') || !signUpEmail.includes('.')) {
-      setError('Please enter a valid student email address');
+      setError(
+        signUpRole === 'TEACHER'
+          ? 'Please enter a valid faculty email address'
+          : 'Please enter a valid student email address'
+      );
       return;
     }
 
@@ -236,7 +293,10 @@ export default function LoginModal({ setUser, setActiveTab }) {
       const res = await fetch('/api/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: signUpEmail.trim().toLowerCase() })
+        body: JSON.stringify({ 
+          email: signUpEmail.trim().toLowerCase(),
+          role: signUpRole
+        })
       });
 
       const data = await res.json().catch(() => ({}));
@@ -244,7 +304,12 @@ export default function LoginModal({ setUser, setActiveTab }) {
         setOtpTimer(60);
         setSignUpStep(2);
       } else {
-        setError(data.message || 'Unable to send OTP. Please check your email address.');
+        setError(
+          data.message || 
+          (signUpRole === 'TEACHER' 
+            ? 'Unable to send OTP. Please check your faculty email address.' 
+            : 'Unable to send OTP. Please check your email address.')
+        );
       }
     } catch (err) {
       console.error('OTP request error:', err);
@@ -281,8 +346,10 @@ export default function LoginModal({ setUser, setActiveTab }) {
 
       const data = await res.json().catch(() => ({}));
       if (res.ok && data.success) {
-        if (!rollNo) {
+        if (signUpRole === 'STUDENT' && !rollNo) {
           setRollNo('240103160' + Math.floor(1000 + Math.random() * 9000));
+        } else if (signUpRole === 'TEACHER' && !facultyId) {
+          setFacultyId('FAC-' + Math.floor(1000 + Math.random() * 9000));
         }
         setShowVerifiedBadge(true);
         setSignUpStep(3);
@@ -360,7 +427,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
 
     setLoading(false);
 
-    // Switch back to Sign In tab as per user request: "fir signup ho jane ke baad sign in kre ga user"
+    // Switch back to Sign In tab
     setSuccessNotice(`🎉 Registration Successful! Welcome ${newStudentData.name}. Please Sign In with your email and new password.`);
     setEmail(newStudentData.email);
     setPassword('');
@@ -372,6 +439,83 @@ export default function LoginModal({ setUser, setActiveTab }) {
     setSignUpEmail('');
     setOtpInput('');
     setName('');
+    setNewPassword('');
+    setConfirmPassword('');
+  };
+
+  // -------------------------------------------------------------
+  // SIGN UP STEP 3: REGISTER FACULTY PROFILE
+  // -------------------------------------------------------------
+  const handleCompleteFacultyRegistration = async (e) => {
+    e?.preventDefault();
+    setError('');
+
+    if (!facultyName.trim()) {
+      setError('Please enter your full faculty name');
+      return;
+    }
+    if (!newPassword || newPassword.length < 4) {
+      setError('Password must be at least 4 characters long');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setError('Passwords do not match. Please re-enter.');
+      return;
+    }
+
+    setLoading(true);
+    const genFacId = facultyId.trim() || ('FAC-' + Math.floor(1000 + Math.random() * 9000));
+    const newFacultyData = {
+      id: 'teacher_' + Date.now(),
+      name: facultyName.trim().toUpperCase(),
+      email: signUpEmail.trim().toLowerCase(),
+      password: newPassword,
+      role: 'TEACHER',
+      facultyId: genFacId,
+      department: department.trim() || 'Computer Science',
+      designation: designation.trim() || 'Assistant Professor',
+      mobile: mobile.trim() || '+91 9876543211'
+    };
+
+    try {
+      const res = await fetch('/api/auth/register-faculty', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newFacultyData)
+      });
+      if (res.ok) {
+        await res.json().catch(() => {});
+      }
+    } catch (err) {
+      console.warn('Backend faculty registration failed, saving locally');
+    }
+
+    // Always cache in localStorage for instant offline access
+    try {
+      const localFaculty = JSON.parse(localStorage.getItem('registeredFaculty') || '[]');
+      const filtered = localFaculty.filter(u => u.email.toLowerCase() !== newFacultyData.email.toLowerCase());
+      filtered.push(newFacultyData);
+      localStorage.setItem('registeredFaculty', JSON.stringify(filtered));
+    } catch (err) {
+      console.error('Storage error:', err);
+    }
+
+    setLoading(false);
+
+    // Switch back to Sign In tab with Faculty role pre-selected
+    setSuccessNotice(`🎉 Faculty Registration Successful! Welcome ${newFacultyData.name}. Please Sign In with your faculty email and new password.`);
+    setEmail(newFacultyData.email);
+    setPassword('');
+    setSelectedRole('TEACHER');
+    setAuthMode('SIGN_IN');
+    
+    // Reset Sign Up state
+    setSignUpStep(1);
+    setSignUpEmail('');
+    setOtpInput('');
+    setFacultyName('');
+    setFacultyId('');
+    setMobile('');
     setNewPassword('');
     setConfirmPassword('');
   };
@@ -439,7 +583,13 @@ export default function LoginModal({ setUser, setActiveTab }) {
             <button
               type="button"
               onClick={() => {
+                if (selectedRole === 'TEACHER') {
+                  setSignUpRole('TEACHER');
+                } else {
+                  setSignUpRole('STUDENT');
+                }
                 setAuthMode('SIGN_UP');
+                setSignUpStep(1);
                 setError('');
                 setSuccessNotice('');
               }}
@@ -449,8 +599,17 @@ export default function LoginModal({ setUser, setActiveTab }) {
                   : 'text-[#64748B] hover:text-[#0F172A]'
               }`}
             >
-              <GraduationCap className="w-4 h-4 text-emerald-600" />
-              <span>Sign Up</span>
+              {selectedRole === 'TEACHER' || signUpRole === 'TEACHER' ? (
+                <>
+                  <UserCheck className="w-4 h-4 text-purple-600" />
+                  <span>Faculty Sign Up</span>
+                </>
+              ) : (
+                <>
+                  <GraduationCap className="w-4 h-4 text-emerald-600" />
+                  <span>Sign Up</span>
+                </>
+              )}
             </button>
           </div>
 
@@ -543,9 +702,9 @@ export default function LoginModal({ setUser, setActiveTab }) {
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder={
                         selectedRole === 'STUDENT'
-                          ? 'Enter your registered email'
+                          ? 'Enter your registered student email'
                           : selectedRole === 'TEACHER'
-                          ? 'teacher@school.edu'
+                          ? 'teacher@school.edu or your faculty email'
                           : 'admin@school.edu'
                       }
                       className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#212121] focus:outline-none focus:border-[#2979FF] focus:bg-white font-medium transition-all"
@@ -593,324 +752,682 @@ export default function LoginModal({ setUser, setActiveTab }) {
 
               {/* FOOTER SWITCH TO SIGN UP */}
               <div className="mt-5 pt-4 border-t border-[#E2E8F0] text-center">
-                <p className="text-xs text-[#64748B]">
-                  New student?{' '}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAuthMode('SIGN_UP');
-                      setError('');
-                      setSuccessNotice('');
-                    }}
-                    className="text-[#2979FF] font-bold hover:underline inline-flex items-center gap-1"
-                  >
-                    Sign Up first <ArrowRight className="w-3.5 h-3.5" />
-                  </button>
-                </p>
+                {selectedRole === 'TEACHER' ? (
+                  <p className="text-xs text-[#64748B]">
+                    New faculty?{' '}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSignUpRole('TEACHER');
+                        setAuthMode('SIGN_UP');
+                        setSignUpStep(1);
+                        setSignUpEmail('');
+                        setOtpInput('');
+                        setError('');
+                        setSuccessNotice('');
+                      }}
+                      className="text-purple-600 font-bold hover:underline inline-flex items-center gap-1"
+                    >
+                      Sign Up first <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </p>
+                ) : (
+                  <p className="text-xs text-[#64748B]">
+                    New student?{' '}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSignUpRole('STUDENT');
+                        setAuthMode('SIGN_UP');
+                        setSignUpStep(1);
+                        setSignUpEmail('');
+                        setOtpInput('');
+                        setError('');
+                        setSuccessNotice('');
+                      }}
+                      className="text-[#2979FF] font-bold hover:underline inline-flex items-center gap-1"
+                    >
+                      Sign Up first <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+                  </p>
+                )}
               </div>
             </div>
           )}
 
           {/* ========================================================= */}
-          {/* MODE 2: SIGN UP FLOW (STUDENT ONLY WITH EMAIL OTP) */}
+          {/* MODE 2: SIGN UP FLOW (STUDENT OR FACULTY WITH EMAIL OTP) */}
           {/* ========================================================= */}
           {authMode === 'SIGN_UP' && (
             <div>
-              {/* ----------------------------------------------------- */}
-              {/* SIGN UP STEP 1: ENTER EMAIL */}
-              {/* ----------------------------------------------------- */}
-              {signUpStep === 1 && (
-                <form onSubmit={handleSendOtp} className="space-y-4">
-                  <div>
-                    <h3 className="text-xl font-black text-[#212121]">Verify Your Student Email</h3>
-                    <p className="text-xs text-[#757575] mt-1">
-                      Enter your official email. We will send an OTP code to verify your identity.
-                    </p>
-                  </div>
 
-                  <div>
-                    <label className="block text-xs font-bold text-[#212121] mb-1">Student Email Address</label>
-                    <div className="relative">
-                      <Mail className="w-4 h-4 text-[#757575] absolute left-3.5 top-3.5" />
-                      <input
-                        type="email"
-                        value={signUpEmail}
-                        onChange={(e) => setSignUpEmail(e.target.value)}
-                        placeholder="yourname@gmail.com or student@muit.in"
-                        className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-3 text-xs text-[#212121] focus:outline-none focus:border-emerald-500 focus:bg-white font-medium transition-all"
-                        required
-                        autoFocus
-                      />
-                    </div>
-                  </div>
+              {/* ===================================================== */}
+              {/* FACULTY SIGN UP FLOW (Strictly Faculty - No Student Mention) */}
+              {/* ===================================================== */}
+              {signUpRole === 'TEACHER' && (
+                <div>
+                  {/* FACULTY STEP 1: ENTER FACULTY EMAIL */}
+                  {signUpStep === 1 && (
+                    <form onSubmit={handleSendOtp} className="space-y-4">
+                      <div>
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-[11px] font-bold mb-2">
+                          <UserCheck className="w-3.5 h-3.5" />
+                          Faculty Portal Registration
+                        </div>
+                        <h3 className="text-xl font-black text-[#212121]">Verify Your Faculty Email</h3>
+                        <p className="text-xs text-[#757575] mt-1">
+                          Enter your official faculty email. We will send an OTP code to verify your identity.
+                        </p>
+                      </div>
 
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-3 text-xs font-black shadow-md flex items-center justify-center gap-2 transition-all"
-                  >
-                    {loading ? (
-                      <span className="flex items-center gap-2">
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                        Generating OTP Code...
-                      </span>
-                    ) : (
-                      <>
-                        <Sparkles className="w-4 h-4" />
-                        Verification OTP
-                        <ArrowRight className="w-4 h-4" />
-                      </>
-                    )}
-                  </button>
+                      <div>
+                        <label className="block text-xs font-bold text-[#212121] mb-1">Faculty Email Address</label>
+                        <div className="relative">
+                          <Mail className="w-4 h-4 text-[#757575] absolute left-3.5 top-3.5" />
+                          <input
+                            type="email"
+                            value={signUpEmail}
+                            onChange={(e) => setSignUpEmail(e.target.value)}
+                            placeholder="faculty@muit.in or professor@gmail.com"
+                            className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-3 text-xs text-[#212121] focus:outline-none focus:border-purple-600 focus:bg-white font-medium transition-all"
+                            required
+                            autoFocus
+                          />
+                        </div>
+                      </div>
 
-                  <div className="pt-2 text-center">
-                    <button
-                      type="button"
-                      onClick={() => setAuthMode('SIGN_IN')}
-                      className="text-xs text-slate-500 font-bold hover:text-slate-800"
-                    >
-                      Already have an account? Sign In
-                    </button>
-                  </div>
-                </form>
-              )}
-
-              {/* ----------------------------------------------------- */}
-              {/* SIGN UP STEP 2: VERIFY OTP */}
-              {/* ----------------------------------------------------- */}
-              {signUpStep === 2 && (
-                <form onSubmit={handleVerifyOtp} className="space-y-4">
-                  <div>
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-xl font-black text-[#212121]">Enter Verification OTP</h3>
                       <button
-                        type="button"
-                        onClick={() => {
-                          setSignUpStep(1);
-                          setError('');
-                        }}
-                        className="text-xs text-[#2979FF] font-bold hover:underline flex items-center gap-1"
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-xl py-3 text-xs font-black shadow-md flex items-center justify-center gap-2 transition-all"
                       >
-                        <ArrowLeft className="w-3 h-3" /> Change Email
+                        {loading ? (
+                          <span className="flex items-center gap-2">
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            Generating Faculty OTP...
+                          </span>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4" />
+                            Faculty Verification OTP
+                            <ArrowRight className="w-4 h-4" />
+                          </>
+                        )}
                       </button>
-                    </div>
-                    <p className="text-xs text-[#757575] mt-1">
-                      An OTP code was sent to <strong className="text-slate-900">{signUpEmail}</strong>
-                    </p>
-                  </div>
 
-                  {/* REAL INBOX DISPATCH CARD */}
-                  <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-2xl flex items-start gap-2.5">
-                    <Mail className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="text-xs text-blue-950 font-bold">Verification code dispatched</p>
-                      <p className="text-[11px] text-blue-700 mt-0.5 leading-relaxed">
-                        We have dispatched an OTP verification code to <strong className="text-blue-950">{signUpEmail}</strong>. Please check your email inbox (and Spam folder) and enter the code below.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-[#212121] mb-1">OTP Code</label>
-                    <div className="relative">
-                      <Lock className="w-4 h-4 text-[#757575] absolute left-3.5 top-3.5" />
-                      <input
-                        type="text"
-                        maxLength="6"
-                        value={otpInput}
-                        onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
-                        placeholder="••••••"
-                        className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-3 text-center text-lg font-mono font-black tracking-[0.4em] text-[#212121] focus:outline-none focus:border-emerald-500 focus:bg-white transition-all"
-                        required
-                        autoFocus
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span>
-                      {otpTimer > 0 ? (
-                        <>Resend code in <strong className="text-slate-800">{otpTimer}s</strong></>
-                      ) : (
+                      <div className="pt-2 text-center">
                         <button
                           type="button"
-                          onClick={handleSendOtp}
-                          className="text-[#2979FF] font-bold hover:underline flex items-center gap-1"
+                          onClick={() => {
+                            setSelectedRole('TEACHER');
+                            setAuthMode('SIGN_IN');
+                          }}
+                          className="text-xs text-slate-500 font-bold hover:text-slate-800"
                         >
-                          <RefreshCw className="w-3 h-3" /> Resend OTP Code
+                          Already have a faculty account? Sign In
                         </button>
-                      )}
-                    </span>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-3 text-xs font-black shadow-md flex items-center justify-center gap-2 transition-all"
-                  >
-                    {loading ? (
-                      <span className="flex items-center gap-2">
-                        <RefreshCw className="w-4 h-4 animate-spin" /> Verifying...
-                      </span>
-                    ) : (
-                      <>
-                        <CheckCircle2 className="w-4 h-4" /> Verify OTP
-                      </>
-                    )}
-                  </button>
-                </form>
-              )}
-
-              {/* ----------------------------------------------------- */}
-              {/* SIGN UP STEP 3: BASIC DETAILS & NEW PASSWORD */}
-              {/* ----------------------------------------------------- */}
-              {signUpStep === 3 && (
-                <form onSubmit={handleCompleteRegistration} className="space-y-3.5">
-                  <div>
-                    <h3 className="text-xl font-black text-[#212121]">Complete Student Profile</h3>
-                    <p className="text-xs text-[#757575] mt-0.5">
-                      Enter your name and create your login password
-                    </p>
-                  </div>
-
-                  {/* VERIFIED EMAIL POPUP NOTIFICATION (Shows for 2 seconds only) */}
-                  {showVerifiedBadge && (
-                    <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between animate-fadeIn transition-all duration-300">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                        <span className="text-xs font-bold text-emerald-900">{signUpEmail}</span>
                       </div>
-                      <span className="text-[10px] font-black uppercase text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-                        Verified
-                      </span>
-                    </div>
+                    </form>
                   )}
 
-                  {/* FULL NAME */}
-                  <div>
-                    <label className="block text-[11px] font-bold text-[#212121] mb-1">Full Student Name *</label>
-                    <div className="relative">
-                      <User className="w-4 h-4 text-[#757575] absolute left-3.5 top-3" />
-                      <input
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        placeholder="e.g. AARAV SHARMA"
-                        className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-2 text-xs text-[#212121] focus:outline-none focus:border-emerald-500 font-semibold"
-                        required
-                        autoFocus
-                      />
-                    </div>
-                  </div>
-
-                  {/* ROLL NO & MOBILE ROW */}
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <div>
-                      <label className="block text-[11px] font-bold text-[#212121] mb-1">Roll Number</label>
-                      <div className="relative">
-                        <Hash className="w-3.5 h-3.5 text-[#757575] absolute left-3 top-2.5" />
-                        <input
-                          type="text"
-                          value={rollNo}
-                          onChange={(e) => setRollNo(e.target.value)}
-                          placeholder="240103160..."
-                          className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-9 pr-3 py-2 text-xs text-[#212121] focus:outline-none focus:border-emerald-500 font-mono font-medium"
-                        />
+                  {/* FACULTY STEP 2: VERIFY FACULTY OTP */}
+                  {signUpStep === 2 && (
+                    <form onSubmit={handleVerifyOtp} className="space-y-4">
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-xl font-black text-[#212121]">Enter Faculty Verification OTP</h3>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSignUpStep(1);
+                              setError('');
+                            }}
+                            className="text-xs text-purple-600 font-bold hover:underline flex items-center gap-1"
+                          >
+                            <ArrowLeft className="w-3 h-3" /> Change Email
+                          </button>
+                        </div>
+                        <p className="text-xs text-[#757575] mt-1">
+                          An OTP code was sent to <strong className="text-slate-900">{signUpEmail}</strong>
+                        </p>
                       </div>
-                    </div>
 
-                    <div>
-                      <label className="block text-[11px] font-bold text-[#212121] mb-1">Mobile (SMS)</label>
-                      <div className="relative">
-                        <Phone className="w-3.5 h-3.5 text-[#757575] absolute left-3 top-2.5" />
-                        <input
-                          type="tel"
-                          value={mobile}
-                          onChange={(e) => setMobile(e.target.value)}
-                          placeholder="8840034446"
-                          className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-9 pr-3 py-2 text-xs text-[#212121] focus:outline-none focus:border-emerald-500 font-mono font-medium"
-                        />
+                      {/* DISPATCH CARD */}
+                      <div className="p-3.5 bg-purple-50 border border-purple-200 rounded-2xl flex items-start gap-2.5">
+                        <Mail className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs text-purple-950 font-bold">Verification code dispatched</p>
+                          <p className="text-[11px] text-purple-700 mt-0.5 leading-relaxed">
+                            We have dispatched a 6-digit OTP verification code to <strong className="text-purple-950">{signUpEmail}</strong>. Please check your faculty email inbox (and Spam folder) and enter the code below.
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  </div>
 
-                  {/* CLASS & SECTION */}
-                  <div>
-                    <label className="block text-[11px] font-bold text-[#212121] mb-1">Class & Section</label>
-                    <div className="relative">
-                      <BookOpen className="w-3.5 h-3.5 text-[#757575] absolute left-3.5 top-2.5" />
-                      <select
-                        value={classSection}
-                        onChange={(e) => setClassSection(e.target.value)}
-                        className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-2 text-xs text-[#212121] focus:outline-none focus:border-emerald-500 font-medium"
+                      <div>
+                        <label className="block text-xs font-bold text-[#212121] mb-1">Faculty OTP Code</label>
+                        <div className="relative">
+                          <Lock className="w-4 h-4 text-[#757575] absolute left-3.5 top-3.5" />
+                          <input
+                            type="text"
+                            maxLength="6"
+                            value={otpInput}
+                            onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
+                            placeholder="••••••"
+                            className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-3 text-center text-lg font-mono font-black tracking-[0.4em] text-[#212121] focus:outline-none focus:border-purple-600 focus:bg-white transition-all"
+                            required
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs text-slate-500">
+                        <span>
+                          {otpTimer > 0 ? (
+                            <>Resend code in <strong className="text-slate-800">{otpTimer}s</strong></>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={handleSendOtp}
+                              className="text-purple-600 font-bold hover:underline flex items-center gap-1"
+                            >
+                              <RefreshCw className="w-3 h-3" /> Resend OTP Code
+                            </button>
+                          )}
+                        </span>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-xl py-3 text-xs font-black shadow-md flex items-center justify-center gap-2 transition-all"
                       >
-                        <option value="B.C.A - Semester V (Section B)">B.C.A - Semester V (Section B)</option>
-                        <option value="B.C.A - Semester V (Section A)">B.C.A - Semester V (Section A)</option>
-                        <option value="B.C.A - Semester III (Section B)">B.C.A - Semester III (Section B)</option>
-                        <option value="B.Tech CSE - Semester V">B.Tech CSE - Semester V</option>
-                      </select>
-                    </div>
-                  </div>
+                        {loading ? (
+                          <span className="flex items-center gap-2">
+                            <RefreshCw className="w-4 h-4 animate-spin" /> Verifying...
+                          </span>
+                        ) : (
+                          <>
+                            <CheckCircle2 className="w-4 h-4" /> Verify OTP
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  )}
 
-                  {/* NEW PASSWORD & CONFIRM PASSWORD */}
-                  <div className="grid grid-cols-2 gap-2.5">
-                    <div>
-                      <label className="block text-[11px] font-bold text-[#212121] mb-1">New Password *</label>
-                      <div className="relative">
-                        <Key className="w-3.5 h-3.5 text-[#757575] absolute left-3 top-2.5" />
-                        <input
-                          type={showNewPassword ? 'text' : 'password'}
-                          value={newPassword}
-                          onChange={(e) => setNewPassword(e.target.value)}
-                          placeholder="Min 4 chars"
-                          className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-9 pr-8 py-2 text-xs text-[#212121] focus:outline-none focus:border-emerald-500 font-medium"
-                          required
-                        />
+                  {/* FACULTY STEP 3: COMPLETE FACULTY PROFILE */}
+                  {signUpStep === 3 && (
+                    <form onSubmit={handleCompleteFacultyRegistration} className="space-y-3.5">
+                      <div>
+                        <h3 className="text-xl font-black text-[#212121]">Complete Faculty Profile</h3>
+                        <p className="text-xs text-[#757575] mt-0.5">
+                          Enter your details and create your faculty login password
+                        </p>
+                      </div>
+
+                      {/* VERIFIED EMAIL BADGE */}
+                      {showVerifiedBadge && (
+                        <div className="p-2.5 bg-purple-50 border border-purple-200 rounded-xl flex items-center justify-between animate-fadeIn transition-all duration-300">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-purple-600" />
+                            <span className="text-xs font-bold text-purple-900">{signUpEmail}</span>
+                          </div>
+                          <span className="text-[10px] font-black uppercase text-purple-700 bg-purple-100 px-2 py-0.5 rounded-full">
+                            Verified
+                          </span>
+                        </div>
+                      )}
+
+                      {/* FULL FACULTY NAME */}
+                      <div>
+                        <label className="block text-[11px] font-bold text-[#212121] mb-1">Full Faculty Name *</label>
+                        <div className="relative">
+                          <User className="w-4 h-4 text-[#757575] absolute left-3.5 top-3" />
+                          <input
+                            type="text"
+                            value={facultyName}
+                            onChange={(e) => setFacultyName(e.target.value)}
+                            placeholder="e.g. DR. RAJESH SHARMA"
+                            className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-2 text-xs text-[#212121] focus:outline-none focus:border-purple-600 font-semibold"
+                            required
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+
+                      {/* FACULTY ID & MOBILE ROW */}
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="block text-[11px] font-bold text-[#212121] mb-1">Faculty ID / Code</label>
+                          <div className="relative">
+                            <Hash className="w-3.5 h-3.5 text-[#757575] absolute left-3 top-2.5" />
+                            <input
+                              type="text"
+                              value={facultyId}
+                              onChange={(e) => setFacultyId(e.target.value)}
+                              placeholder="FAC-8049"
+                              className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-9 pr-3 py-2 text-xs text-[#212121] focus:outline-none focus:border-purple-600 font-mono font-medium"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-[#212121] mb-1">Mobile (SMS)</label>
+                          <div className="relative">
+                            <Phone className="w-3.5 h-3.5 text-[#757575] absolute left-3 top-2.5" />
+                            <input
+                              type="tel"
+                              value={mobile}
+                              onChange={(e) => setMobile(e.target.value)}
+                              placeholder="+91 9876543211"
+                              className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-9 pr-3 py-2 text-xs text-[#212121] focus:outline-none focus:border-purple-600 font-mono font-medium"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* DEPARTMENT & DESIGNATION */}
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="block text-[11px] font-bold text-[#212121] mb-1">Department *</label>
+                          <div className="relative">
+                            <BookOpen className="w-3.5 h-3.5 text-[#757575] absolute left-3 top-2.5" />
+                            <select
+                              value={department}
+                              onChange={(e) => setDepartment(e.target.value)}
+                              className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-9 pr-3 py-2 text-xs text-[#212121] focus:outline-none focus:border-purple-600 font-medium"
+                            >
+                              <option value="Computer Science">Computer Science</option>
+                              <option value="Information Technology">Information Technology</option>
+                              <option value="Computer Applications">Computer Applications</option>
+                              <option value="Electronics & Communication">Electronics & Communication</option>
+                              <option value="Mechanical Engineering">Mechanical Engineering</option>
+                              <option value="Management Studies">Management Studies</option>
+                              <option value="Applied Sciences">Applied Sciences</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-[#212121] mb-1">Designation</label>
+                          <div className="relative">
+                            <UserCheck className="w-3.5 h-3.5 text-[#757575] absolute left-3 top-2.5" />
+                            <select
+                              value={designation}
+                              onChange={(e) => setDesignation(e.target.value)}
+                              className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-9 pr-3 py-2 text-xs text-[#212121] focus:outline-none focus:border-purple-600 font-medium"
+                            >
+                              <option value="Assistant Professor">Assistant Professor</option>
+                              <option value="Associate Professor">Associate Professor</option>
+                              <option value="Professor">Professor</option>
+                              <option value="Head of Department (HOD)">Head of Department (HOD)</option>
+                              <option value="Visiting Faculty">Visiting Faculty</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* NEW PASSWORD & CONFIRM PASSWORD */}
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="block text-[11px] font-bold text-[#212121] mb-1">New Password *</label>
+                          <div className="relative">
+                            <Key className="w-3.5 h-3.5 text-[#757575] absolute left-3 top-2.5" />
+                            <input
+                              type={showNewPassword ? 'text' : 'password'}
+                              value={newPassword}
+                              onChange={(e) => setNewPassword(e.target.value)}
+                              placeholder="Min 4 chars"
+                              className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-9 pr-8 py-2 text-xs text-[#212121] focus:outline-none focus:border-purple-600 font-medium"
+                              required
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowNewPassword(!showNewPassword)}
+                              className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600"
+                            >
+                              {showNewPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-[#212121] mb-1">Confirm Password *</label>
+                          <div className="relative">
+                            <Key className="w-3.5 h-3.5 text-[#757575] absolute left-3 top-2.5" />
+                            <input
+                              type={showNewPassword ? 'text' : 'password'}
+                              value={confirmPassword}
+                              onChange={(e) => setConfirmPassword(e.target.value)}
+                              placeholder="Repeat password"
+                              className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-9 pr-3 py-2 text-xs text-[#212121] focus:outline-none focus:border-purple-600 font-medium"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-purple-600 hover:bg-purple-700 text-white rounded-xl py-3 text-xs font-black shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2 transition-all mt-1"
+                      >
+                        {loading ? (
+                          <span className="flex items-center gap-2">
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            Creating Faculty Account...
+                          </span>
+                        ) : (
+                          <>
+                            <CheckCircle2 className="w-4 h-4" />
+                            Complete Faculty Registration
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  )}
+                </div>
+              )}
+
+              {/* ===================================================== */}
+              {/* STUDENT SIGN UP FLOW */}
+              {/* ===================================================== */}
+              {signUpRole === 'STUDENT' && (
+                <div>
+                  {/* STUDENT STEP 1: ENTER EMAIL */}
+                  {signUpStep === 1 && (
+                    <form onSubmit={handleSendOtp} className="space-y-4">
+                      <div>
+                        <h3 className="text-xl font-black text-[#212121]">Verify Your Student Email</h3>
+                        <p className="text-xs text-[#757575] mt-1">
+                          Enter your official email. We will send an OTP code to verify your identity.
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#212121] mb-1">Student Email Address</label>
+                        <div className="relative">
+                          <Mail className="w-4 h-4 text-[#757575] absolute left-3.5 top-3.5" />
+                          <input
+                            type="email"
+                            value={signUpEmail}
+                            onChange={(e) => setSignUpEmail(e.target.value)}
+                            placeholder="yourname@gmail.com or student@muit.in"
+                            className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-3 text-xs text-[#212121] focus:outline-none focus:border-emerald-500 focus:bg-white font-medium transition-all"
+                            required
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-3 text-xs font-black shadow-md flex items-center justify-center gap-2 transition-all"
+                      >
+                        {loading ? (
+                          <span className="flex items-center gap-2">
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            Generating OTP Code...
+                          </span>
+                        ) : (
+                          <>
+                            <Sparkles className="w-4 h-4" />
+                            Verification OTP
+                            <ArrowRight className="w-4 h-4" />
+                          </>
+                        )}
+                      </button>
+
+                      <div className="pt-2 text-center">
                         <button
                           type="button"
-                          onClick={() => setShowNewPassword(!showNewPassword)}
-                          className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600"
+                          onClick={() => {
+                            setSelectedRole('STUDENT');
+                            setAuthMode('SIGN_IN');
+                          }}
+                          className="text-xs text-slate-500 font-bold hover:text-slate-800"
                         >
-                          {showNewPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                          Already have an account? Sign In
                         </button>
                       </div>
-                    </div>
+                    </form>
+                  )}
 
-                    <div>
-                      <label className="block text-[11px] font-bold text-[#212121] mb-1">Confirm Password *</label>
-                      <div className="relative">
-                        <Key className="w-3.5 h-3.5 text-[#757575] absolute left-3 top-2.5" />
-                        <input
-                          type={showNewPassword ? 'text' : 'password'}
-                          value={confirmPassword}
-                          onChange={(e) => setConfirmPassword(e.target.value)}
-                          placeholder="Repeat password"
-                          className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-9 pr-3 py-2 text-xs text-[#212121] focus:outline-none focus:border-emerald-500 font-medium"
-                          required
-                        />
+                  {/* STUDENT STEP 2: VERIFY OTP */}
+                  {signUpStep === 2 && (
+                    <form onSubmit={handleVerifyOtp} className="space-y-4">
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-xl font-black text-[#212121]">Enter Verification OTP</h3>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSignUpStep(1);
+                              setError('');
+                            }}
+                            className="text-xs text-[#2979FF] font-bold hover:underline flex items-center gap-1"
+                          >
+                            <ArrowLeft className="w-3 h-3" /> Change Email
+                          </button>
+                        </div>
+                        <p className="text-xs text-[#757575] mt-1">
+                          An OTP code was sent to <strong className="text-slate-900">{signUpEmail}</strong>
+                        </p>
                       </div>
-                    </div>
-                  </div>
 
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-3 text-xs font-black shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all mt-1"
-                  >
-                    {loading ? (
-                      <span className="flex items-center gap-2">
-                        <RefreshCw className="w-4 h-4 animate-spin" />
-                        Creating Student Account...
-                      </span>
-                    ) : (
-                      <>
-                        <CheckCircle2 className="w-4 h-4" />
-                        Complete Registration
-                      </>
-                    )}
-                  </button>
-                </form>
+                      {/* DISPATCH CARD */}
+                      <div className="p-3.5 bg-blue-50 border border-blue-200 rounded-2xl flex items-start gap-2.5">
+                        <Mail className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <p className="text-xs text-blue-950 font-bold">Verification code dispatched</p>
+                          <p className="text-[11px] text-blue-700 mt-0.5 leading-relaxed">
+                            We have dispatched an OTP verification code to <strong className="text-blue-950">{signUpEmail}</strong>. Please check your email inbox (and Spam folder) and enter the code below.
+                          </p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#212121] mb-1">OTP Code</label>
+                        <div className="relative">
+                          <Lock className="w-4 h-4 text-[#757575] absolute left-3.5 top-3.5" />
+                          <input
+                            type="text"
+                            maxLength="6"
+                            value={otpInput}
+                            onChange={(e) => setOtpInput(e.target.value.replace(/\D/g, ''))}
+                            placeholder="••••••"
+                            className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-3 text-center text-lg font-mono font-black tracking-[0.4em] text-[#212121] focus:outline-none focus:border-emerald-500 focus:bg-white transition-all"
+                            required
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between text-xs text-slate-500">
+                        <span>
+                          {otpTimer > 0 ? (
+                            <>Resend code in <strong className="text-slate-800">{otpTimer}s</strong></>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={handleSendOtp}
+                              className="text-[#2979FF] font-bold hover:underline flex items-center gap-1"
+                            >
+                              <RefreshCw className="w-3 h-3" /> Resend OTP Code
+                            </button>
+                          )}
+                        </span>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-3 text-xs font-black shadow-md flex items-center justify-center gap-2 transition-all"
+                      >
+                        {loading ? (
+                          <span className="flex items-center gap-2">
+                            <RefreshCw className="w-4 h-4 animate-spin" /> Verifying...
+                          </span>
+                        ) : (
+                          <>
+                            <CheckCircle2 className="w-4 h-4" /> Verify OTP
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  )}
+
+                  {/* STUDENT STEP 3: REGISTER PROFILE */}
+                  {signUpStep === 3 && (
+                    <form onSubmit={handleCompleteRegistration} className="space-y-3.5">
+                      <div>
+                        <h3 className="text-xl font-black text-[#212121]">Complete Student Profile</h3>
+                        <p className="text-xs text-[#757575] mt-0.5">
+                          Enter your name and create your login password
+                        </p>
+                      </div>
+
+                      {/* VERIFIED EMAIL BADGE */}
+                      {showVerifiedBadge && (
+                        <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between animate-fadeIn transition-all duration-300">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                            <span className="text-xs font-bold text-emerald-900">{signUpEmail}</span>
+                          </div>
+                          <span className="text-[10px] font-black uppercase text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
+                            Verified
+                          </span>
+                        </div>
+                      )}
+
+                      {/* FULL NAME */}
+                      <div>
+                        <label className="block text-[11px] font-bold text-[#212121] mb-1">Full Student Name *</label>
+                        <div className="relative">
+                          <User className="w-4 h-4 text-[#757575] absolute left-3.5 top-3" />
+                          <input
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            placeholder="e.g. AARAV SHARMA"
+                            className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-2 text-xs text-[#212121] focus:outline-none focus:border-emerald-500 font-semibold"
+                            required
+                            autoFocus
+                          />
+                        </div>
+                      </div>
+
+                      {/* ROLL NO & MOBILE ROW */}
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="block text-[11px] font-bold text-[#212121] mb-1">Roll Number</label>
+                          <div className="relative">
+                            <Hash className="w-3.5 h-3.5 text-[#757575] absolute left-3 top-2.5" />
+                            <input
+                              type="text"
+                              value={rollNo}
+                              onChange={(e) => setRollNo(e.target.value)}
+                              placeholder="240103160..."
+                              className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-9 pr-3 py-2 text-xs text-[#212121] focus:outline-none focus:border-emerald-500 font-mono font-medium"
+                            />
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-[#212121] mb-1">Mobile (SMS)</label>
+                          <div className="relative">
+                            <Phone className="w-3.5 h-3.5 text-[#757575] absolute left-3 top-2.5" />
+                            <input
+                              type="tel"
+                              value={mobile}
+                              onChange={(e) => setMobile(e.target.value)}
+                              placeholder="8840034446"
+                              className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-9 pr-3 py-2 text-xs text-[#212121] focus:outline-none focus:border-emerald-500 font-mono font-medium"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* CLASS & SECTION */}
+                      <div>
+                        <label className="block text-[11px] font-bold text-[#212121] mb-1">Class & Section</label>
+                        <div className="relative">
+                          <BookOpen className="w-3.5 h-3.5 text-[#757575] absolute left-3.5 top-2.5" />
+                          <select
+                            value={classSection}
+                            onChange={(e) => setClassSection(e.target.value)}
+                            className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-2 text-xs text-[#212121] focus:outline-none focus:border-emerald-500 font-medium"
+                          >
+                            <option value="B.C.A - Semester V (Section B)">B.C.A - Semester V (Section B)</option>
+                            <option value="B.C.A - Semester V (Section A)">B.C.A - Semester V (Section A)</option>
+                            <option value="B.C.A - Semester III (Section B)">B.C.A - Semester III (Section B)</option>
+                            <option value="B.Tech CSE - Semester V">B.Tech CSE - Semester V</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* NEW PASSWORD & CONFIRM PASSWORD */}
+                      <div className="grid grid-cols-2 gap-2.5">
+                        <div>
+                          <label className="block text-[11px] font-bold text-[#212121] mb-1">New Password *</label>
+                          <div className="relative">
+                            <Key className="w-3.5 h-3.5 text-[#757575] absolute left-3 top-2.5" />
+                            <input
+                              type={showNewPassword ? 'text' : 'password'}
+                              value={newPassword}
+                              onChange={(e) => setNewPassword(e.target.value)}
+                              placeholder="Min 4 chars"
+                              className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-9 pr-8 py-2 text-xs text-[#212121] focus:outline-none focus:border-emerald-500 font-medium"
+                              required
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowNewPassword(!showNewPassword)}
+                              className="absolute right-2.5 top-2 text-slate-400 hover:text-slate-600"
+                            >
+                              {showNewPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                            </button>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label className="block text-[11px] font-bold text-[#212121] mb-1">Confirm Password *</label>
+                          <div className="relative">
+                            <Key className="w-3.5 h-3.5 text-[#757575] absolute left-3 top-2.5" />
+                            <input
+                              type={showNewPassword ? 'text' : 'password'}
+                              value={confirmPassword}
+                              onChange={(e) => setConfirmPassword(e.target.value)}
+                              placeholder="Repeat password"
+                              className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-9 pr-3 py-2 text-xs text-[#212121] focus:outline-none focus:border-emerald-500 font-medium"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl py-3 text-xs font-black shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2 transition-all mt-1"
+                      >
+                        {loading ? (
+                          <span className="flex items-center gap-2">
+                            <RefreshCw className="w-4 h-4 animate-spin" />
+                            Creating Student Account...
+                          </span>
+                        ) : (
+                          <>
+                            <CheckCircle2 className="w-4 h-4" />
+                            Complete Registration
+                          </>
+                        )}
+                      </button>
+                    </form>
+                  )}
+                </div>
               )}
+
             </div>
           )}
 

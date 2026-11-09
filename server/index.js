@@ -32,7 +32,7 @@ function calculateDistanceMeters(lat1, lon1, lat2, lon2) {
 // AUTH ROUTES
 // -------------------------------------------------------------
 app.post('/api/login', (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;
   const emailLower = (email || '').trim().toLowerCase();
 
   // Block demo student credentials
@@ -50,7 +50,10 @@ app.post('/api/login', (req, res) => {
   );
 
   if (!user) {
-    return res.status(401).json({ success: false, message: 'Invalid Email or Password. If you are a new student, please Sign Up first.' });
+    const roleMsg = (role === 'TEACHER' || role === 'FACULTY')
+      ? 'If you are a new faculty member, please Sign Up first.'
+      : 'If you are a new student, please Sign Up first.';
+    return res.status(401).json({ success: false, message: `Invalid Email or Password. ${roleMsg}` });
   }
 
   res.json({
@@ -60,6 +63,9 @@ app.post('/api/login', (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      department: user.department || null,
+      facultyId: user.facultyId || null,
+      designation: user.designation || null,
       rollNo: user.rollNo || null,
       enrollmentNo: user.enrollmentNo || null,
       fatherName: user.fatherName || null,
@@ -96,7 +102,7 @@ const getMailTransporter = () => {
 
 // Send Email OTP endpoint (Real-time email dispatch)
 app.post('/api/auth/send-otp', async (req, res) => {
-  const { email } = req.body;
+  const { email, role } = req.body;
   if (!email || !email.includes('@')) {
     return res.status(400).json({ success: false, message: 'Valid email is required' });
   }
@@ -126,22 +132,30 @@ app.post('/api/auth/send-otp', async (req, res) => {
   const brevoSender = (process.env.BREVO_SENDER || process.env.EMAIL_USER || (brevoAuthUser.includes('@smtp-brevo') ? 'manojs082007@gmail.com' : brevoAuthUser)).trim();
   const transporter = getMailTransporter();
 
-  const emailSubject = `Your Scan2Attend Verification OTP: ${otp}`;
-  const emailText = `Your Scan2Attend student verification code is ${otp}. This code is valid for 5 minutes.`;
+  const isFaculty = role === 'TEACHER' || role === 'FACULTY';
+  const roleTitle = isFaculty ? 'Faculty' : 'Student';
+  const roleGreet = isFaculty ? 'Professor / Faculty Member' : 'Student';
+  const rolePortal = isFaculty ? 'Faculty Portal' : 'Verification Service';
+  const accentColor = isFaculty ? '#9333ea' : '#2563eb';
+  const accentLight = isFaculty ? '#faf5ff' : '#eff6ff';
+  const accentBorder = isFaculty ? '#d8b4fe' : '#bfdbfe';
+
+  const emailSubject = `Your Scan2Attend ${roleTitle} Verification OTP: ${otp}`;
+  const emailText = `Your Scan2Attend ${roleTitle.toLowerCase()} verification code is ${otp}. This code is valid for 5 minutes.`;
   const emailHtml = `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 520px; margin: 0 auto; padding: 32px 24px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 20px;">
       <div style="text-align: center; margin-bottom: 24px;">
         <h1 style="color: #0f172a; margin: 0; font-size: 26px; font-weight: 900;">
-          Scan<span style="color: #2563eb;">2</span>Attend
+          Scan<span style="color: ${accentColor};">2</span>Attend
         </h1>
         <p style="color: #64748b; font-size: 13px; font-weight: 600; margin: 6px 0 0; text-transform: uppercase; letter-spacing: 1px;">
           Smart Campus Attendance System
         </p>
       </div>
 
-      <div style="background: linear-gradient(135deg, #eff6ff 0%, #f0fdf4 100%); border: 1px solid #bfdbfe; border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px;">
+      <div style="background: linear-gradient(135deg, ${accentLight} 0%, #f0fdf4 100%); border: 1px solid ${accentBorder}; border-radius: 16px; padding: 24px; text-align: center; margin-bottom: 24px;">
         <p style="color: #1e3a8a; font-size: 14px; font-weight: 700; margin: 0 0 12px;">Your 6-Digit Email Verification Code</p>
-        <div style="font-size: 38px; font-weight: 900; letter-spacing: 8px; color: #1d4ed8; font-family: monospace; background: #ffffff; display: inline-block; padding: 10px 24px; border-radius: 12px; border: 2px dashed #93c5fd;">
+        <div style="font-size: 38px; font-weight: 900; letter-spacing: 8px; color: ${accentColor}; font-family: monospace; background: #ffffff; display: inline-block; padding: 10px 24px; border-radius: 12px; border: 2px dashed ${accentBorder};">
           ${otp}
         </div>
         <p style="color: #64748b; font-size: 12px; font-weight: 600; margin: 12px 0 0;">
@@ -150,14 +164,14 @@ app.post('/api/auth/send-otp', async (req, res) => {
       </div>
 
       <p style="color: #334155; font-size: 13px; line-height: 1.6; margin: 0 0 16px;">
-        Hello Student,<br/>
-        Enter this 6-digit code in the Scan2Attend portal to verify your email and complete your student registration.
+        Hello ${roleGreet},<br/>
+        Enter this 6-digit code in the Scan2Attend portal to verify your email and complete your ${roleTitle.toLowerCase()} registration.
       </p>
 
       <hr style="border: none; border-top: 1px solid #f1f5f9; margin: 24px 0;" />
       
       <p style="color: #94a3b8; font-size: 11px; text-align: center; margin: 0;">
-        Maharishi University • Scan2Attend Verification Service
+        Maharishi University • Scan2Attend ${rolePortal}
       </p>
     </div>
   `;
@@ -314,6 +328,45 @@ app.post('/api/auth/register-student', (req, res) => {
     success: true,
     message: 'Student registered successfully!',
     user: newStudent
+  });
+});
+
+// Register New Faculty / Teacher endpoint
+app.post(['/api/auth/register-faculty', '/api/auth/register-teacher'], (req, res) => {
+  const { name, email, password, facultyId, department, designation, mobile } = req.body;
+  if (!name || !email || !password) {
+    return res.status(400).json({ success: false, message: 'Name, email, and password are required' });
+  }
+
+  const db = readDB();
+  const existingUser = db.users.find(u => 
+    u.email.toLowerCase() === email.toLowerCase() || 
+    (u.email_alt && u.email_alt.toLowerCase() === email.toLowerCase())
+  );
+  if (existingUser) {
+    return res.status(400).json({ success: false, message: 'An account with this email already exists' });
+  }
+
+  const generatedId = 'FAC-' + Math.floor(1000 + Math.random() * 9000);
+  const newFaculty = {
+    id: 'teacher_' + Date.now(),
+    name: name.trim().toUpperCase(),
+    email: email.trim().toLowerCase(),
+    password: password,
+    role: 'TEACHER',
+    facultyId: facultyId ? facultyId.trim() : generatedId,
+    department: department ? department.trim() : 'Computer Science',
+    designation: designation ? designation.trim() : 'Assistant Professor',
+    mobile: mobile ? mobile.trim() : '+91 9876543211'
+  };
+
+  db.users.push(newFaculty);
+  writeDB(db);
+
+  res.json({
+    success: true,
+    message: 'Faculty registered successfully!',
+    user: newFaculty
   });
 });
 
