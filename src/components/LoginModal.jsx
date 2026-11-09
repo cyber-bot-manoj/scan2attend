@@ -867,16 +867,20 @@ export default function LoginModal({ setUser, setActiveTab }) {
                       </button>
 
                       <div className="pt-2 text-center">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedRole('TEACHER');
-                            setAuthMode('SIGN_IN');
-                          }}
-                          className="text-xs text-slate-500 font-bold hover:text-slate-800"
-                        >
-                          Already have a faculty account? Sign In
-                        </button>
+                        <p className="text-xs text-[#64748B]">
+                          Already have an account?{' '}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedRole('TEACHER');
+                              setAuthMode('SIGN_IN');
+                              setError('');
+                            }}
+                            className="text-[#2979FF] font-bold hover:underline"
+                          >
+                            Sign In
+                          </button>
+                        </p>
                       </div>
                     </form>
                   )}
@@ -1190,16 +1194,20 @@ export default function LoginModal({ setUser, setActiveTab }) {
                       </button>
 
                       <div className="pt-2 text-center">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedRole('STUDENT');
-                            setAuthMode('SIGN_IN');
-                          }}
-                          className="text-xs text-slate-500 font-bold hover:text-slate-800"
-                        >
-                          Already have an account? Sign In
-                        </button>
+                        <p className="text-xs text-[#64748B]">
+                          Already have an account?{' '}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedRole('STUDENT');
+                              setAuthMode('SIGN_IN');
+                              setError('');
+                            }}
+                            className="text-[#2979FF] font-bold hover:underline"
+                          >
+                            Sign In
+                          </button>
+                        </p>
                       </div>
                     </form>
                   )}
