@@ -89,18 +89,8 @@ export default function LoginModal({ setUser, setActiveTab }) {
   const fillQuickAcc = (role) => {
     setSelectedRole(role);
     setError('');
-    if (role === 'TEACHER') {
-      setEmail('teacher@school.edu');
-      setPassword('teacher');
-    } else if (role === 'STUDENT') {
-      // Students MUST NOT have prefilled demo credentials
-      setEmail('');
-      setPassword('');
-    } else {
-      // Admin: Credentials strictly typed by authorized user, not prefilled
-      setEmail('');
-      setPassword('');
-    }
+    setEmail('');
+    setPassword('');
   };
 
   // -------------------------------------------------------------
@@ -181,6 +171,14 @@ export default function LoginModal({ setUser, setActiveTab }) {
           if (selectedRole === 'ADMIN' && data.user.role !== 'ADMIN') {
             setError('Access denied: Unauthorized administrator.');
             return;
+          }
+          if (data.user.role === 'TEACHER') {
+            try {
+              const localFaculty = JSON.parse(localStorage.getItem('registeredFaculty') || '[]');
+              const filtered = localFaculty.filter(u => u.email.toLowerCase() !== data.user.email.toLowerCase());
+              filtered.push({ ...data.user, password });
+              localStorage.setItem('registeredFaculty', JSON.stringify(filtered));
+            } catch (e) {}
           }
           setUser(data.user);
           setActiveTab(data.user.role || (selectedRole === 'TEACHER' ? 'TEACHER' : selectedRole === 'ADMIN' ? 'ADMIN' : 'STUDENT'));
@@ -612,17 +610,8 @@ export default function LoginModal({ setUser, setActiveTab }) {
                   : 'text-[#64748B] hover:text-[#0F172A]'
               }`}
             >
-              {selectedRole === 'TEACHER' || signUpRole === 'TEACHER' ? (
-                <>
-                  <UserCheck className="w-4 h-4 text-purple-600" />
-                  <span>Faculty Sign Up</span>
-                </>
-              ) : (
-                <>
-                  <GraduationCap className="w-4 h-4 text-emerald-600" />
-                  <span>Sign Up</span>
-                </>
-              )}
+              <GraduationCap className="w-4 h-4 text-emerald-600" />
+              <span>Sign Up</span>
             </button>
           </div>
 
@@ -717,7 +706,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
                         selectedRole === 'STUDENT'
                           ? 'Enter your registered student email'
                           : selectedRole === 'TEACHER'
-                          ? 'teacher@school.edu or your faculty email'
+                          ? 'Enter your registered faculty email'
                           : 'Enter administrator email'
                       }
                       className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#212121] focus:outline-none focus:border-[#2979FF] focus:bg-white font-medium transition-all"
@@ -729,9 +718,6 @@ export default function LoginModal({ setUser, setActiveTab }) {
                 <div>
                   <div className="flex justify-between items-center mb-1">
                     <label className="block text-xs font-bold text-[#212121]">Password</label>
-                    {selectedRole === 'TEACHER' && (
-                      <span className="text-[10px] text-slate-400 font-medium">Demo: teacher</span>
-                    )}
                   </div>
                   <div className="relative">
                     <Key className="w-4 h-4 text-[#757575] absolute left-3.5 top-3.5" />
