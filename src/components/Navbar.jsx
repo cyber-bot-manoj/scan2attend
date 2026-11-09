@@ -28,6 +28,18 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
+  // Sync modal state to body class so overlays & chatbot know a modal is open
+  React.useEffect(() => {
+    if (showSettings) {
+      document.body.classList.add('modal-backdrop-active');
+    } else {
+      document.body.classList.remove('modal-backdrop-active');
+    }
+    return () => {
+      document.body.classList.remove('modal-backdrop-active');
+    };
+  }, [showSettings]);
+
   // Global Search Engine across ALL 65 Students of BCA V-B
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
@@ -387,7 +399,7 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
 
       {/* SYSTEM PREFERENCES & SETTINGS MODAL */}
       {showSettings && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
           <div className="card-3d bg-white max-w-lg w-full p-6 space-y-5 shadow-2xl rounded-3xl border border-[#E2E8F0] max-h-[88vh] flex flex-col">
             
             {/* Modal Header */}

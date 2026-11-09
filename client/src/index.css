@@ -177,3 +177,17 @@ body {
 }
 
 
+
+
+/* Hide Gemini AI chatbot on mobile phones and whenever any modal is open */
+body.modal-backdrop-active #gemini-chatbot-root,
+body.modal-backdrop-active .gemini-chatbot-container {
+  display: none !important;
+}
+
+@media (max-width: 767px) {
+  #gemini-chatbot-root,
+  .gemini-chatbot-container {
+    display: none !important;
+  }
+}

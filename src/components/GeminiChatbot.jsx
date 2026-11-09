@@ -34,6 +34,18 @@ export default function GeminiChatbot({ user }) {
 
   const chatEndRef = useRef(null);
 
+  // Hide completely when any modal is open
+  const [hideForModal, setHideForModal] = useState(false);
+  useEffect(() => {
+    const checkModal = () => {
+      setHideForModal(document.body.classList.contains('modal-backdrop-active'));
+    };
+    checkModal();
+    const observer = new MutationObserver(checkModal);
+    observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     if (isOpen) {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -151,11 +163,13 @@ export default function GeminiChatbot({ user }) {
     { label: '📱 SMS Alerts dispatches', query: 'How do SMS notification alerts work?' }
   ];
 
+  if (hideForModal) return null;
+
   return (
     <>
       {/* FLOATING ACTION BUTTON - LOWER CORNER OF DASHBOARD */}
       {!isOpen && (
-        <div className="fixed bottom-6 right-6 z-50 animate-bounce-short">
+        <div className="gemini-chatbot-container fixed bottom-6 right-6 z-40 animate-bounce-short hidden md:block">
           <button
             onClick={() => setIsOpen(true)}
             className="group relative flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-[#2979FF] via-[#7C4DFF] to-[#FF4081] text-white rounded-full shadow-2xl hover:shadow-indigo-500/50 hover:scale-105 transition-all duration-300 border-2 border-white/40"
@@ -177,7 +191,7 @@ export default function GeminiChatbot({ user }) {
       {/* EXPANDABLE CHATBOT WINDOW */}
       {isOpen && (
         <div 
-          className={`fixed z-50 transition-all duration-300 ease-in-out flex flex-col bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden ${
+          className={`gemini-chatbot-container fixed z-40 transition-all duration-300 ease-in-out flex flex-col bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden ${
             isExpanded 
               ? 'inset-4 sm:inset-10 w-auto h-auto' 
               : 'bottom-6 right-4 sm:right-6 w-[92vw] sm:w-[400px] h-[580px] max-h-[85vh]'
