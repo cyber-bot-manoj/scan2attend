@@ -245,15 +245,6 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
                   {/* Desktop Search Bar */}
                   {renderSearchBar(false)}
 
-                  {/* Settings Gear Icon inside a stylish circle */}
-                  <button 
-                    onClick={() => setShowSettings(true)}
-                    className="w-9 h-9 rounded-full bg-[#FAF8F5] hover:bg-[#F1F5F9] border border-[#E2E8F0] flex items-center justify-center text-[#64748B] hover:text-[#0F172A] shadow-xs transition-all active:scale-95"
-                    title="System Settings & Preferences"
-                  >
-                    <Settings className="w-4 h-4" />
-                  </button>
-
                   {/* User Profile Dropdown */}
                   <div className="relative">
                     <button
@@ -317,6 +308,20 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
                               Admin System
                             </button>
                           )}
+                          {/* Settings Option inside Circular Profile Menu */}
+                          <button
+                            onClick={() => { 
+                              setShowSettings(true); 
+                              setShowProfileMenu(false); 
+                            }}
+                            className="w-full text-left px-4 py-2 text-[#212121] hover:bg-[#FAF8F5] font-semibold flex items-center justify-between transition-colors border-t border-[#E2E8F0]/60 mt-1 pt-2"
+                          >
+                            <span className="flex items-center gap-2">
+                              <Settings className="w-3.5 h-3.5 text-[#2979FF]" />
+                              <span>Settings & Preferences</span>
+                            </span>
+                          </button>
+
                           <div className="border-t border-[#E2E8F0] mt-1 pt-1">
                             <button
                               onClick={() => { 
