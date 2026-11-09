@@ -551,7 +551,6 @@ export default function LoginModal({ setUser, setActiveTab }) {
                 <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-1">
                   Scan<span className="text-blue-400">2</span>Attend
                 </h1>
-                <p className="text-[10px] text-blue-200/80 font-bold tracking-wider uppercase">Smart Campus Verification</p>
               </div>
             </div>
 
