@@ -825,10 +825,6 @@ export default function LoginModal({ setUser, setActiveTab }) {
                   {signUpStep === 1 && (
                     <form onSubmit={handleSendOtp} className="space-y-4">
                       <div>
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 border border-purple-200 text-[11px] font-bold mb-2">
-                          <UserCheck className="w-3.5 h-3.5" />
-                          Faculty Portal Registration
-                        </div>
                         <h3 className="text-xl font-black text-[#212121]">Verify Your Faculty Email</h3>
                         <p className="text-xs text-[#757575] mt-1">
                           Enter your official faculty email. We will send an OTP code to verify your identity.
@@ -859,12 +855,12 @@ export default function LoginModal({ setUser, setActiveTab }) {
                         {loading ? (
                           <span className="flex items-center gap-2">
                             <RefreshCw className="w-4 h-4 animate-spin" />
-                            Generating Faculty OTP...
+                            Generating OTP Code...
                           </span>
                         ) : (
                           <>
                             <Sparkles className="w-4 h-4" />
-                            Faculty Verification OTP
+                            Verification OTP
                             <ArrowRight className="w-4 h-4" />
                           </>
                         )}
@@ -890,7 +886,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
                     <form onSubmit={handleVerifyOtp} className="space-y-4">
                       <div>
                         <div className="flex items-center justify-between">
-                          <h3 className="text-xl font-black text-[#212121]">Enter Faculty Verification OTP</h3>
+                          <h3 className="text-xl font-black text-[#212121]">Enter Verification OTP</h3>
                           <button
                             type="button"
                             onClick={() => {
@@ -919,7 +915,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
                       </div>
 
                       <div>
-                        <label className="block text-xs font-bold text-[#212121] mb-1">Faculty OTP Code</label>
+                        <label className="block text-xs font-bold text-[#212121] mb-1">OTP Code</label>
                         <div className="relative">
                           <Lock className="w-4 h-4 text-[#757575] absolute left-3.5 top-3.5" />
                           <input
