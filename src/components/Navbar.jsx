@@ -14,32 +14,88 @@ import {
   MapPin,
   Camera,
   Globe,
-  Sliders
+  Sliders,
+  Volume2,
+  Clock,
+  FileSpreadsheet,
+  UserCheck,
+  ShieldAlert,
+  SwitchCamera,
+  Navigation
 } from 'lucide-react';
 
 export default function Navbar({ user, setUser, activeTab, setActiveTab, globalAttendanceRecords = [] }) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
-  // Settings State
-  const [smsAlertsEnabled, setSmsAlertsEnabled] = useState(true);
-  const [geofenceRadius, setGeofenceRadius] = useState(50);
-  const [livenessMode, setLivenessMode] = useState('STRICT');
+  // Settings State with LocalStorage persistence
+  const [smsAlertsEnabled, setSmsAlertsEnabled] = useState(() => {
+    return localStorage.getItem('s2a_sms_alerts') !== 'false';
+  });
+  const [geofenceRadius, setGeofenceRadius] = useState(() => {
+    return Number(localStorage.getItem('s2a_geofence_radius')) || 50;
+  });
+  const [livenessMode, setLivenessMode] = useState(() => {
+    return localStorage.getItem('s2a_liveness_mode') || 'STRICT';
+  });
+  const [appLanguage, setAppLanguage] = useState(() => {
+    return localStorage.getItem('s2a_app_language') || 'English (US)';
+  });
+
+  // Student specific settings
+  const [cameraMode, setCameraMode] = useState(() => {
+    return localStorage.getItem('s2a_camera_mode') || 'user';
+  });
+  const [attendanceReminders, setAttendanceReminders] = useState(() => {
+    return localStorage.getItem('s2a_reminders') !== 'false';
+  });
+  const [soundOnScan, setSoundOnScan] = useState(() => {
+    return localStorage.getItem('s2a_sound_on_scan') !== 'false';
+  });
+  const [highAccuracyGps, setHighAccuracyGps] = useState(() => {
+    return localStorage.getItem('s2a_high_accuracy_gps') !== 'false';
+  });
+
+  // Teacher specific settings
+  const [qrDuration, setQrDuration] = useState(() => {
+    return Number(localStorage.getItem('s2a_qr_duration')) || 5;
+  });
+  const [autoExportCsv, setAutoExportCsv] = useState(() => {
+    return localStorage.getItem('s2a_auto_export_csv') !== 'false';
+  });
+  const [scanChimeAlert, setScanChimeAlert] = useState(() => {
+    return localStorage.getItem('s2a_scan_chime') !== 'false';
+  });
+  const [proxySmsAlert, setProxySmsAlert] = useState(() => {
+    return localStorage.getItem('s2a_proxy_sms') !== 'false';
+  });
+
+  // Admin specific settings
+  const [riskThreshold, setRiskThreshold] = useState(() => {
+    return Number(localStorage.getItem('s2a_risk_threshold')) || 75;
+  });
+  const [auditRetention, setAuditRetention] = useState(() => {
+    return localStorage.getItem('s2a_audit_retention') || '90_DAYS';
+  });
+
   const [savedSuccess, setSavedSuccess] = useState(false);
 
-  // Global Search Engine across ALL 65 Students of BCA V-B
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showSearchResults, setShowSearchResults] = useState(false);
-  const [selectedResultModal, setSelectedResultModal] = useState(null);
-
-  // Live filter across all 65 student records passed from App state
-  const searchResults = searchQuery.trim() === '' ? [] : globalAttendanceRecords.filter(s => 
-    (s.studentName && s.studentName.toLowerCase().includes(searchQuery.toLowerCase())) ||
-    (s.rollNo && s.rollNo.includes(searchQuery)) ||
-    (s.subject && s.subject.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
-
   const handleSaveSettings = () => {
+    localStorage.setItem('s2a_sms_alerts', smsAlertsEnabled);
+    localStorage.setItem('s2a_geofence_radius', geofenceRadius);
+    localStorage.setItem('s2a_liveness_mode', livenessMode);
+    localStorage.setItem('s2a_app_language', appLanguage);
+    localStorage.setItem('s2a_camera_mode', cameraMode);
+    localStorage.setItem('s2a_reminders', attendanceReminders);
+    localStorage.setItem('s2a_sound_on_scan', soundOnScan);
+    localStorage.setItem('s2a_high_accuracy_gps', highAccuracyGps);
+    localStorage.setItem('s2a_qr_duration', qrDuration);
+    localStorage.setItem('s2a_auto_export_csv', autoExportCsv);
+    localStorage.setItem('s2a_scan_chime', scanChimeAlert);
+    localStorage.setItem('s2a_proxy_sms', proxySmsAlert);
+    localStorage.setItem('s2a_risk_threshold', riskThreshold);
+    localStorage.setItem('s2a_audit_retention', auditRetention);
+
     setSavedSuccess(true);
     setTimeout(() => {
       setSavedSuccess(false);
@@ -177,10 +233,10 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
                   {/* Desktop Search Bar */}
                   {renderSearchBar(false)}
 
-                  {/* Settings Gear Icon */}
+                  {/* Settings Gear Icon inside a stylish circle */}
                   <button 
                     onClick={() => setShowSettings(true)}
-                    className="p-2 rounded-xl text-[#757575] hover:text-[#212121] hover:bg-[#FAF8F5] transition-colors"
+                    className="w-9 h-9 rounded-full bg-[#FAF8F5] hover:bg-[#F1F5F9] border border-[#E2E8F0] flex items-center justify-center text-[#64748B] hover:text-[#0F172A] shadow-xs transition-all active:scale-95"
                     title="System Settings & Preferences"
                   >
                     <Settings className="w-4 h-4" />
@@ -315,33 +371,358 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
       {/* SYSTEM PREFERENCES & SETTINGS MODAL */}
       {showSettings && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
-          <div className="card-3d bg-white max-w-md w-full p-6 space-y-6 shadow-2xl rounded-2xl border border-[#E2E8F0]">
+          <div className="card-3d bg-white max-w-lg w-full p-6 space-y-5 shadow-2xl rounded-3xl border border-[#E2E8F0] max-h-[88vh] flex flex-col">
             
             {/* Modal Header */}
-            <div className="flex justify-between items-center border-b border-[#E2E8F0] pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-[#2979FF]/10 text-[#2979FF] flex items-center justify-center font-bold">
-                  <Sliders className="w-5 h-5" />
+            <div className="flex justify-between items-center border-b border-[#E2E8F0] pb-3 shrink-0">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-bold shadow-xs ${
+                  user?.role === 'TEACHER' 
+                    ? 'bg-purple-100 text-purple-700' 
+                    : user?.role === 'ADMIN' 
+                    ? 'bg-amber-100 text-amber-700' 
+                    : 'bg-blue-100 text-blue-700'
+                }`}>
+                  {user?.role === 'TEACHER' ? (
+                    <UserCheck className="w-5 h-5" />
+                  ) : user?.role === 'ADMIN' ? (
+                    <ShieldCheck className="w-5 h-5" />
+                  ) : (
+                    <GraduationCap className="w-5 h-5" />
+                  )}
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-[#212121]">System Settings & Preferences</h3>
-                  <p className="text-[11px] text-[#757575] font-medium">Configure app behavior, geofence & alerts</p>
+                  <h3 className="text-base font-black text-[#212121] flex items-center gap-2">
+                    {user?.role === 'TEACHER' 
+                      ? 'Faculty Settings & Tools' 
+                      : user?.role === 'ADMIN' 
+                      ? 'Administrator Global Controls' 
+                      : 'Student Settings & Preferences'}
+                  </h3>
+                  <p className="text-[11px] text-[#757575] font-medium">
+                    {user?.role === 'TEACHER'
+                      ? 'Manage QR timer, auto-export & scan chimes'
+                      : user?.role === 'ADMIN'
+                      ? 'Configure geofence radius, liveness strictness & SMS'
+                      : 'Manage camera selection, reminders & sound alerts'}
+                  </p>
                 </div>
               </div>
               <button 
                 onClick={() => setShowSettings(false)}
-                className="text-gray-400 hover:text-gray-600 p-1.5 rounded-lg hover:bg-gray-100"
+                className="text-gray-400 hover:text-gray-600 p-1.5 rounded-xl hover:bg-gray-100 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Settings Options List */}
-            <div className="space-y-4 text-xs">
+            {/* Scrollable Settings Options List */}
+            <div className="space-y-3.5 text-xs overflow-y-auto pr-1 flex-1">
               
-              {/* Option 1: SMS Alert Notifications */}
-              <div className="flex items-center justify-between p-3 bg-[#FAF8F5] rounded-xl border border-[#E2E8F0]">
-                <div className="flex items-center gap-3">
+              {/* ======================================================== */}
+              {/* ROLE-BASED FEATURES: STUDENT */}
+              {/* ======================================================== */}
+              {user?.role === 'STUDENT' && (
+                <>
+                  {/* Student Option 1: Camera Selection (Front vs Back) */}
+                  <div className="p-3 bg-[#FAF8F5] rounded-2xl border border-[#E2E8F0] space-y-2">
+                    <div className="flex items-center gap-2">
+                      <SwitchCamera className="w-4 h-4 text-[#2979FF]" />
+                      <span className="font-extrabold text-[#212121]">Face Verification Camera</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 pt-0.5">
+                      <button
+                        type="button"
+                        onClick={() => setCameraMode('user')}
+                        className={`py-2 rounded-xl font-bold text-xs transition-all border flex items-center justify-center gap-1.5 ${
+                          cameraMode === 'user'
+                            ? 'bg-[#2979FF] text-white border-[#2979FF] shadow-sm'
+                            : 'bg-white text-[#64748B] border-[#E2E8F0] hover:bg-slate-50'
+                        }`}
+                      >
+                        <Camera className="w-3.5 h-3.5" />
+                        Front (Selfie)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setCameraMode('environment')}
+                        className={`py-2 rounded-xl font-bold text-xs transition-all border flex items-center justify-center gap-1.5 ${
+                          cameraMode === 'environment'
+                            ? 'bg-[#2979FF] text-white border-[#2979FF] shadow-sm'
+                            : 'bg-white text-[#64748B] border-[#E2E8F0] hover:bg-slate-50'
+                        }`}
+                      >
+                        <SwitchCamera className="w-3.5 h-3.5" />
+                        Back (Rear Camera)
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Student Option 2: Class Attendance Reminders */}
+                  <div className="flex items-center justify-between p-3 bg-[#FAF8F5] rounded-2xl border border-[#E2E8F0]">
+                    <div className="flex items-center gap-2.5">
+                      <Bell className="w-4 h-4 text-[#2979FF]" />
+                      <div>
+                        <span className="font-extrabold text-[#212121] block">Class Lecture Reminders</span>
+                        <span className="text-[10px] text-[#757575]">Push notification 10 minutes before lecture</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setAttendanceReminders(!attendanceReminders)}
+                      className={`w-11 h-6 rounded-full transition-colors flex items-center p-1 ${
+                        attendanceReminders ? 'bg-[#00C853] justify-end' : 'bg-gray-300 justify-start'
+                      }`}
+                    >
+                      <span className="w-4 h-4 rounded-full bg-white shadow-md"></span>
+                    </button>
+                  </div>
+
+                  {/* Student Option 3: Audio Beep on Attendance Marked */}
+                  <div className="flex items-center justify-between p-3 bg-[#FAF8F5] rounded-2xl border border-[#E2E8F0]">
+                    <div className="flex items-center gap-2.5">
+                      <Volume2 className="w-4 h-4 text-[#2979FF]" />
+                      <div>
+                        <span className="font-extrabold text-[#212121] block">Audio Scan Confirmation</span>
+                        <span className="text-[10px] text-[#757575]">Play audio chime upon successful scan</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSoundOnScan(!soundOnScan)}
+                      className={`w-11 h-6 rounded-full transition-colors flex items-center p-1 ${
+                        soundOnScan ? 'bg-[#00C853] justify-end' : 'bg-gray-300 justify-start'
+                      }`}
+                    >
+                      <span className="w-4 h-4 rounded-full bg-white shadow-md"></span>
+                    </button>
+                  </div>
+
+                  {/* Student Option 4: High Accuracy GPS Positioning */}
+                  <div className="flex items-center justify-between p-3 bg-[#FAF8F5] rounded-2xl border border-[#E2E8F0]">
+                    <div className="flex items-center gap-2.5">
+                      <Navigation className="w-4 h-4 text-[#2979FF]" />
+                      <div>
+                        <span className="font-extrabold text-[#212121] block">High Accuracy GPS</span>
+                        <span className="text-[10px] text-[#757575]">Use fine hardware geolocation for campus geofence</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setHighAccuracyGps(!highAccuracyGps)}
+                      className={`w-11 h-6 rounded-full transition-colors flex items-center p-1 ${
+                        highAccuracyGps ? 'bg-[#00C853] justify-end' : 'bg-gray-300 justify-start'
+                      }`}
+                    >
+                      <span className="w-4 h-4 rounded-full bg-white shadow-md"></span>
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {/* ======================================================== */}
+              {/* ROLE-BASED FEATURES: TEACHER / FACULTY */}
+              {/* ======================================================== */}
+              {user?.role === 'TEACHER' && (
+                <>
+                  {/* Teacher Option 1: Dynamic QR Expiry Timer */}
+                  <div className="p-3 bg-purple-50/50 rounded-2xl border border-purple-200/70 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-purple-600" />
+                      <span className="font-extrabold text-[#212121]">Dynamic QR Expiry Timer</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 pt-0.5">
+                      {[3, 5, 10].map(mins => (
+                        <button
+                          key={mins}
+                          type="button"
+                          onClick={() => setQrDuration(mins)}
+                          className={`py-2 rounded-xl font-bold text-xs transition-all border ${
+                            qrDuration === mins
+                              ? 'bg-purple-600 text-white border-purple-600 shadow-sm'
+                              : 'bg-white text-slate-600 border-purple-200 hover:bg-purple-50'
+                          }`}
+                        >
+                          {mins} Mins {mins === 5 && '(Default)'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Teacher Option 2: Auto-Export CSV at End */}
+                  <div className="flex items-center justify-between p-3 bg-purple-50/50 rounded-2xl border border-purple-200/70">
+                    <div className="flex items-center gap-2.5">
+                      <FileSpreadsheet className="w-4 h-4 text-purple-600" />
+                      <div>
+                        <span className="font-extrabold text-[#212121] block">Auto-Export CSV on Session End</span>
+                        <span className="text-[10px] text-[#757575]">Download CSV report automatically after timer</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setAutoExportCsv(!autoExportCsv)}
+                      className={`w-11 h-6 rounded-full transition-colors flex items-center p-1 ${
+                        autoExportCsv ? 'bg-[#00C853] justify-end' : 'bg-gray-300 justify-start'
+                      }`}
+                    >
+                      <span className="w-4 h-4 rounded-full bg-white shadow-md"></span>
+                    </button>
+                  </div>
+
+                  {/* Teacher Option 3: Sound Chime on Student Scan */}
+                  <div className="flex items-center justify-between p-3 bg-purple-50/50 rounded-2xl border border-purple-200/70">
+                    <div className="flex items-center gap-2.5">
+                      <Volume2 className="w-4 h-4 text-purple-600" />
+                      <div>
+                        <span className="font-extrabold text-[#212121] block">Live Student Scan Chime</span>
+                        <span className="text-[10px] text-[#757575]">Audio ding whenever a student verifies</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setScanChimeAlert(!scanChimeAlert)}
+                      className={`w-11 h-6 rounded-full transition-colors flex items-center p-1 ${
+                        scanChimeAlert ? 'bg-[#00C853] justify-end' : 'bg-gray-300 justify-start'
+                      }`}
+                    >
+                      <span className="w-4 h-4 rounded-full bg-white shadow-md"></span>
+                    </button>
+                  </div>
+
+                  {/* Teacher Option 4: Instant Proxy Geofence Warning SMS */}
+                  <div className="flex items-center justify-between p-3 bg-purple-50/50 rounded-2xl border border-purple-200/70">
+                    <div className="flex items-center gap-2.5">
+                      <Smartphone className="w-4 h-4 text-purple-600" />
+                      <div>
+                        <span className="font-extrabold text-[#212121] block">Instant Proxy Warning Alert</span>
+                        <span className="text-[10px] text-[#757575]">Flag & alert students violating distance (&gt;50m)</span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setProxySmsAlert(!proxySmsAlert)}
+                      className={`w-11 h-6 rounded-full transition-colors flex items-center p-1 ${
+                        proxySmsAlert ? 'bg-[#00C853] justify-end' : 'bg-gray-300 justify-start'
+                      }`}
+                    >
+                      <span className="w-4 h-4 rounded-full bg-white shadow-md"></span>
+                    </button>
+                  </div>
+                </>
+              )}
+
+              {/* ======================================================== */}
+              {/* ROLE-BASED FEATURES: ADMIN */}
+              {/* ======================================================== */}
+              {user?.role === 'ADMIN' && (
+                <>
+                  {/* Admin Option 1: Geofence Safety Radius */}
+                  <div className="p-3 bg-amber-50/50 rounded-2xl border border-amber-200/70 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-amber-600" />
+                      <span className="font-extrabold text-[#212121]">Geofence Radius Constraint</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 pt-0.5">
+                      {[25, 50, 100].map(radius => (
+                        <button
+                          key={radius}
+                          type="button"
+                          onClick={() => setGeofenceRadius(radius)}
+                          className={`py-2 rounded-xl font-bold text-xs transition-all border ${
+                            geofenceRadius === radius
+                              ? 'bg-amber-600 text-white border-amber-600 shadow-sm'
+                              : 'bg-white text-slate-600 border-amber-200 hover:bg-amber-50'
+                          }`}
+                        >
+                          {radius}m {radius === 50 && '(Default)'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Admin Option 2: Face Liveness Strictness */}
+                  <div className="p-3 bg-amber-50/50 rounded-2xl border border-amber-200/70 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Camera className="w-4 h-4 text-amber-600" />
+                      <span className="font-extrabold text-[#212121]">Face Liveness Verification</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 pt-0.5">
+                      <button
+                        type="button"
+                        onClick={() => setLivenessMode('STRICT')}
+                        className={`py-2 rounded-xl font-bold text-xs transition-all border ${
+                          livenessMode === 'STRICT'
+                            ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                            : 'bg-white text-slate-600 border-amber-200'
+                        }`}
+                      >
+                        Strict (Live Camera)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setLivenessMode('FAST')}
+                        className={`py-2 rounded-xl font-bold text-xs transition-all border ${
+                          livenessMode === 'FAST'
+                            ? 'bg-amber-600 text-white border-amber-600 shadow-sm'
+                            : 'bg-white text-slate-600 border-amber-200'
+                        }`}
+                      >
+                        Fast (Snapshot)
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Admin Option 3: Low Attendance Risk Threshold */}
+                  <div className="p-3 bg-amber-50/50 rounded-2xl border border-amber-200/70 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <ShieldAlert className="w-4 h-4 text-amber-600" />
+                      <span className="font-extrabold text-[#212121]">Low Attendance Alert Limit</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 pt-0.5">
+                      {[75, 80, 85].map(limit => (
+                        <button
+                          key={limit}
+                          type="button"
+                          onClick={() => setRiskThreshold(limit)}
+                          className={`py-2 rounded-xl font-bold text-xs transition-all border ${
+                            riskThreshold === limit
+                              ? 'bg-amber-600 text-white border-amber-600 shadow-sm'
+                              : 'bg-white text-slate-600 border-amber-200 hover:bg-amber-50'
+                          }`}
+                        >
+                          {limit}% {limit === 75 && '(Mandatory)'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Admin Option 4: Audit Logs Retention */}
+                  <div className="flex items-center justify-between p-3 bg-amber-50/50 rounded-2xl border border-amber-200/70">
+                    <div className="flex items-center gap-2.5">
+                      <Clock className="w-4 h-4 text-amber-600" />
+                      <div>
+                        <span className="font-extrabold text-[#212121] block">Audit Logs Retention</span>
+                        <span className="text-[10px] text-[#757575]">Keep crypto hashes & GPS verification history</span>
+                      </div>
+                    </div>
+                    <select 
+                      value={auditRetention}
+                      onChange={(e) => setAuditRetention(e.target.value)}
+                      className="bg-white border border-amber-200 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-800 focus:outline-none"
+                    >
+                      <option value="30_DAYS">30 Days</option>
+                      <option value="90_DAYS">90 Days</option>
+                      <option value="1_YEAR">1 Year</option>
+                    </select>
+                  </div>
+                </>
+              )}
+
+              {/* ======================================================== */}
+              {/* COMMON OPTIONS: ALL ROLES */}
+              {/* ======================================================== */}
+              <div className="flex items-center justify-between p-3 bg-[#FAF8F5] rounded-2xl border border-[#E2E8F0]">
+                <div className="flex items-center gap-2.5">
                   <Smartphone className="w-4 h-4 text-[#2979FF]" />
                   <div>
                     <span className="font-extrabold text-[#212121] block">Instant SMS Notifications</span>
@@ -349,6 +730,7 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
                   </div>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setSmsAlertsEnabled(!smsAlertsEnabled)}
                   className={`w-11 h-6 rounded-full transition-colors flex items-center p-1 ${
                     smsAlertsEnabled ? 'bg-[#00C853] justify-end' : 'bg-gray-300 justify-start'
@@ -358,88 +740,41 @@ export default function Navbar({ user, setUser, activeTab, setActiveTab, globalA
                 </button>
               </div>
 
-              {/* Option 2: Geofence Safety Perimeter Radius */}
-              <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#E2E8F0] space-y-2">
-                <div className="flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-[#2979FF]" />
-                  <span className="font-extrabold text-[#212121]">Geofence Radius Constraint</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2 pt-1">
-                  {[25, 50, 100].map(radius => (
-                    <button
-                      key={radius}
-                      onClick={() => setGeofenceRadius(radius)}
-                      className={`py-2 rounded-lg font-extrabold text-xs transition-all border ${
-                        geofenceRadius === radius
-                          ? 'bg-[#2979FF] text-white border-[#2979FF] shadow-md'
-                          : 'bg-white text-[#64748B] border-[#E2E8F0] hover:bg-gray-50'
-                      }`}
-                    >
-                      {radius} Meters {radius === 50 && '(Default)'}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Option 3: Camera Liveness Strictness */}
-              <div className="p-3 bg-[#FAF8F5] rounded-xl border border-[#E2E8F0] space-y-2">
-                <div className="flex items-center gap-2">
-                  <Camera className="w-4 h-4 text-[#2979FF]" />
-                  <span className="font-extrabold text-[#212121]">Face Liveness Verification Level</span>
-                </div>
-                <div className="grid grid-cols-2 gap-2 pt-1">
-                  <button
-                    onClick={() => setLivenessMode('STRICT')}
-                    className={`py-2 rounded-lg font-extrabold text-xs transition-all border ${
-                      livenessMode === 'STRICT'
-                        ? 'bg-[#00C853] text-white border-[#00C853] shadow-md'
-                        : 'bg-white text-[#64748B] border-[#E2E8F0]'
-                    }`}
-                  >
-                    Strict (Live Camera)
-                  </button>
-                  <button
-                    onClick={() => setLivenessMode('FAST')}
-                    className={`py-2 rounded-lg font-extrabold text-xs transition-all border ${
-                      livenessMode === 'FAST'
-                        ? 'bg-[#2979FF] text-white border-[#2979FF] shadow-md'
-                        : 'bg-white text-[#64748B] border-[#E2E8F0]'
-                    }`}
-                  >
-                    Fast (Snapshot)
-                  </button>
-                </div>
-              </div>
-
-              {/* Option 4: System Language */}
-              <div className="flex items-center justify-between p-3 bg-[#FAF8F5] rounded-xl border border-[#E2E8F0]">
+              {/* Common Option: Language */}
+              <div className="flex items-center justify-between p-3 bg-[#FAF8F5] rounded-2xl border border-[#E2E8F0]">
                 <div className="flex items-center gap-2.5">
                   <Globe className="w-4 h-4 text-[#2979FF]" />
                   <span className="font-extrabold text-[#212121]">App Interface Language</span>
                 </div>
-                <select className="bg-white border border-[#E2E8F0] rounded-lg px-2.5 py-1 text-xs font-bold text-[#212121]">
-                  <option>English (US)</option>
-                  <option>Hindi (हिन्दी)</option>
-                  <option>Hinglish</option>
+                <select 
+                  value={appLanguage}
+                  onChange={(e) => setAppLanguage(e.target.value)}
+                  className="bg-white border border-[#E2E8F0] rounded-lg px-2.5 py-1 text-xs font-bold text-[#212121] focus:outline-none"
+                >
+                  <option value="English (US)">English (US)</option>
+                  <option value="Hindi (हिन्दी)">Hindi (हिन्दी)</option>
+                  <option value="Hinglish">Hinglish</option>
                 </select>
               </div>
 
             </div>
 
             {/* Modal Actions */}
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex items-center gap-3 pt-3 border-t border-[#E2E8F0] shrink-0">
               <button
+                type="button"
                 onClick={() => setShowSettings(false)}
                 className="flex-1 btn-secondary justify-center py-2.5 text-xs font-bold"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleSaveSettings}
                 className="flex-1 btn-blue justify-center py-2.5 text-xs font-extrabold"
               >
                 {savedSuccess ? (
-                  <span className="flex items-center gap-1">
+                  <span className="flex items-center gap-1.5 justify-center text-white">
                     <Check className="w-4 h-4" /> Preferences Saved!
                   </span>
                 ) : (
