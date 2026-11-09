@@ -43,6 +43,14 @@ app.post('/api/login', (req, res) => {
     });
   }
 
+  // Block legacy demo admin credentials
+  if (emailLower === 'admin@school.edu' || (role === 'ADMIN' && emailLower === 'admin')) {
+    return res.status(401).json({ 
+      success: false, 
+      message: 'Default demo admin credentials are disabled. Please enter authorized admin credentials.' 
+    });
+  }
+
   const db = readDB();
   const user = db.users.find(u => 
     (u.email.toLowerCase() === emailLower || (u.email_alt && u.email_alt.toLowerCase() === emailLower)) && 
@@ -52,8 +60,14 @@ app.post('/api/login', (req, res) => {
   if (!user) {
     const roleMsg = (role === 'TEACHER' || role === 'FACULTY')
       ? 'If you are a new faculty member, please Sign Up first.'
+      : role === 'ADMIN'
+      ? 'Please check your authorized administrator credentials.'
       : 'If you are a new student, please Sign Up first.';
     return res.status(401).json({ success: false, message: `Invalid Email or Password. ${roleMsg}` });
+  }
+
+  if (role === 'ADMIN' && user.role !== 'ADMIN') {
+    return res.status(403).json({ success: false, message: 'Access denied: User is not an authorized administrator.' });
   }
 
   res.json({

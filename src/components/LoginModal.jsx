@@ -97,8 +97,9 @@ export default function LoginModal({ setUser, setActiveTab }) {
       setEmail('');
       setPassword('');
     } else {
-      setEmail('admin@school.edu');
-      setPassword('admin');
+      // Admin: Credentials strictly typed by authorized user, not prefilled
+      setEmail('');
+      setPassword('');
     }
   };
 
@@ -177,8 +178,12 @@ export default function LoginModal({ setUser, setActiveTab }) {
             setError('Demo student login is disabled. Please Sign Up to create your account.');
             return;
           }
+          if (selectedRole === 'ADMIN' && data.user.role !== 'ADMIN') {
+            setError('Access denied: Unauthorized administrator.');
+            return;
+          }
           setUser(data.user);
-          setActiveTab(data.user.role || (selectedRole === 'TEACHER' ? 'TEACHER' : 'STUDENT'));
+          setActiveTab(data.user.role || (selectedRole === 'TEACHER' ? 'TEACHER' : selectedRole === 'ADMIN' ? 'ADMIN' : 'STUDENT'));
           return;
         } else {
           setError(
@@ -187,33 +192,35 @@ export default function LoginModal({ setUser, setActiveTab }) {
               ? 'No registered student account found with this email. Please Sign Up first.' 
               : selectedRole === 'TEACHER'
               ? 'No registered faculty account found with this email. Please check credentials or Sign Up first.'
+              : selectedRole === 'ADMIN'
+              ? 'Invalid Administrator credentials. Access denied.'
               : 'Invalid email or password.')
           );
           return;
         }
       } else {
-        // Fallback for default demo accounts matching data.json (TEACHER & ADMIN ONLY)
-        if (
-          (emailLower === 'teacher@school.edu' && password === 'teacher') ||
-          (emailLower === 'admin@school.edu' && password === 'admin')
-        ) {
+        // Fallback for default accounts matching data.json
+        if (emailLower === 'teacher@school.edu' && password === 'teacher') {
+          performFallbackAuth();
+        } else if (emailLower === 'manojs082007@gmail.com' && password === 'manojk') {
           performFallbackAuth();
         } else {
           setError(
             selectedRole === 'STUDENT'
               ? 'No registered student account found with this email. Please Sign Up first.'
               : selectedRole === 'TEACHER'
-              ? 'No registered faculty account found with this email. Please check your credentials or Sign Up first.'
+              ? 'No registered faculty account found with this email. Please check credentials or Sign Up first.'
+              : selectedRole === 'ADMIN'
+              ? 'Invalid Administrator credentials. Access denied.'
               : 'Invalid email or password. Please check your credentials.'
           );
         }
       }
     } catch (err) {
       console.warn('Backend server unreachable, executing fallback authentication');
-      if (
-        (emailLower === 'teacher@school.edu' && password === 'teacher') ||
-        (emailLower === 'admin@school.edu' && password === 'admin')
-      ) {
+      if (emailLower === 'teacher@school.edu' && password === 'teacher') {
+        performFallbackAuth();
+      } else if (emailLower === 'manojs082007@gmail.com' && password === 'manojk') {
         performFallbackAuth();
       } else {
         const allLocal = [
@@ -225,13 +232,15 @@ export default function LoginModal({ setUser, setActiveTab }) {
         );
         if (matchedLocal) {
           setUser(matchedLocal);
-          setActiveTab(matchedLocal.role || (selectedRole === 'TEACHER' ? 'TEACHER' : 'STUDENT'));
+          setActiveTab(matchedLocal.role || (selectedRole === 'TEACHER' ? 'TEACHER' : selectedRole === 'ADMIN' ? 'ADMIN' : 'STUDENT'));
         } else {
           setError(
             selectedRole === 'STUDENT'
               ? 'No registered student account found with this email. Please Sign Up first.'
               : selectedRole === 'TEACHER'
               ? 'No registered faculty account found with this email. Please check credentials or Sign Up first.'
+              : selectedRole === 'ADMIN'
+              ? 'Invalid Administrator credentials. Access denied.'
               : 'Invalid Email or Password. Please try again.'
           );
         }
@@ -255,16 +264,20 @@ export default function LoginModal({ setUser, setActiveTab }) {
         designation: 'Assistant Professor',
         mobile: '+91 9876543211'
       };
-    } else if (email.toLowerCase().includes('admin') || selectedRole === 'ADMIN') {
+    } else if (email.trim().toLowerCase() === 'manojs082007@gmail.com' && password === 'manojk') {
       mockUser = {
         id: 'admin_1',
         name: 'System Admin',
-        email: 'admin@school.edu',
+        email: 'manojs082007@gmail.com',
         role: 'ADMIN',
-        mobile: '+91 9876543210'
+        mobile: '+91 8840034446'
       };
     } else {
-      setError('Student demo login is disabled. Please Sign Up with Email OTP first.');
+      setError(
+        selectedRole === 'ADMIN'
+          ? 'Invalid Administrator credentials. Access denied.'
+          : 'Student demo login is disabled. Please Sign Up with Email OTP first.'
+      );
       return;
     }
 
@@ -705,7 +718,7 @@ export default function LoginModal({ setUser, setActiveTab }) {
                           ? 'Enter your registered student email'
                           : selectedRole === 'TEACHER'
                           ? 'teacher@school.edu or your faculty email'
-                          : 'admin@school.edu'
+                          : 'Enter administrator email'
                       }
                       className="w-full bg-[#FAF8F5] border border-[#E2E8F0] rounded-xl pl-10 pr-4 py-2.5 text-xs text-[#212121] focus:outline-none focus:border-[#2979FF] focus:bg-white font-medium transition-all"
                       required
@@ -716,8 +729,8 @@ export default function LoginModal({ setUser, setActiveTab }) {
                 <div>
                   <div className="flex justify-between items-center mb-1">
                     <label className="block text-xs font-bold text-[#212121]">Password</label>
-                    {selectedRole !== 'STUDENT' && (
-                      <span className="text-[10px] text-slate-400 font-medium">Demo: {selectedRole.toLowerCase()}</span>
+                    {selectedRole === 'TEACHER' && (
+                      <span className="text-[10px] text-slate-400 font-medium">Demo: teacher</span>
                     )}
                   </div>
                   <div className="relative">
@@ -770,6 +783,11 @@ export default function LoginModal({ setUser, setActiveTab }) {
                     >
                       Sign Up first <ArrowRight className="w-3.5 h-3.5" />
                     </button>
+                  </p>
+                ) : selectedRole === 'ADMIN' ? (
+                  <p className="text-xs text-[#64748B] flex items-center justify-center gap-1.5 font-medium">
+                    <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
+                    Authorized administrator access only
                   </p>
                 ) : (
                   <p className="text-xs text-[#64748B]">
