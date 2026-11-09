@@ -91,6 +91,9 @@ export default function LoginModal({ setUser, setActiveTab }) {
     setError('');
     setEmail('');
     setPassword('');
+    if (role === 'ADMIN') {
+      setAuthMode('SIGN_IN');
+    }
   };
 
   // -------------------------------------------------------------
@@ -574,47 +577,56 @@ export default function LoginModal({ setUser, setActiveTab }) {
         <div className="md:col-span-7 p-6 sm:p-10 flex flex-col justify-center bg-white">
           
           {/* TOP AUTH MODE SELECTOR TABS: SIGN IN vs SIGN UP */}
-          <div className="flex items-center bg-[#F1F5F9] p-1.5 rounded-2xl mb-6 border border-[#E2E8F0]">
-            <button
-              type="button"
-              onClick={() => {
-                setAuthMode('SIGN_IN');
-                setError('');
-              }}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${
-                authMode === 'SIGN_IN'
-                  ? 'bg-white text-[#0F172A] shadow-md shadow-slate-200'
-                  : 'text-[#64748B] hover:text-[#0F172A]'
-              }`}
-            >
-              <LogIn className="w-4 h-4 text-[#2979FF]" />
-              Sign In
-            </button>
+          {selectedRole === 'ADMIN' ? (
+            <div className="flex items-center bg-[#F1F5F9] p-1.5 rounded-2xl mb-6 border border-[#E2E8F0]">
+              <div className="flex-1 py-2.5 rounded-xl text-xs font-black bg-white text-[#0F172A] shadow-md shadow-slate-200 flex items-center justify-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-amber-600" />
+                <span>Admin Sign In</span>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center bg-[#F1F5F9] p-1.5 rounded-2xl mb-6 border border-[#E2E8F0]">
+              <button
+                type="button"
+                onClick={() => {
+                  setAuthMode('SIGN_IN');
+                  setError('');
+                }}
+                className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${
+                  authMode === 'SIGN_IN'
+                    ? 'bg-white text-[#0F172A] shadow-md shadow-slate-200'
+                    : 'text-[#64748B] hover:text-[#0F172A]'
+                }`}
+              >
+                <LogIn className="w-4 h-4 text-[#2979FF]" />
+                Sign In
+              </button>
 
-            <button
-              type="button"
-              onClick={() => {
-                if (selectedRole === 'TEACHER') {
-                  setSignUpRole('TEACHER');
-                } else {
-                  setSignUpRole('STUDENT');
-                }
-                setAuthMode('SIGN_UP');
-                setSignUpStep(1);
-                setError('');
-                setSuccessNotice('');
-              }}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${
-                authMode === 'SIGN_UP'
-                  ? 'bg-white text-[#0F172A] shadow-md shadow-slate-200'
-                  : 'text-[#64748B] hover:text-[#0F172A]'
-              }`}
-            >
-              <GraduationCap className="w-4 h-4 text-emerald-600" />
-              <span>Sign Up</span>
-            </button>
-          </div>
-
+              <button
+                type="button"
+                onClick={() => {
+                  if (selectedRole === 'TEACHER') {
+                    setSignUpRole('TEACHER');
+                  } else {
+                    setSignUpRole('STUDENT');
+                  }
+                  setAuthMode('SIGN_UP');
+                  setSignUpStep(1);
+                  setError('');
+                  setSuccessNotice('');
+                }}
+                className={`flex-1 py-2.5 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 ${
+                  authMode === 'SIGN_UP'
+                    ? 'bg-white text-[#0F172A] shadow-md shadow-slate-200'
+                    : 'text-[#64748B] hover:text-[#0F172A]'
+                }`}
+              >
+                <GraduationCap className="w-4 h-4 text-emerald-600" />
+                <span>Sign Up</span>
+              </button>
+            </div>
+          )}
+          
           {/* SUCCESS NOTICE POPUP BANNER (Auto-dismisses after 5 seconds) */}
           {successNotice && (
             <div className="mb-4 p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-start justify-between gap-2.5 animate-fadeIn shadow-sm">
