@@ -27,7 +27,12 @@ import {
   X,
   Calendar,
   BookOpen,
-  AlertCircle
+  AlertCircle,
+  ExternalLink,
+  ChevronRight,
+  Download,
+  UploadCloud,
+  Paperclip
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -392,6 +397,178 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   const [showFullReportModal, setShowFullReportModal] = useState(false);
   const [selectedAuditRecord, setSelectedAuditRecord] = useState(null);
 
+  // Official MUIT Student ERP Portal - Assignments & Coursework (https://stdlogin.muituniversity.in/Student/VAssignment)
+  const MUIT_ASSIGNMENT_PORTAL_URL = 'https://stdlogin.muituniversity.in/Student/VAssignment';
+  const [assignmentFilter, setAssignmentFilter] = useState('ALL');
+  const [selectedAssignment, setSelectedAssignment] = useState(null);
+  const [assignmentSubmitSuccess, setAssignmentSubmitSuccess] = useState(false);
+  const [submittingAssignmentId, setSubmittingAssignmentId] = useState(null);
+
+  const [assignments, setAssignments] = useState([
+    {
+      id: 'ASN-BCA501-03',
+      code: 'BCA501',
+      subject: 'Computer Graphics (BCA501)',
+      faculty: 'Mr. Dhananjay Kr. Yadav',
+      facultyShort: 'DKY',
+      title: 'Rasterization & 2D/3D Geometric Transformations',
+      description: 'Implement Bresenham’s Line Drawing algorithm and 2D/3D composite transformations (rotation about an arbitrary pivot, shearing, and scaling) in C++ / OpenGL. Provide formal mathematical derivation and terminal screenshots.',
+      assignedDate: '04 Nov 2026',
+      dueDate: '18 Nov 2026',
+      dueTime: '11:59 PM',
+      isPending: true,
+      status: 'PENDING',
+      maxMarks: 20,
+      obtainedMarks: null,
+      attachmentName: 'BCA501_Assignment_03_RasterOps.pdf',
+      attachmentSize: '1.4 MB',
+      submissionType: 'PDF Report / C++ Source Archive (.zip)',
+      instructions: 'Submit a well-documented PDF containing source code snippets, algorithm derivations, and output terminal screenshots with your University Roll No. visible.'
+    },
+    {
+      id: 'ASN-BCA502-02',
+      code: 'BCA502',
+      subject: 'Cryptography & Network Security (BCA502)',
+      faculty: 'Dr. Gouri Shukla',
+      facultyShort: 'GS',
+      title: 'Asymmetric Cryptography: RSA & Diffie-Hellman Key Exchange',
+      description: 'Solve mathematical problems on modular exponentiation using repeated squaring. Demonstrate RSA key generation (p=61, q=53), encrypt message M=65, and analyze the man-in-the-middle vulnerability in unauthenticated Diffie-Hellman key exchange.',
+      assignedDate: '06 Nov 2026',
+      dueDate: '20 Nov 2026',
+      dueTime: '05:00 PM',
+      isPending: true,
+      status: 'PENDING',
+      maxMarks: 25,
+      obtainedMarks: null,
+      attachmentName: 'BCA502_CNS_ProblemSet2.pdf',
+      attachmentSize: '2.1 MB',
+      submissionType: 'Handwritten scanned PDF or LaTeX document',
+      instructions: 'All numerical calculations must display step-by-step extended Euclidean algorithm calculations. Late submissions will attract a 10% penalty.'
+    },
+    {
+      id: 'ASN-BCA503-04',
+      code: 'BCA503',
+      subject: 'Web Technology (BCA503)',
+      faculty: 'Mr. Rishi Mohan Awasthi',
+      facultyShort: 'RMA',
+      title: 'RESTful API Architecture & Secure JWT Session Auth',
+      description: 'Design and deploy modular Node.js/Express API with role-based JWT bearer authentication, Bcrypt password hashing, and MongoDB Mongoose models for university student records.',
+      assignedDate: '28 Oct 2026',
+      dueDate: '12 Nov 2026',
+      dueTime: '11:59 PM',
+      isPending: false,
+      status: 'SUBMITTED',
+      submittedDate: '09 Nov 2026, 04:32 PM',
+      submittedFileName: 'ManojSharma_2401031601137_WebTech_Assignment4.zip',
+      maxMarks: 20,
+      obtainedMarks: null,
+      facultyRemark: 'Submission received. Evaluation in progress by RMA.',
+      attachmentName: 'BCA503_WebTech_API_Specification.pdf',
+      attachmentSize: '3.2 MB',
+      submissionType: 'ZIP Archive containing server code + Postman Collection',
+      instructions: 'Include Postman export collection v2.1 and readme instructions with sample API credentials.'
+    },
+    {
+      id: 'ASN-BCA504-01',
+      code: 'BCA504',
+      subject: 'Minor Project (BCA504)',
+      faculty: 'Dr. Peeyush Pathak',
+      facultyShort: 'PP',
+      title: 'System Requirements Specification (SRS) & Architecture Design',
+      description: 'Submit comprehensive IEEE-830 compliant SRS document for your chosen BCA Capstone project. Include functional/non-functional requirements, UML Class diagrams, Sequence diagrams, and ER schema.',
+      assignedDate: '15 Oct 2026',
+      dueDate: '05 Nov 2026',
+      dueTime: '04:00 PM',
+      isPending: false,
+      status: 'EVALUATED',
+      submittedDate: '03 Nov 2026, 02:15 PM',
+      submittedFileName: 'Scan2Attend_SRS_ManojSharma_BCA504.pdf',
+      maxMarks: 50,
+      obtainedMarks: 48,
+      grade: 'A+',
+      facultyRemark: 'Excellent work. Architecture and geofencing sequence flow clearly outlined. Approved for development phase.',
+      attachmentName: 'BCA504_SRS_MUIT_Guidelines_Template.pdf',
+      attachmentSize: '4.5 MB',
+      submissionType: 'PDF Document (Formatted as per MUIT CS Guidelines)',
+      instructions: 'Approved synopsis topic must strictly match presentation slides.'
+    },
+    {
+      id: 'ASN-BCA511-02',
+      code: 'BCA511',
+      subject: 'Computer Graphics Lab (BCA511)',
+      faculty: 'Dr. Gouri Shukla & Mr. Rishi Mohan Awasthi',
+      facultyShort: 'GS / RMA',
+      title: 'Practical Lab 4: Cohen-Sutherland Line Clipping Simulation',
+      description: 'Write complete executable code for Cohen-Sutherland line clipping with OutCode region classification (Left, Right, Bottom, Top). Render input polygon boundaries and clipped lines.',
+      assignedDate: '20 Oct 2026',
+      dueDate: '02 Nov 2026',
+      dueTime: '02:00 PM',
+      isPending: false,
+      status: 'EVALUATED',
+      submittedDate: '01 Nov 2026, 11:20 AM',
+      submittedFileName: 'BCA511_Lab4_CohenSutherland_2401031601137.cpp',
+      maxMarks: 25,
+      obtainedMarks: 24,
+      grade: 'A+',
+      facultyRemark: 'Well verified with test coordinates and clean visual plot output.',
+      attachmentName: 'BCA511_Lab_Manual_CohenSutherland.pdf',
+      attachmentSize: '1.8 MB',
+      submissionType: 'C++ Source Code file (.cpp)',
+      instructions: 'Include terminal screenshots showing inside, partially inside, and outside test vectors.'
+    },
+    {
+      id: 'ASN-ACE511-01',
+      code: 'ACE511',
+      subject: 'Industrial Internship (ACE511)',
+      faculty: 'Mr. Imtiyaz Haq',
+      facultyShort: 'IH',
+      title: 'Internship Bi-Weekly Progress Log & Industry Mentor Evaluation',
+      description: 'Submit fortnightly signed timesheets, technological stack summary, and verified milestone evaluation report endorsed by industry host organization manager.',
+      assignedDate: '10 Nov 2026',
+      dueDate: '25 Nov 2026',
+      dueTime: '05:00 PM',
+      isPending: true,
+      status: 'PENDING',
+      maxMarks: 50,
+      obtainedMarks: null,
+      attachmentName: 'ACE511_BiWeekly_Log_Format.pdf',
+      attachmentSize: '850 KB',
+      submissionType: 'Scanned PDF with official seal & signature',
+      instructions: 'Must be endorsed with seal of host company / supervisor signature before scanning.'
+    }
+  ]);
+
+  const filteredAssignments = assignments.filter(item => {
+    if (assignmentFilter === 'ALL') return true;
+    return item.status === assignmentFilter;
+  });
+
+  const handleSimulateSubmitAssignment = (asnId) => {
+    setSubmittingAssignmentId(asnId);
+    setTimeout(() => {
+      const nowStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+      const studentFile = `${(user?.name || 'Manoj_Sharma').replace(/\s+/g, '_')}_Solution.pdf`;
+      setAssignments(prev => prev.map(a => {
+        if (a.id === asnId) {
+          const updated = {
+            ...a,
+            status: 'SUBMITTED',
+            isPending: false,
+            submittedDate: nowStr,
+            submittedFileName: studentFile,
+            facultyRemark: 'Submission received online. Awaiting faculty evaluation.'
+          };
+          setSelectedAssignment(updated);
+          return updated;
+        }
+        return a;
+      }));
+      setSubmittingAssignmentId(null);
+      setAssignmentSubmitSuccess(true);
+      setTimeout(() => setAssignmentSubmitSuccess(false), 4000);
+    }, 800);
+  };
+
   const [attendanceLogs, setAttendanceLogs] = useState([
     { id: 'REC-901', subject: 'Computer Graphics (BCA501)', date: '29 Sep 2026', time: '09:35 AM', teacher: 'Mr. Dhananjay Kr. Yadav', room: 'Room B-302', status: 'PRESENT', distance: '14m', hash: 'AUDIT-2026-REC-901827' },
     { id: 'REC-902', subject: 'Cryptography and Network Security (BCA502)', date: '28 Sep 2026', time: '11:15 AM', teacher: 'Dr. Gouri Shukla', room: 'Room B-302', status: 'PRESENT', distance: '12m', hash: 'AUDIT-2026-REC-891920' },
@@ -667,174 +844,6 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
   const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-
-  // Dedicated Print Function for Digital Student ID Card Only
-  const handlePrintDigitalIdCard = () => {
-    const studentName = user ? user.name : 'Manoj Sharma';
-    const rollNo = user ? (user.rollNo || '2401031601137') : '2401031601137';
-    const printWindow = window.open('', '_blank', 'width=600,height=700');
-    if (!printWindow) return;
-
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Student ID Card - ${studentName}</title>
-          <style>
-            body {
-              font-family: system-ui, -apple-system, sans-serif;
-              background-color: #020617;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              min-height: 100vh;
-              margin: 0;
-              padding: 20px;
-              box-sizing: border-box;
-            }
-            .id-card {
-              width: 360px;
-              background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #1e1b4b 100%);
-              border: 2px solid #f59e0b;
-              border-radius: 20px;
-              padding: 20px;
-              color: white;
-              box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-              position: relative;
-            }
-            .header {
-              border-bottom: 1px solid rgba(245, 158, 11, 0.4);
-              padding-bottom: 10px;
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-            }
-            .title {
-              font-size: 11px;
-              font-weight: 900;
-              color: #fcd34d;
-              letter-spacing: 1px;
-              text-transform: uppercase;
-            }
-            .subtitle {
-              font-size: 8px;
-              color: #94a3b8;
-              text-transform: uppercase;
-              font-weight: 700;
-            }
-            .profile-row {
-              display: flex;
-              gap: 15px;
-              align-items: center;
-              margin-top: 15px;
-            }
-            .avatar {
-              width: 75px;
-              height: 85px;
-              border-radius: 12px;
-              object-fit: cover;
-              border: 2px solid #f59e0b;
-            }
-            .name {
-              font-size: 15px;
-              font-weight: 900;
-              margin: 0 0 4px 0;
-              color: #ffffff;
-              text-transform: uppercase;
-            }
-            .details {
-              font-size: 11px;
-              color: #cbd5e1;
-              line-height: 1.5;
-            }
-            .barcode-strip {
-              margin-top: 15px;
-              padding-top: 10px;
-              border-top: 1px solid rgba(255,255,255,0.1);
-              display: flex;
-              align-items: center;
-              justify-content: space-between;
-              font-family: monospace;
-              font-size: 9px;
-            }
-            .barcode-svg {
-              height: 24px;
-              background: white;
-              padding: 2px 6px;
-              border-radius: 4px;
-            }
-            @media print {
-              body { background: white; padding: 0; }
-              .id-card { border-color: #000; box-shadow: none; color: black; background: #fff; }
-              .name { color: #000; }
-              .details { color: #333; }
-              .title { color: #000; }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="id-card">
-            <div class="header">
-              <div>
-                <div class="title">Maharishi University</div>
-                <div class="subtitle">Of Information Technology</div>
-              </div>
-              <div style="font-family: monospace; background: rgba(245,158,11,0.2); color: #fcd34d; padding: 2px 6px; border-radius: 4px; font-weight: bold;">
-                ${rollNo}
-              </div>
-            </div>
-
-            <div class="profile-row">
-              <img src="/manoj_sharma_profile.jpg" class="avatar" alt="Student Profile" />
-              <div class="details">
-                <div class="name">${studentName}</div>
-                <div style="color: #fcd34d; font-family: monospace; font-weight: bold;">Roll: ${rollNo}</div>
-                <div>B.C.A • Computer Applications</div>
-                <div>Semester V • Blood: O+</div>
-                <div style="font-family: monospace;">Mob: +91 8840034446</div>
-              </div>
-            </div>
-
-            <div class="barcode-strip">
-              <div>
-                <svg class="barcode-svg" viewBox="0 0 100 24">
-                  <rect x="0" y="0" width="3" height="24" fill="#000"/>
-                  <rect x="5" y="0" width="1" height="24" fill="#000"/>
-                  <rect x="8" y="0" width="4" height="24" fill="#000"/>
-                  <rect x="14" y="0" width="2" height="24" fill="#000"/>
-                  <rect x="18" y="0" width="5" height="24" fill="#000"/>
-                  <rect x="25" y="0" width="1" height="24" fill="#000"/>
-                  <rect x="28" y="0" width="3" height="24" fill="#000"/>
-                  <rect x="33" y="0" width="2" height="24" fill="#000"/>
-                  <rect x="37" y="0" width="4" height="24" fill="#000"/>
-                  <rect x="43" y="0" width="1" height="24" fill="#000"/>
-                  <rect x="46" y="0" width="5" height="24" fill="#000"/>
-                  <rect x="53" y="0" width="2" height="24" fill="#000"/>
-                  <rect x="57" y="0" width="3" height="24" fill="#000"/>
-                  <rect x="62" y="0" width="1" height="24" fill="#000"/>
-                  <rect x="65" y="0" width="4" height="24" fill="#000"/>
-                  <rect x="71" y="0" width="2" height="24" fill="#000"/>
-                  <rect x="75" y="0" width="5" height="24" fill="#000"/>
-                  <rect x="82" y="0" width="1" height="24" fill="#000"/>
-                  <rect x="85" y="0" width="3" height="24" fill="#000"/>
-                  <rect x="90" y="0" width="2" height="24" fill="#000"/>
-                  <rect x="94" y="0" width="4" height="24" fill="#000"/>
-                </svg>
-                <div style="font-size: 8px; color: #94a3b8; margin-top: 2px;">MUIT-GATE-2026-SCAN</div>
-              </div>
-            </div>
-          </div>
-          <script>
-            window.onload = () => {
-              window.print();
-              setTimeout(() => window.close(), 500);
-            };
-          </script>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
-  };
 
   // Start real browser camera stream
   const startCamera = async () => {
@@ -1327,103 +1336,184 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           </button>
         </div>
 
-        {/* CARD 5: 3D DIGITAL STUDENT ID CARD (MAHARISHI UNIVERSITY OF INFORMATION TECHNOLOGY) */}
-        <div className="card-3d p-6 space-y-4 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
+        {/* CARD 5: OFFICIAL MUIT COURSEWORK & ASSIGNMENTS PORTAL (https://stdlogin.muituniversity.in/Student/VAssignment) */}
+        <div className="card-3d p-5 space-y-3 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
           <div className="space-y-3">
+            {/* Header with Title and Official Direct ERP Link */}
             <div className="flex justify-between items-center">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <Award className="w-4 h-4 text-amber-500" /> Digital Student ID Card
+                <BookOpen className="w-4 h-4 text-indigo-600" /> MUIT Assignments (VAssignment)
               </span>
+              <a
+                href={MUIT_ASSIGNMENT_PORTAL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[10px] font-bold border border-indigo-200/80 transition-colors shadow-2xs group"
+                title="Open Official MUIT ERP Assignment Portal"
+              >
+                <span>ERP Portal</span>
+                <ExternalLink className="w-2.5 h-2.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </a>
             </div>
 
-            {/* MUIT Professional Smart Digital ID Card Box */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 text-white p-4 space-y-3 border-2 border-amber-500/40 shadow-2xl">
-              
-              {/* Holographic Background Watermark Pattern */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            {/* Official University ERP Live Link Banner */}
+            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 text-white p-3.5 border border-indigo-500/30 shadow-md">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
+              <div className="flex items-center justify-between gap-2 relative z-10">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-8 h-8 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 shrink-0">
+                    <FileText className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[11px] font-black text-amber-300 tracking-wide uppercase">
+                        MUIT Student ERP
+                      </span>
+                      <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 text-[8px] font-mono font-bold border border-emerald-500/30">
+                        LIVE
+                      </span>
+                    </div>
+                    <p className="text-[9px] text-slate-300 font-mono truncate">
+                      stdlogin.muituniversity.in/Student/VAssignment
+                    </p>
+                  </div>
+                </div>
 
-              {/* Maharishi University Header Line */}
-              <div className="border-b border-amber-500/30 pb-2 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <img src="/scan2attend-logo.svg" alt="MUIT Logo" className="w-6 h-6 object-contain" />
-                  <div>
-                    <h5 className="text-[10px] font-black tracking-wider text-amber-300 uppercase leading-none">
-                      Maharishi University
-                    </h5>
-                    <span className="text-[8px] text-slate-300 tracking-tight font-semibold">
-                      OF INFORMATION TECHNOLOGY
+                <a
+                  href={MUIT_ASSIGNMENT_PORTAL_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 text-[10px] font-black transition-all shadow-md flex items-center gap-1 group"
+                >
+                  <span>Open URL</span>
+                  <ExternalLink className="w-3 h-3 group-hover:scale-110 transition-transform" />
+                </a>
+              </div>
+            </div>
+
+            {/* Filter Pills */}
+            <div className="flex items-center justify-between gap-1 pt-0.5">
+              <div className="flex items-center gap-1 text-[10px] font-bold overflow-x-auto py-0.5">
+                <button
+                  onClick={() => setAssignmentFilter('ALL')}
+                  className={`px-2 py-0.5 rounded-md transition-all ${
+                    assignmentFilter === 'ALL'
+                      ? 'bg-slate-900 text-white font-black shadow-xs'
+                      : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                  }`}
+                >
+                  All ({assignments.length})
+                </button>
+                <button
+                  onClick={() => setAssignmentFilter('PENDING')}
+                  className={`px-2 py-0.5 rounded-md transition-all ${
+                    assignmentFilter === 'PENDING'
+                      ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
+                      : 'bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/50'
+                  }`}
+                >
+                  Pending ({assignments.filter(a => a.status === 'PENDING').length})
+                </button>
+                <button
+                  onClick={() => setAssignmentFilter('SUBMITTED')}
+                  className={`px-2 py-0.5 rounded-md transition-all ${
+                    assignmentFilter === 'SUBMITTED'
+                      ? 'bg-blue-600 text-white font-black shadow-xs'
+                      : 'bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/50'
+                  }`}
+                >
+                  Submitted ({assignments.filter(a => a.status === 'SUBMITTED').length})
+                </button>
+                <button
+                  onClick={() => setAssignmentFilter('EVALUATED')}
+                  className={`px-2 py-0.5 rounded-md transition-all ${
+                    assignmentFilter === 'EVALUATED'
+                      ? 'bg-emerald-600 text-white font-black shadow-xs'
+                      : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/50'
+                  }`}
+                >
+                  Graded ({assignments.filter(a => a.status === 'EVALUATED').length})
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable Assignment Stream */}
+            <div className="h-56 overflow-y-auto space-y-2 pr-1">
+              {filteredAssignments.map((asn) => (
+                <div
+                  key={asn.id}
+                  onClick={() => setSelectedAssignment(asn)}
+                  className="p-2.5 rounded-xl bg-slate-50 hover:bg-white border border-slate-200/90 hover:border-indigo-400 hover:shadow-md cursor-pointer transition-all duration-200 space-y-1.5 group relative overflow-hidden"
+                >
+                  {/* Left status vertical strip */}
+                  <div className={`absolute top-0 left-0 bottom-0 w-1 ${
+                    asn.status === 'PENDING' ? 'bg-amber-500' :
+                    asn.status === 'SUBMITTED' ? 'bg-blue-500' : 'bg-emerald-500'
+                  }`} />
+
+                  <div className="flex items-center justify-between pl-1">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="text-[9px] font-black font-mono px-1.5 py-0.5 rounded bg-white text-indigo-700 border border-slate-200 shadow-2xs">
+                        {asn.code}
+                      </span>
+                      <span className="text-[10px] font-bold text-slate-700 truncate max-w-[130px]">
+                        {asn.subject.split('(')[0]}
+                      </span>
+                    </div>
+
+                    {asn.status === 'PENDING' && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[9px] font-black shrink-0">
+                        <Clock className="w-2.5 h-2.5 text-amber-700" /> Due: {asn.dueDate.split(' ')[0]} {asn.dueDate.split(' ')[1]}
+                      </span>
+                    )}
+                    {asn.status === 'SUBMITTED' && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100 text-blue-900 border border-blue-300 text-[9px] font-black shrink-0">
+                        <CheckCircle2 className="w-2.5 h-2.5 text-blue-700" /> Submitted
+                      </span>
+                    )}
+                    {asn.status === 'EVALUATED' && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 text-[9px] font-black shrink-0">
+                        <Sparkles className="w-2.5 h-2.5 text-emerald-700" /> {asn.obtainedMarks}/{asn.maxMarks} ({asn.grade})
+                      </span>
+                    )}
+                  </div>
+
+                  <h5 className="text-[11px] font-black text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1 pl-1">
+                    {asn.title}
+                  </h5>
+
+                  <div className="flex items-center justify-between text-[9px] pl-1 pt-1 border-t border-slate-200/60 text-slate-500">
+                    <span className="truncate max-w-[150px]">
+                      By: <strong className="text-slate-800">{asn.facultyShort || asn.faculty}</strong>
+                    </span>
+                    <span className="font-bold text-indigo-600 flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
+                      View Task <ChevronRight className="w-2.5 h-2.5" />
                     </span>
                   </div>
                 </div>
-                <span className="text-[9px] font-mono font-bold bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded border border-amber-400/30">
-                  2401031601137
-                </span>
-              </div>
+              ))}
 
-              {/* Student Photo & Particulars */}
-              <div className="flex items-center gap-3.5 pt-1">
-                <div className="relative shrink-0">
-                  <img 
-                    src="/manoj_sharma_profile.jpg" 
-                    alt="ID Profile" 
-                    onError={(event) => { event.currentTarget.src = '/student_profile_avatar.png'; }}
-                    className="w-16 h-18 rounded-xl object-cover border-2 border-amber-400/60 shadow-md ring-2 ring-amber-500/20" 
-                  />
-                  <span className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-0.5 rounded-full border border-slate-900 text-[8px] font-bold">
-                    <CheckCircle2 className="w-2.5 h-2.5" />
-                  </span>
+              {filteredAssignments.length === 0 && (
+                <div className="text-center py-8 text-slate-400 text-xs">
+                  No assignments found in this filter.
                 </div>
-
-                <div className="space-y-0.5 text-xs">
-                  <h4 className="text-sm font-black text-white tracking-wide uppercase">Manoj Sharma</h4>
-                  <p className="text-[10px] text-amber-300 font-mono font-extrabold">Roll No: 2401031601137</p>
-                  <p className="text-[10px] text-slate-300 font-medium">B.C.A • Computer Applications</p>
-                  <p className="text-[9px] text-slate-400">Semester 5 • Blood Group: O+</p>
-                  <p className="text-[9px] text-slate-400 font-mono">Mobile: +91 8840034446</p>
-                </div>
-              </div>
-
-              {/* Unique Vector Gate Barcode & Security Band */}
-              <div className="pt-2 border-t border-slate-800 flex items-center justify-between text-[9px] font-mono">
-                <div className="flex items-center gap-1.5 text-slate-400">
-                  <div className="bg-white p-1 rounded border border-slate-700 flex items-center">
-                    <svg className="w-20 h-5" viewBox="0 0 100 24">
-                      <rect x="0" y="0" width="3" height="24" fill="#000"/>
-                      <rect x="5" y="0" width="1" height="24" fill="#000"/>
-                      <rect x="8" y="0" width="4" height="24" fill="#000"/>
-                      <rect x="14" y="0" width="2" height="24" fill="#000"/>
-                      <rect x="18" y="0" width="5" height="24" fill="#000"/>
-                      <rect x="25" y="0" width="1" height="24" fill="#000"/>
-                      <rect x="28" y="0" width="3" height="24" fill="#000"/>
-                      <rect x="33" y="0" width="2" height="24" fill="#000"/>
-                      <rect x="37" y="0" width="4" height="24" fill="#000"/>
-                      <rect x="43" y="0" width="1" height="24" fill="#000"/>
-                      <rect x="46" y="0" width="5" height="24" fill="#000"/>
-                      <rect x="53" y="0" width="2" height="24" fill="#000"/>
-                      <rect x="57" y="0" width="3" height="24" fill="#000"/>
-                      <rect x="62" y="0" width="1" height="24" fill="#000"/>
-                      <rect x="65" y="0" width="4" height="24" fill="#000"/>
-                      <rect x="71" y="0" width="2" height="24" fill="#000"/>
-                      <rect x="75" y="0" width="5" height="24" fill="#000"/>
-                      <rect x="82" y="0" width="1" height="24" fill="#000"/>
-                      <rect x="85" y="0" width="3" height="24" fill="#000"/>
-                      <rect x="90" y="0" width="2" height="24" fill="#000"/>
-                      <rect x="94" y="0" width="4" height="24" fill="#000"/>
-                    </svg>
-                  </div>
-                  <span className="text-[8px]">MUIT GATE PASS</span>
-                </div>
-              </div>
-
+              )}
             </div>
           </div>
 
-          <button
-            onClick={handlePrintDigitalIdCard}
-            className="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-black text-xs transition-all shadow-md flex items-center justify-center gap-1.5"
-          >
-            <Printer className="w-3.5 h-3.5" /> Print
-          </button>
+          {/* Card Bottom CTA */}
+          <div className="space-y-1.5 pt-1">
+            <a
+              href={MUIT_ASSIGNMENT_PORTAL_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-extrabold text-xs transition-all shadow-md flex items-center justify-center gap-2 group"
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Open stdlogin.muituniversity.in (VAssignment)</span>
+              <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
+          </div>
         </div>
 
         {/* CARD 6: RECENT NOTIFICATIONS & OFFICIAL MUIT NOTICE BOARD VERTICAL TICKER */}
@@ -1923,6 +2013,230 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
             >
               Close Verification Proof
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* OFFICIAL MUIT ASSIGNMENT DETAILS & SUBMISSION MODAL (https://stdlogin.muituniversity.in/Student/VAssignment) */}
+      {selectedAssignment && (
+        <div className="fixed inset-0 z-[99999] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="max-w-2xl w-full bg-white text-slate-900 border border-slate-200 rounded-3xl p-6 relative shadow-2xl space-y-5 max-h-[92vh] overflow-y-auto">
+            
+            {/* Modal Header */}
+            <div className="flex justify-between items-start border-b border-slate-200 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-200 shadow-inner">
+                  <BookOpen className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded border border-indigo-200">
+                      {selectedAssignment.code}
+                    </span>
+                    <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">
+                      MUIT Coursework Assignment
+                    </span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight mt-0.5">
+                    {selectedAssignment.title}
+                  </h3>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedAssignment(null)}
+                className="p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Quick Metrics Bar */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200 text-center">
+              <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Subject</span>
+                <span className="text-xs font-black text-slate-900 truncate block mt-0.5" title={selectedAssignment.subject}>
+                  {selectedAssignment.code}
+                </span>
+              </div>
+              <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Faculty</span>
+                <span className="text-xs font-black text-slate-900 truncate block mt-0.5">
+                  {selectedAssignment.facultyShort || selectedAssignment.faculty}
+                </span>
+              </div>
+              <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Max Marks</span>
+                <span className="text-xs font-black text-indigo-600 font-mono block mt-0.5">
+                  {selectedAssignment.maxMarks} Marks
+                </span>
+              </div>
+              <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Due Date</span>
+                <span className="text-xs font-black text-amber-600 font-mono block mt-0.5">
+                  {selectedAssignment.dueDate}
+                </span>
+              </div>
+            </div>
+
+            {/* Detailed Description */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                <FileText className="w-4 h-4 text-indigo-600" /> Assignment Brief & Instructions
+              </h4>
+              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-2 leading-relaxed">
+                <p className="font-semibold text-slate-900">{selectedAssignment.description}</p>
+                <div className="pt-2 border-t border-slate-200/80 text-[11px] text-slate-600 space-y-1">
+                  <div><strong>Submission Guidelines:</strong> {selectedAssignment.instructions}</div>
+                  <div><strong>Allowed File Types:</strong> {selectedAssignment.submissionType}</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Reference Attachment Box */}
+            <div className="p-3 rounded-2xl bg-indigo-50/50 border border-indigo-100 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-white border border-indigo-200 flex items-center justify-center text-indigo-600 shadow-2xs">
+                  <Paperclip className="w-4 h-4" />
+                </div>
+                <div>
+                  <h5 className="text-xs font-bold text-slate-900">{selectedAssignment.attachmentName}</h5>
+                  <span className="text-[10px] text-slate-500 font-mono">{selectedAssignment.attachmentSize} • Official Course PDF</span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => alert(`📥 Downloading question paper: ${selectedAssignment.attachmentName}`)}
+                className="px-3 py-1.5 rounded-xl bg-white hover:bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5"
+              >
+                <Download className="w-3.5 h-3.5" /> Download PDF
+              </button>
+            </div>
+
+            {/* Status / Submission Area */}
+            {selectedAssignment.status === 'EVALUATED' && (
+              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                    <span className="text-xs font-black text-emerald-900 uppercase">Assignment Evaluated & Graded</span>
+                  </div>
+                  <span className="px-2.5 py-1 rounded-full bg-emerald-600 text-white font-mono font-black text-xs">
+                    Score: {selectedAssignment.obtainedMarks}/{selectedAssignment.maxMarks} ({selectedAssignment.grade})
+                  </span>
+                </div>
+                <p className="text-xs text-emerald-800 font-medium bg-white/70 p-2.5 rounded-xl border border-emerald-200/60">
+                  <strong>Faculty Feedback:</strong> "{selectedAssignment.facultyRemark}"
+                </p>
+                <div className="text-[10px] text-slate-500 font-mono">
+                  Submitted file: {selectedAssignment.submittedFileName} on {selectedAssignment.submittedDate}
+                </div>
+              </div>
+            )}
+
+            {selectedAssignment.status === 'SUBMITTED' && (
+              <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-blue-600" />
+                    <span className="text-xs font-black text-blue-900 uppercase">Submitted — Under Evaluation</span>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full bg-blue-200 text-blue-900 font-mono font-bold text-[10px]">
+                    Pending Grade
+                  </span>
+                </div>
+                <div className="text-xs text-blue-900 bg-white/70 p-2.5 rounded-xl border border-blue-200/60 space-y-1">
+                  <div><strong>File:</strong> <span className="font-mono text-[11px]">{selectedAssignment.submittedFileName}</span></div>
+                  <div><strong>Turned in:</strong> {selectedAssignment.submittedDate}</div>
+                  <div><strong>Remarks:</strong> {selectedAssignment.facultyRemark}</div>
+                </div>
+              </div>
+            )}
+
+            {selectedAssignment.status === 'PENDING' && (
+              <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-amber-900 uppercase flex items-center gap-1.5">
+                    <Clock className="w-4 h-4 text-amber-600" /> Online Solution Submission
+                  </span>
+                  <span className="text-[10px] text-amber-800 font-mono font-bold">
+                    Due by {selectedAssignment.dueTime}
+                  </span>
+                </div>
+
+                {assignmentSubmitSuccess ? (
+                  <div className="p-3 bg-emerald-600 text-white rounded-xl text-center text-xs font-bold animate-fadeIn flex items-center justify-center gap-2">
+                    <CheckCircle2 className="w-4 h-4" /> Solution uploaded successfully! Status updated to SUBMITTED.
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="border-2 border-dashed border-amber-300 rounded-xl p-4 text-center bg-white/60 hover:bg-white transition-colors cursor-pointer">
+                      <UploadCloud className="w-6 h-6 text-amber-600 mx-auto mb-1" />
+                      <p className="text-xs font-bold text-slate-800">
+                        Drag and drop your assignment solution file here, or click to browse
+                      </p>
+                      <p className="text-[10px] text-slate-500 font-mono mt-0.5">
+                        PDF, DOCX, ZIP (Max 15MB) • Enrollment No: {user?.rollNo || '2401031601137'}
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => handleSimulateSubmitAssignment(selectedAssignment.id)}
+                      disabled={submittingAssignmentId === selectedAssignment.id}
+                      className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs transition-all shadow-md flex items-center justify-center gap-2"
+                    >
+                      {submittingAssignmentId === selectedAssignment.id ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 animate-spin" /> Uploading to MUIT Server...
+                        </>
+                      ) : (
+                        <>
+                          <UploadCloud className="w-4 h-4" /> Submit Assignment Online
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Official Link Banner in Modal */}
+            <div className="p-3 rounded-2xl bg-slate-900 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-2 truncate">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+                <span className="text-slate-300 truncate">Official Portal:</span>
+                <code className="text-indigo-300 text-[10px] font-mono truncate">
+                  https://stdlogin.muituniversity.in/Student/VAssignment
+                </code>
+              </div>
+              <a
+                href={MUIT_ASSIGNMENT_PORTAL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-1 transition-all"
+              >
+                Open in MUIT Portal <ExternalLink className="w-3 h-3" />
+              </a>
+            </div>
+
+            {/* Modal Bottom Buttons */}
+            <div className="pt-2 border-t border-slate-200 flex justify-between items-center gap-3">
+              <a
+                href={MUIT_ASSIGNMENT_PORTAL_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-xs flex items-center gap-1.5 transition-colors"
+              >
+                <ExternalLink className="w-3.5 h-3.5" /> Direct ERP Access
+              </a>
+
+              <button
+                onClick={() => setSelectedAssignment(null)}
+                className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md"
+              >
+                Close
+              </button>
+            </div>
+
           </div>
         </div>
       )}
