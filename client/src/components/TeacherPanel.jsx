@@ -8,7 +8,7 @@ import {
   RefreshCw, 
   AlertTriangle, 
   CheckCircle2, 
-  MessageSquare, 
+  BookOpen, 
   LineChart, 
   FileSpreadsheet, 
   Volume2, 
@@ -24,8 +24,20 @@ import {
   UserCheck,
   UserX,
   Sliders,
-  BellRing
+  BellRing,
+  Plus,
+  Search,
+  FileText,
+  Eye,
+  Paperclip,
+  AlertCircle,
+  Filter
 } from 'lucide-react';
+import { 
+  getStoredAssignments, 
+  addTeacherAssignment, 
+  BCA_STUDENTS_ROSTER 
+} from './muitAssignmentsData';
 
 export default function TeacherPanel({ user, activeSession, setActiveSession, globalAttendanceRecords = [] }) {
   const [classes, setClasses] = useState([]);
@@ -34,9 +46,54 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
   const [filterStatus, setFilterStatus] = useState('ALL'); // 'ALL', 'PRESENT', 'ABSENT'
   const [loading, setLoading] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
-  const [customSmsText, setCustomSmsText] = useState('Reminder: BCA V-B lecture starts now in Room B-302. Please scan class QR code.');
-  const [smsSentNotice, setSmsSentNotice] = useState(false);
   const [showAllFeedModal, setShowAllFeedModal] = useState(false);
+
+  // Teacher Coursework & Assignments State
+  const [assignments, setAssignments] = useState(getStoredAssignments);
+  const [teacherSubjectFilter, setTeacherSubjectFilter] = useState('ALL');
+  const [selectedAssignmentSubmissions, setSelectedAssignmentSubmissions] = useState(null);
+  const [submissionFilterTab, setSubmissionFilterTab] = useState('ALL'); // 'ALL', 'SUBMITTED', 'PENDING'
+  const [submissionSearch, setSubmissionSearch] = useState('');
+  const [showTeacherUploadModal, setShowTeacherUploadModal] = useState(false);
+  const [previewStudentSubmission, setPreviewStudentSubmission] = useState(null);
+  const [assignmentUploadToast, setAssignmentUploadToast] = useState(null);
+  const [remindedStudents, setRemindedStudents] = useState({});
+
+  // Teacher Upload Form state
+  const [newAssignmentForm, setNewAssignmentForm] = useState({
+    code: 'BCA501',
+    subject: 'COMPUTER GRAPHICS',
+    title: '',
+    fileName: '',
+    questions: '',
+    dueDate: '2026-11-25'
+  });
+
+  // Listen for student submissions or teacher uploads in real time
+  useEffect(() => {
+    const handleSync = (e) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setAssignments(e.detail);
+        setSelectedAssignmentSubmissions(prev => {
+          if (!prev) return null;
+          return e.detail.find(a => a.sNo === prev.sNo) || prev;
+        });
+      } else {
+        const fresh = getStoredAssignments();
+        setAssignments(fresh);
+        setSelectedAssignmentSubmissions(prev => {
+          if (!prev) return null;
+          return fresh.find(a => a.sNo === prev.sNo) || prev;
+        });
+      }
+    };
+    window.addEventListener('scan2attend_assignments_updated', handleSync);
+    window.addEventListener('storage', handleSync);
+    return () => {
+      window.removeEventListener('scan2attend_assignments_updated', handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
+  }, []);
 
   // Initial classes setup
   useEffect(() => {
@@ -253,9 +310,75 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
   const totalEnrolled = 65;
   const attendancePercentage = Math.round((presentCount / totalEnrolled) * 100);
 
-  const handleSendSms = () => {
-    setSmsSentNotice(true);
-    setTimeout(() => setSmsSentNotice(false), 3500);
+  const handlePublishTeacherAssignment = (e) => {
+    e.preventDefault();
+    if (!newAssignmentForm.title.trim()) {
+      alert('Please enter assignment topic or title');
+      return;
+    }
+    const cleanTitle = newAssignmentForm.title.trim();
+    const fileName = newAssignmentForm.fileName.trim() || 
+      `${newAssignmentForm.code}_${cleanTitle.replace(/[^a-zA-Z0-9_-]/g, '_')}.pdf`;
+    
+    const questionsList = newAssignmentForm.questions
+      .split('\n')
+      .map(q => q.trim())
+      .filter(Boolean);
+
+    const created = addTeacherAssignment({
+      code: newAssignmentForm.code,
+      subject: newAssignmentForm.subject,
+      title: cleanTitle,
+      fileName: fileName,
+      fileType: fileName.toLowerCase().endsWith('.docx') ? 'docx' : 'pdf',
+      questions: questionsList.length > 0 ? questionsList : [
+        `1. Comprehensive problem set for ${cleanTitle} as per university curriculum.`,
+        `2. Show complete step-by-step mathematical reasoning and pseudo-code algorithm.`,
+        `3. Submit properly formatted solution PDF before deadline ${newAssignmentForm.dueDate}.`
+      ],
+      dueDate: newAssignmentForm.dueDate,
+      uploadedByTeacher: user?.name || 'Prof. Dhananjay Kr. Yadav'
+    });
+
+    setAssignments(getStoredAssignments());
+    setShowTeacherUploadModal(false);
+    setNewAssignmentForm({
+      code: 'BCA501',
+      subject: 'COMPUTER GRAPHICS',
+      title: '',
+      fileName: '',
+      questions: '',
+      dueDate: '2026-11-25'
+    });
+
+    setAssignmentUploadToast(`🎉 Assignment #${created.sNo} published successfully! Visible on Student Dashboard.`);
+    setTimeout(() => setAssignmentUploadToast(null), 5000);
+  };
+
+  const handleSendStudentReminder = (rollNo, studentName) => {
+    setRemindedStudents(prev => ({ ...prev, [rollNo]: true }));
+    setAssignmentUploadToast(`🔔 Reminder sent to ${studentName} (${rollNo})!`);
+    setTimeout(() => setAssignmentUploadToast(null), 3500);
+  };
+
+  const handleExportSubmissionsCsv = (asn) => {
+    if (!asn) return;
+    const subs = asn.submissions || [];
+    const csvHeader = "Roll No,Student Name,Status,Submission Date & Time,Submitted File Name\n";
+    const rows = BCA_STUDENTS_ROSTER.map(st => {
+      const sub = subs.find(s => s.rollNo === st.rollNo || s.studentName === st.studentName);
+      if (sub) {
+        return `"${st.rollNo}","${st.studentName}","SUBMITTED","${sub.submittedAt}","${sub.fileName}"`;
+      }
+      return `"${st.rollNo}","${st.studentName}","PENDING","—","—"`;
+    }).join("\n");
+    const blob = new Blob([csvHeader + rows], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Submissions_${asn.code}_Assign_${asn.sNo}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   const handleExportCsv = () => {
@@ -658,39 +781,126 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
           </div>
         </div>
 
-        {/* CARD 5: 3D FACULTY SMS DISPATCHER GATEWAY */}
+        {/* CARD 5: ASSIGNMENT MANAGEMENT & STUDENT SUBMISSIONS TRACKER */}
         <div className="card-3d p-6 space-y-4 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
           <div className="space-y-3">
-            <div className="flex justify-between items-center">
+            {/* Header */}
+            <div className="flex justify-between items-center h-6">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <MessageSquare className="w-4 h-4 text-indigo-600" /> Faculty SMS Broadcast
+                <BookOpen className="w-4 h-4 text-indigo-600" /> Assignment
               </span>
+
+              <button
+                onClick={() => setShowTeacherUploadModal(true)}
+                className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold shadow-xs transition-all flex items-center gap-1"
+                title="Upload New Coursework Assignment"
+              >
+                <Plus className="w-3 h-3" /> Upload Assignment
+              </button>
             </div>
 
-            <p className="text-xs text-slate-500 font-medium">
-              Broadcast SMS alerts directly to student and parent mobile numbers.
-            </p>
+            {/* Subject Filter Pills */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b border-slate-200 text-[10px] font-bold h-7">
+              {['ALL', 'BCA501', 'BCA502', 'BCA503', 'BCA504', 'BCA511', 'BCA512'].map((code) => (
+                <button
+                  key={code}
+                  onClick={() => setTeacherSubjectFilter(code)}
+                  className={`px-2 py-0.5 rounded-md transition-all shrink-0 ${
+                    teacherSubjectFilter === code
+                      ? 'bg-indigo-600 text-white font-black shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {code}
+                </button>
+              ))}
+            </div>
 
-            <textarea
-              rows="3"
-              value={customSmsText}
-              onChange={(e) => setCustomSmsText(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 font-medium focus:outline-none focus:border-indigo-500"
-              placeholder="Type SMS announcement..."
-            />
+            {/* Assignment List with Real-Time Submissions Counter */}
+            <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
+              {assignments
+                .filter(asn => teacherSubjectFilter === 'ALL' || asn.code === teacherSubjectFilter)
+                .map((asn) => {
+                  const subCount = asn.submissions ? asn.submissions.length : 0;
+                  const totalStudents = BCA_STUDENTS_ROSTER.length; // 65
+                  const pct = Math.round((subCount / totalStudents) * 100);
 
-            {smsSentNotice && (
-              <div className="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold flex items-center gap-1.5 animate-fadeIn">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" /> SMS Broadcast Sent to Section A Students!
+                  return (
+                    <div
+                      key={asn.sNo}
+                      className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90 hover:border-indigo-400 hover:bg-white transition-all space-y-1.5 group"
+                    >
+                      {/* Top: S.No + Code + Subject + Faculty New Badge */}
+                      <div className="flex items-center justify-between text-[10px]">
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="font-mono font-bold bg-slate-200 text-slate-800 px-1 py-0.2 rounded text-[9px]">
+                            #{asn.sNo}
+                          </span>
+                          <span className="font-mono font-black text-indigo-700 bg-indigo-50 px-1 py-0.2 rounded border border-indigo-200 text-[9px]">
+                            {asn.code}
+                          </span>
+                          {asn.isNewFacultyUpload && (
+                            <span className="font-black text-purple-700 bg-purple-100 px-1.5 py-0.2 rounded border border-purple-300 text-[8px] animate-pulse">
+                              FACULTY NEW
+                            </span>
+                          )}
+                          <span className="font-extrabold text-slate-900 truncate max-w-[150px]" title={asn.subject}>
+                            {asn.subject}
+                          </span>
+                        </div>
+                        <span className="text-[9px] text-slate-400 font-mono">
+                          Due: {asn.dueDate || 'Nov 20'}
+                        </span>
+                      </div>
+
+                      {/* File info */}
+                      <div className="text-[11px] font-bold text-slate-700 truncate flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                        <span className="truncate">{asn.fileName}</span>
+                      </div>
+
+                      {/* Submission tracker row */}
+                      <div className="flex items-center justify-between gap-1 pt-1 border-t border-slate-200/70 text-[10px]">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-slate-400 text-[9px]">Submissions:</span>
+                          <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 text-[9px]">
+                            ✓ {subCount}/{totalStudents} ({pct}%)
+                          </span>
+                        </div>
+
+                        <button
+                          onClick={() => setSelectedAssignmentSubmissions(asn)}
+                          className="px-2 py-0.5 rounded bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[10px] shrink-0 shadow-2xs flex items-center gap-1 transition-all"
+                          title="View submitted student list & files"
+                        >
+                          <Users className="w-2.5 h-2.5" /> View Submissions
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+
+              {assignments.filter(asn => teacherSubjectFilter === 'ALL' || asn.code === teacherSubjectFilter).length === 0 && (
+                <div className="py-6 text-center text-slate-400 text-xs">
+                  No assignments found for this subject filter.
+                </div>
+              )}
+            </div>
+
+            {/* Success toast notification */}
+            {assignmentUploadToast && (
+              <div className="p-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold flex items-center gap-1.5 animate-fadeIn">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> {assignmentUploadToast}
               </div>
             )}
           </div>
 
+          {/* Bottom Button */}
           <button
-            onClick={handleSendSms}
-            className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black transition-all shadow-md flex items-center justify-center gap-1.5"
+            onClick={() => setShowTeacherUploadModal(true)}
+            className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black transition-all shadow-md flex items-center justify-center gap-1.5 mt-1"
           >
-            <Send className="w-3.5 h-3.5" /> Broadcast Class SMS
+            <Plus className="w-3.5 h-3.5" /> + Upload New Assignment for Students
           </button>
         </div>
 
@@ -852,6 +1062,528 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
 
           </div>
 
+        </div>
+      )}
+
+      {/* MODAL 1: TEACHER UPLOAD NEW ASSIGNMENT MODAL */}
+      {showTeacherUploadModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="max-w-xl w-full bg-white rounded-3xl p-6 space-y-4 shadow-2xl border border-slate-200 max-h-[92vh] flex flex-col">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-200 shadow-inner">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900">
+                    Upload & Publish Assignment
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Upload new coursework assignment for BCA 5th Semester students
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowTeacherUploadModal(false)}
+                className="p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Upload Form */}
+            <form onSubmit={handlePublishTeacherAssignment} className="space-y-3.5 flex-1 overflow-y-auto pr-1">
+              
+              {/* Subject Selector */}
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Subject & Code:
+                </label>
+                <select
+                  value={newAssignmentForm.code}
+                  onChange={(e) => {
+                    const code = e.target.value;
+                    const subjectNames = {
+                      BCA501: 'COMPUTER GRAPHICS',
+                      BCA502: 'CRYPTOGRAPHY AND NETWORK SECURITY',
+                      BCA503: 'WEB TECHNOLOGY',
+                      BCA504: 'MINOR PROJECT',
+                      BCA511: 'COMPUTER GRAPHICS LAB',
+                      BCA512: 'WEB TECHNOLOGY LAB'
+                    };
+                    setNewAssignmentForm(prev => ({
+                      ...prev,
+                      code,
+                      subject: subjectNames[code] || prev.subject
+                    }));
+                  }}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 font-bold focus:outline-none focus:border-indigo-500"
+                >
+                  <option value="BCA501">BCA501 - COMPUTER GRAPHICS</option>
+                  <option value="BCA502">BCA502 - CRYPTOGRAPHY AND NETWORK SECURITY</option>
+                  <option value="BCA503">BCA503 - WEB TECHNOLOGY</option>
+                  <option value="BCA504">BCA504 - MINOR PROJECT</option>
+                  <option value="BCA511">BCA511 - COMPUTER GRAPHICS LAB</option>
+                  <option value="BCA512">BCA512 - WEB TECHNOLOGY LAB</option>
+                </select>
+              </div>
+
+              {/* Assignment Topic / Title */}
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Assignment Title / Topic: *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Unit 4: 3D Geometric Transformations & Projections"
+                  value={newAssignmentForm.title}
+                  onChange={(e) => setNewAssignmentForm(prev => ({ ...prev, title: e.target.value }))}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 font-medium focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              {/* Assignment File / Document Name */}
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Assignment Document File (.pdf / .docx):
+                </label>
+                <div className="flex gap-2 items-center">
+                  <input
+                    type="text"
+                    placeholder="e.g. BCA501_Assignment_4_3D_Transformations.pdf"
+                    value={newAssignmentForm.fileName}
+                    onChange={(e) => setNewAssignmentForm(prev => ({ ...prev, fileName: e.target.value }))}
+                    className="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 font-medium focus:outline-none focus:border-indigo-500"
+                  />
+                  <label className="px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold cursor-pointer border border-slate-300 flex items-center gap-1.5 shrink-0">
+                    <Paperclip className="w-3.5 h-3.5" /> Browse
+                    <input
+                      type="file"
+                      accept=".pdf,.docx,.doc"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setNewAssignmentForm(prev => ({ ...prev, fileName: file.name }));
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              {/* Due Date */}
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Submission Deadline / Due Date:
+                </label>
+                <input
+                  type="date"
+                  value={newAssignmentForm.dueDate}
+                  onChange={(e) => setNewAssignmentForm(prev => ({ ...prev, dueDate: e.target.value }))}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 font-medium focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              {/* Assignment Questions / Problem Statement */}
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Assignment Questions / Problem Statement (1 per line):
+                </label>
+                <textarea
+                  rows="4"
+                  placeholder="Question 1: Derive 3D rotation matrix about arbitrary axis.&#10;Question 2: Differentiate between parallel and perspective projection.&#10;Question 3: Implement Z-buffer hidden surface removal algorithm."
+                  value={newAssignmentForm.questions}
+                  onChange={(e) => setNewAssignmentForm(prev => ({ ...prev, questions: e.target.value }))}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-900 font-medium focus:outline-none focus:border-indigo-500"
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-2 border-t border-slate-200 flex justify-end gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setShowTeacherUploadModal(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md flex items-center gap-1.5"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Publish to Student Dashboard
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 2: ASSIGNMENT SUBMISSIONS INSPECTOR MODAL */}
+      {selectedAssignmentSubmissions && (() => {
+        const asn = selectedAssignmentSubmissions;
+        const subs = asn.submissions || [];
+        const totalStudents = BCA_STUDENTS_ROSTER.length; // 65
+        const submittedRolls = new Set(subs.map(s => s.rollNo));
+        const submittedStudents = subs;
+        const pendingStudents = BCA_STUDENTS_ROSTER.filter(st => !submittedRolls.has(st.rollNo));
+        const pct = Math.round((submittedStudents.length / totalStudents) * 100);
+
+        // Filter list based on tab and search
+        const q = submissionSearch.trim().toLowerCase();
+        let displayList = [];
+        if (submissionFilterTab === 'SUBMITTED') {
+          displayList = submittedStudents.map(s => ({ ...s, isSubmitted: true }));
+        } else if (submissionFilterTab === 'PENDING') {
+          displayList = pendingStudents.map(st => ({ ...st, isSubmitted: false }));
+        } else {
+          // ALL
+          displayList = [
+            ...submittedStudents.map(s => ({ ...s, isSubmitted: true })),
+            ...pendingStudents.map(st => ({ ...st, isSubmitted: false }))
+          ];
+        }
+
+        if (q) {
+          displayList = displayList.filter(item => 
+            (item.studentName && item.studentName.toLowerCase().includes(q)) ||
+            (item.rollNo && item.rollNo.includes(q)) ||
+            (item.fileName && item.fileName.toLowerCase().includes(q))
+          );
+        }
+
+        return (
+          <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+            <div className="max-w-4xl w-full bg-white rounded-3xl p-6 space-y-4 shadow-2xl border border-slate-200 max-h-[92vh] flex flex-col">
+              
+              {/* Header */}
+              <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-200 shadow-inner">
+                    <BookOpen className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-black text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200 text-xs">
+                        {asn.code}
+                      </span>
+                      <h3 className="text-base font-black text-slate-900 truncate max-w-lg">
+                        Assignment #{asn.sNo}: {asn.subject}
+                      </h3>
+                    </div>
+                    <p className="text-xs text-slate-500 font-medium mt-0.5 flex items-center gap-2">
+                      <span className="font-semibold text-slate-700">{asn.fileName}</span>
+                      <span>• Due Date: {asn.dueDate || '2026-11-20'}</span>
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setSelectedAssignmentSubmissions(null)}
+                  className="p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* 3 Metric Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-center">
+                  <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Total Enrolled</span>
+                  <span className="text-xl font-black text-slate-900 font-mono">{totalStudents}</span>
+                  <span className="text-[10px] text-slate-500 block font-medium">BCA 5th Semester</span>
+                </div>
+                <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-center">
+                  <span className="text-[10px] uppercase font-bold text-emerald-600 block tracking-wider">Total Submitted</span>
+                  <span className="text-xl font-black text-emerald-700 font-mono">{submittedStudents.length}</span>
+                  <span className="text-[10px] text-emerald-600 block font-bold">{pct}% Submission Rate</span>
+                </div>
+                <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-center">
+                  <span className="text-[10px] uppercase font-bold text-amber-600 block tracking-wider">Pending Upload</span>
+                  <span className="text-xl font-black text-amber-700 font-mono">{pendingStudents.length}</span>
+                  <span className="text-[10px] text-amber-600 block font-medium">{100 - pct}% Awaiting upload</span>
+                </div>
+              </div>
+
+              {/* Filter Tabs & Search Bar */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-50 p-2.5 rounded-2xl border border-slate-200">
+                <div className="flex items-center gap-1.5">
+                  <button
+                    onClick={() => setSubmissionFilterTab('ALL')}
+                    className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all ${
+                      submissionFilterTab === 'ALL'
+                        ? 'bg-indigo-600 text-white shadow-xs'
+                        : 'bg-white text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    All ({totalStudents})
+                  </button>
+                  <button
+                    onClick={() => setSubmissionFilterTab('SUBMITTED')}
+                    className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all ${
+                      submissionFilterTab === 'SUBMITTED'
+                        ? 'bg-emerald-600 text-white shadow-xs'
+                        : 'bg-white text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    Submitted ({submittedStudents.length})
+                  </button>
+                  <button
+                    onClick={() => setSubmissionFilterTab('PENDING')}
+                    className={`px-3 py-1.5 rounded-xl font-bold text-xs transition-all ${
+                      submissionFilterTab === 'PENDING'
+                        ? 'bg-amber-600 text-white shadow-xs'
+                        : 'bg-white text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    Pending ({pendingStudents.length})
+                  </button>
+                </div>
+
+                <div className="relative min-w-[220px]">
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Search student or roll no..."
+                    value={submissionSearch}
+                    onChange={(e) => setSubmissionSearch(e.target.value)}
+                    className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-500 shadow-2xs"
+                  />
+                </div>
+              </div>
+
+              {/* Submissions Table */}
+              <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-2xs flex-1">
+                <div className="max-h-[42vh] overflow-y-auto">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead className="sticky top-0 z-10 bg-slate-900 text-white font-bold text-[11px] tracking-wide uppercase">
+                      <tr>
+                        <th className="py-2.5 px-3 text-center w-12">#</th>
+                        <th className="py-2.5 px-3 w-32">Roll Number</th>
+                        <th className="py-2.5 px-3">Student Name</th>
+                        <th className="py-2.5 px-3">Status</th>
+                        <th className="py-2.5 px-3">Submission Details</th>
+                        <th className="py-2.5 px-3 text-center w-36">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
+                      {displayList.map((st, idx) => (
+                        <tr key={st.rollNo || idx} className="hover:bg-slate-50 transition-colors">
+                          <td className="py-2 px-3 text-center font-mono font-bold text-slate-500 text-xs">
+                            {idx + 1}
+                          </td>
+                          <td className="py-2 px-3 font-mono font-bold text-slate-900 text-xs">
+                            {st.rollNo}
+                          </td>
+                          <td className="py-2 px-3 font-extrabold text-slate-900 text-xs">
+                            {st.studentName}
+                          </td>
+                          <td className="py-2 px-3">
+                            {st.isSubmitted ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <Check className="w-3 h-3 text-emerald-600" /> SUBMITTED
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-50 text-amber-700 border border-amber-200">
+                                <Clock className="w-3 h-3 text-amber-500" /> PENDING
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-2 px-3 text-xs">
+                            {st.isSubmitted ? (
+                              <div>
+                                <span className="font-bold text-slate-800 block truncate max-w-[220px]" title={st.fileName}>
+                                  📄 {st.fileName}
+                                </span>
+                                <span className="text-[10px] text-slate-400 font-mono">
+                                  {st.submittedAt}
+                                </span>
+                              </div>
+                            ) : (
+                              <span className="text-slate-400 font-mono text-xs italic">— Not uploaded yet —</span>
+                            )}
+                          </td>
+                          <td className="py-2 px-3 text-center">
+                            {st.isSubmitted ? (
+                              <button
+                                onClick={() => setPreviewStudentSubmission({
+                                  ...st,
+                                  assignment: asn
+                                })}
+                                className="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-[11px] shadow-2xs flex items-center justify-center gap-1 mx-auto transition-all"
+                              >
+                                <Eye className="w-3 h-3" /> View Solution
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleSendStudentReminder(st.rollNo, st.studentName)}
+                                disabled={remindedStudents[st.rollNo]}
+                                className={`px-2.5 py-1 rounded-lg font-bold text-[11px] shadow-2xs flex items-center justify-center gap-1 mx-auto transition-all ${
+                                  remindedStudents[st.rollNo]
+                                    ? 'bg-slate-200 text-slate-500 cursor-not-allowed'
+                                    : 'bg-amber-500 hover:bg-amber-600 text-white'
+                                }`}
+                              >
+                                <Send className="w-3 h-3" /> {remindedStudents[st.rollNo] ? 'Reminded' : 'Send Reminder'}
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+
+                      {displayList.length === 0 && (
+                        <tr>
+                          <td colSpan="6" className="py-8 text-center text-slate-400 text-xs">
+                            No students found matching your criteria.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-slate-200">
+                <button
+                  onClick={() => handleExportSubmissionsCsv(asn)}
+                  className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center gap-1.5 border border-slate-200 transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5 text-indigo-600" /> Export Submissions CSV Report
+                </button>
+
+                <button
+                  onClick={() => setSelectedAssignmentSubmissions(null)}
+                  className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md"
+                >
+                  Close Inspector
+                </button>
+              </div>
+
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* MODAL 3: STUDENT SOLUTION DOCUMENT PREVIEW MODAL */}
+      {previewStudentSubmission && (
+        <div className="fixed inset-0 z-[60] bg-slate-950/85 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="max-w-2xl w-full bg-white rounded-3xl p-6 space-y-4 shadow-2xl border border-slate-200 max-h-[92vh] flex flex-col">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-200 shadow-inner">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900">
+                    Student Submitted Solution
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">
+                    {previewStudentSubmission.studentName} • Roll No: {previewStudentSubmission.rollNo}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setPreviewStudentSubmission(null)}
+                className="p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Document Details Card */}
+            <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-2">
+              <div className="flex justify-between items-center text-[11px]">
+                <span className="text-slate-500 font-semibold">Subject & Code:</span>
+                <span className="font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded border border-indigo-200">
+                  {previewStudentSubmission.assignment?.code} - {previewStudentSubmission.assignment?.subject}
+                </span>
+              </div>
+              <div className="flex justify-between items-center text-[11px]">
+                <span className="text-slate-500 font-semibold">Submitted File:</span>
+                <span className="font-mono font-bold text-slate-900">{previewStudentSubmission.fileName}</span>
+              </div>
+              <div className="flex justify-between items-center text-[11px]">
+                <span className="text-slate-500 font-semibold">Submitted At:</span>
+                <span className="font-mono text-emerald-700 font-bold">{previewStudentSubmission.submittedAt}</span>
+              </div>
+              <div className="flex justify-between items-center text-[11px]">
+                <span className="text-slate-500 font-semibold">Verification Hash:</span>
+                <span className="font-mono text-slate-400 text-[10px]">SHA256:7a8b9c0d1e2f3a4b</span>
+              </div>
+            </div>
+
+            {/* Solution Sheet Preview Body */}
+            <div className="flex-1 overflow-y-auto space-y-3 p-4 bg-white border border-slate-200 rounded-2xl text-xs">
+              <div className="border-b border-slate-200 pb-2">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Assignment Topic</span>
+                <p className="font-black text-slate-900 text-sm">{previewStudentSubmission.assignment?.topic || previewStudentSubmission.assignment?.subject}</p>
+              </div>
+
+              <div className="space-y-2.5">
+                <span className="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Student Solution & Answers</span>
+                {(previewStudentSubmission.assignment?.questions || [
+                  'Question 1: Explain the fundamental principles and provide complete derivation.',
+                  'Question 2: Provide implementation code and complexity analysis.'
+                ]).map((q, qIdx) => (
+                  <div key={qIdx} className="p-3 bg-slate-50 rounded-xl border border-slate-200/80 space-y-1.5">
+                    <p className="font-bold text-slate-900 text-xs">
+                      Q{qIdx + 1}. {q}
+                    </p>
+                    <div className="p-2.5 bg-white rounded-lg border border-slate-200 text-slate-700 font-serif text-[11px] leading-relaxed">
+                      <p className="font-sans font-semibold text-emerald-800 text-[10px] mb-1">
+                        ✓ Verified Solution by {previewStudentSubmission.studentName}:
+                      </p>
+                      <p>
+                        The problem has been completely solved according to university prescribed standards. All relevant diagrams, mathematical formulation, and algorithmic steps have been documented in the submitted PDF solution document.
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Preview Footer */}
+            <div className="pt-2 border-t border-slate-200 flex justify-between items-center">
+              <button
+                onClick={() => {
+                  const content = `MAHARISHI UNIVERSITY OF INFORMATION TECHNOLOGY\n` +
+                    `Student Coursework Submission: ${previewStudentSubmission.assignment?.subject}\n` +
+                    `Student Name: ${previewStudentSubmission.studentName}\n` +
+                    `Roll Number: ${previewStudentSubmission.rollNo}\n` +
+                    `Submission Date: ${previewStudentSubmission.submittedAt}\n` +
+                    `File: ${previewStudentSubmission.fileName}\n\n` +
+                    `Status: Verified Authentic Academic Submission.`;
+                  const blob = new Blob([content], { type: 'text/plain' });
+                  const url = window.URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = previewStudentSubmission.fileName || 'Solution.pdf';
+                  a.click();
+                  window.URL.revokeObjectURL(url);
+                }}
+                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md"
+              >
+                <Download className="w-3.5 h-3.5" /> Download Student Solution
+              </button>
+
+              <button
+                onClick={() => setPreviewStudentSubmission(null)}
+                className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md"
+              >
+                Close Preview
+              </button>
+            </div>
+
+          </div>
         </div>
       )}
 

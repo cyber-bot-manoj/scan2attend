@@ -39,7 +39,7 @@ import {
   Maximize2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { MUIT_ASSIGNMENTS } from './muitAssignmentsData';
+import { MUIT_ASSIGNMENTS, getStoredAssignments, recordStudentSubmission } from './muitAssignmentsData';
 
 export default function StudentPanel({ user, activeSession, setActiveSession, setActiveTab, onNewAttendance }) {
   const [step, setStep] = useState(1); // 1: Main Dashboard, 2: Verification Flow, 3: Success Confirmation
@@ -402,8 +402,8 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   const [showFullReportModal, setShowFullReportModal] = useState(false);
   const [selectedAuditRecord, setSelectedAuditRecord] = useState(null);
 
-  // Official MUIT Student Coursework & Assignments Database (All 58 items from MUIT Portal)
-  const [assignments, setAssignments] = useState(MUIT_ASSIGNMENTS);
+  // Official MUIT Student Coursework & Assignments Database
+  const [assignments, setAssignments] = useState(getStoredAssignments);
   const [assignmentSubjectFilter, setAssignmentSubjectFilter] = useState('ALL');
   const [assignmentSearch, setAssignmentSearch] = useState('');
   const [selectedAssignmentDoc, setSelectedAssignmentDoc] = useState(null);
@@ -411,6 +411,23 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   const [showAllAssignmentsModal, setShowAllAssignmentsModal] = useState(false);
   const [uploadToast, setUploadToast] = useState(null);
   const [uploadFileNameInput, setUploadFileNameInput] = useState('');
+
+  // Two-way synchronization with Teacher Panel and multi-tabs
+  useEffect(() => {
+    const handleSync = (e) => {
+      if (e.detail && Array.isArray(e.detail)) {
+        setAssignments(e.detail);
+      } else {
+        setAssignments(getStoredAssignments());
+      }
+    };
+    window.addEventListener('scan2attend_assignments_updated', handleSync);
+    window.addEventListener('storage', handleSync);
+    return () => {
+      window.removeEventListener('scan2attend_assignments_updated', handleSync);
+      window.removeEventListener('storage', handleSync);
+    };
+  }, []);
 
   const filteredMuitAssignments = assignments.filter(asn => {
     const matchesSubject = assignmentSubjectFilter === 'ALL' || asn.code === assignmentSubjectFilter;
@@ -425,15 +442,8 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
 
   const handleUploadAssignment = (sNo, customName) => {
     const fileName = customName || uploadFileNameInput.trim() || `${(user?.name || 'Manoj_Sharma').replace(/\s+/g, '_')}_Assignment_${sNo}_Solution.pdf`;
-    setAssignments(prev => prev.map(a => {
-      if (a.sNo === sNo) {
-        return {
-          ...a,
-          uploadedFile: fileName
-        };
-      }
-      return a;
-    }));
+    const updated = recordStudentSubmission(sNo, user?.name, user?.rollNo, fileName);
+    setAssignments(updated);
     if (selectedAssignmentDoc && selectedAssignmentDoc.sNo === sNo) {
       setSelectedAssignmentDoc(prev => ({
         ...prev,
@@ -1269,6 +1279,11 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                       <span className="font-mono font-black text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded border border-emerald-200 text-[9px]">
                         {asn.code}
                       </span>
+                      {asn.isNewFacultyUpload && (
+                        <span className="font-black text-purple-700 bg-purple-100 px-1.5 py-0.2 rounded border border-purple-300 text-[8px] animate-pulse shrink-0">
+                          FACULTY NEW
+                        </span>
+                      )}
                       <span className="font-extrabold text-slate-900 truncate max-w-[140px]" title={asn.subject}>
                         {asn.subject}
                       </span>
@@ -2173,7 +2188,14 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                           {asn.code}
                         </td>
                         <td className="py-2 px-3 font-bold text-slate-900 text-xs">
-                          {asn.subject}
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span>{asn.subject}</span>
+                            {asn.isNewFacultyUpload && (
+                              <span className="px-1.5 py-0.5 rounded-full text-[9px] font-black bg-purple-100 text-purple-700 border border-purple-300 animate-pulse">
+                                FACULTY NEW
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="py-2 px-3">
                           <button

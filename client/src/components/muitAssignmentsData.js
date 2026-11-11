@@ -870,3 +870,202 @@ export const MUIT_ASSIGNMENTS = [
     ]
   }
 ];
+
+// Complete Official BCA 5th Semester Student Roster (All 65 Students)
+export const BCA_STUDENTS_ROSTER = [
+  { studentName: 'MANOJ SHARMA', rollNo: '2401031601137', email: 'manoj.bca24@muit.in' },
+  { studentName: 'ANSH GUPTA', rollNo: '2401031601046', email: 'ansh.bca24@muit.in' },
+  { studentName: 'AYUSH SRIVASTAVA', rollNo: '2401031601077', email: 'ayush.bca24@muit.in' },
+  { studentName: 'AYUSHI GUPTA', rollNo: '2401031601079', email: 'ayushi.bca24@muit.in' },
+  { studentName: 'BADRINATH GUPTA', rollNo: '2401031601080', email: 'badrinath.bca24@muit.in' },
+  { studentName: 'BHAVISHYA PRATAP SINGH', rollNo: '2401031601081', email: 'bhavishya.bca24@muit.in' },
+  { studentName: 'CHAMAN', rollNo: '2401031601082', email: 'chaman.bca24@muit.in' },
+  { studentName: 'CHANDRA PRAKASH SAH', rollNo: '2401031601083', email: 'chandra.bca24@muit.in' },
+  { studentName: 'CHANDRANSH SINGH', rollNo: '2401031601085', email: 'chandransh.bca24@muit.in' },
+  { studentName: 'DARKHSHA KHATOON', rollNo: '2401031601086', email: 'darkhsha.bca24@muit.in' },
+  { studentName: 'DEEPAK', rollNo: '2401031601087', email: 'deepak.bca24@muit.in' },
+  { studentName: 'DHAIRYA DIXIT', rollNo: '2401031601091', email: 'dhairya.bca24@muit.in' },
+  { studentName: 'DIVANCI SAXENA', rollNo: '2401031601264', email: 'divanci.bca24@muit.in' },
+  { studentName: 'DIVYANSH SRIVASTAVA', rollNo: '2401031601094', email: 'divyansh.bca24@muit.in' },
+  { studentName: 'DIVYANSHU PATEL', rollNo: '2401031601095', email: 'divyanshu.bca24@muit.in' },
+  { studentName: 'EKANSHI SHARAN SRIVASTAVA', rollNo: '2401031601098', email: 'ekanshi.bca24@muit.in' },
+  { studentName: 'EKATA', rollNo: '2401031601099', email: 'ekata.bca24@muit.in' },
+  { studentName: 'GARIMA SINGH', rollNo: '2401031601101', email: 'garima.bca24@muit.in' },
+  { studentName: 'GAURAV RAWAT', rollNo: '2401031601102', email: 'gaurav.r.bca24@muit.in' },
+  { studentName: 'GAURAV SHARMA', rollNo: '2401031601103', email: 'gaurav.s.bca24@muit.in' },
+  { studentName: 'HARSH TRIVEDI', rollNo: '2401031601105', email: 'harsh.bca24@muit.in' },
+  { studentName: 'HARSHIT PANDEY', rollNo: '2401031601283', email: 'harshit.p.bca24@muit.in' },
+  { studentName: 'HARSHIT SHUKLA', rollNo: '2401031601107', email: 'harshit.s.bca24@muit.in' },
+  { studentName: 'HEMANT KUMAR PANDEY', rollNo: '2401031601108', email: 'hemant.bca24@muit.in' },
+  { studentName: 'HIMANSHU KUMAR', rollNo: '2401031601110', email: 'himanshu.k.bca24@muit.in' },
+  { studentName: 'HIMANSHU SRIVASTAVA', rollNo: '2401031601262', email: 'himanshu.s.bca24@muit.in' },
+  { studentName: 'INDRAJEET SAHANI', rollNo: '2401031601260', email: 'indrajeet.bca24@muit.in' },
+  { studentName: 'ISHIKA GAUR', rollNo: '2401031601111', email: 'ishika.bca24@muit.in' },
+  { studentName: 'ISHITA DIXIT', rollNo: '2401031601112', email: 'ishita.d.bca24@muit.in' },
+  { studentName: 'ISHITA GUPTA', rollNo: '2401031601113', email: 'ishita.g.bca24@muit.in' },
+  { studentName: 'ISHU AMAN', rollNo: '2401031601263', email: 'ishu.bca24@muit.in' },
+  { studentName: 'JAVED HUSAIN', rollNo: '2401031601115', email: 'javed.bca24@muit.in' },
+  { studentName: 'JAY SHUKLA', rollNo: '2401031601116', email: 'jay.bca24@muit.in' },
+  { studentName: 'KARISHMA SINGH', rollNo: '2401031601119', email: 'karishma.bca24@muit.in' },
+  { studentName: 'KASHIF ANSARI', rollNo: '2401031601120', email: 'kashif.bca24@muit.in' },
+  { studentName: 'KASHISH CHAURASIA', rollNo: '2401031601121', email: 'kashish.bca24@muit.in' },
+  { studentName: 'KAUSHAL KUMAR BHARTI', rollNo: '2401031601122', email: 'kaushal.bca24@muit.in' },
+  { studentName: 'KAVYANSHI SRIVASTAVA', rollNo: '2401031601123', email: 'kavyanshi.bca24@muit.in' },
+  { studentName: 'KHAN MOHD JUNED NOOR MOHAMMED', rollNo: '2401031601125', email: 'juned.bca24@muit.in' },
+  { studentName: 'KHUSHI KANNOUJIYA', rollNo: '2401031601127', email: 'khushi.bca24@muit.in' },
+  { studentName: 'KOMAL SINGH', rollNo: '2401031601129', email: 'komal.bca24@muit.in' },
+  { studentName: 'KULDEEP MAURYA', rollNo: '2401031601130', email: 'kuldeep.bca24@muit.in' },
+  { studentName: 'KUNAL PATEL', rollNo: '2401031601293', email: 'kunal.bca24@muit.in' },
+  { studentName: 'MANDAVI SINGH', rollNo: '2401031601134', email: 'mandavi.bca24@muit.in' },
+  { studentName: 'MANEESH SINGH', rollNo: '2401031601135', email: 'maneesh.bca24@muit.in' },
+  { studentName: 'MANSI YADAV', rollNo: '2401031601138', email: 'mansi.bca24@muit.in' },
+  { studentName: 'MEDHA PANDEY', rollNo: '2401031601139', email: 'medha.bca24@muit.in' },
+  { studentName: 'MOHAMMAD ABDULLA', rollNo: '2401031601140', email: 'abdulla.bca24@muit.in' },
+  { studentName: 'MOHAN SINGH', rollNo: '2401031601287', email: 'mohan.bca24@muit.in' },
+  { studentName: 'MOHD TAUSIF KHAN', rollNo: '2401031601142', email: 'tausif.bca24@muit.in' },
+  { studentName: 'MONU', rollNo: '2401031601144', email: 'monu.bca24@muit.in' },
+  { studentName: 'MUJAHID HUSAIN', rollNo: '2401031601145', email: 'mujahid.bca24@muit.in' },
+  { studentName: 'NANDINI KESHARWANI', rollNo: '2401031601147', email: 'nandini.bca24@muit.in' },
+  { studentName: 'NILESH KUMAR SINGH', rollNo: '2401031601151', email: 'nilesh.bca24@muit.in' },
+  { studentName: 'NISHANT MISHRA', rollNo: '2401031601152', email: 'nishant.bca24@muit.in' },
+  { studentName: 'NITESH KUMAR CHAUHAN', rollNo: '2401031601153', email: 'nitesh.bca24@muit.in' },
+  { studentName: 'NITIN RAJPOOT', rollNo: '2401031601288', email: 'nitin.bca24@muit.in' },
+  { studentName: 'RAVI JAISWAL', rollNo: '2401031601176', email: 'ravi.bca24@muit.in' },
+  { studentName: 'RITIK VERMA', rollNo: '2401031601182', email: 'ritik.bca24@muit.in' },
+  { studentName: 'SHANTANU MISHRA', rollNo: '2401031601203', email: 'shantanu.bca24@muit.in' },
+  { studentName: 'SHIVANSHI TRIPATHI', rollNo: '2401031601214', email: 'shivanshi.bca24@muit.in' },
+  { studentName: 'SHREESH MISHRA', rollNo: '2401031601216', email: 'shreesh.bca24@muit.in' },
+  { studentName: 'YASH SRIVASTAVA', rollNo: '2401031601316', email: 'yash.s.bca24@muit.in' },
+  { studentName: 'YASHIKA UPADHYAY', rollNo: '2401031601251', email: 'yashika.bca24@muit.in' },
+  { studentName: 'Kuldeep Maurya', rollNo: '2401031601130', email: 'kuldeep.m.bca24@muit.in' }
+];
+
+export const generateSeedSubmissions = (sNo, code) => {
+  // Deterministic submitted count between 38 and 58 students out of 65
+  const count = 38 + ((sNo * 7 + 13) % 22);
+  const submissions = [];
+  for (let i = 0; i < count && i < BCA_STUDENTS_ROSTER.length; i++) {
+    const student = BCA_STUDENTS_ROSTER[i];
+    const day = 1 + ((sNo + i) % 10);
+    const hour = 9 + ((sNo * 3 + i) % 8);
+    const min = 10 + ((i * 7) % 50);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour > 12 ? hour - 12 : hour;
+    const cleanName = student.studentName.replace(/\s+/g, '_');
+    submissions.push({
+      studentName: student.studentName,
+      rollNo: student.rollNo,
+      submittedAt: `Nov 0${day}, 2026, ${displayHour < 10 ? '0' + displayHour : displayHour}:${min < 10 ? '0' + min : min} ${ampm}`,
+      fileName: `${cleanName}_${code}_Assign_${sNo}_Solution.pdf`,
+      fileSize: `${(1.2 + ((i % 5) * 0.4)).toFixed(1)} MB`,
+      status: 'SUBMITTED',
+      remarks: 'Verified complete'
+    });
+  }
+  return submissions;
+};
+
+const STORAGE_KEY = 'scan2attend_muit_assignments_v3';
+
+export const getStoredAssignments = () => {
+  if (typeof window === 'undefined') return MUIT_ASSIGNMENTS;
+  try {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (data) {
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.error('Error reading assignments from storage:', e);
+  }
+
+  // First time initialization with seed submissions
+  const initial = MUIT_ASSIGNMENTS.map(item => ({
+    ...item,
+    submissions: generateSeedSubmissions(item.sNo, item.code),
+    uploadedByTeacher: item.uploadedByTeacher || 'Prof. Dhananjay Kr. Yadav',
+    dueDate: item.dueDate || '2026-11-20',
+    createdAt: item.createdAt || '2026-11-01'
+  }));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(initial));
+  } catch (e) {
+    console.error('Error saving initial assignments:', e);
+  }
+  return initial;
+};
+
+export const saveStoredAssignments = (assignmentsList) => {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(assignmentsList));
+    window.dispatchEvent(new CustomEvent('scan2attend_assignments_updated', { detail: assignmentsList }));
+  } catch (e) {
+    console.error('Error saving assignments to storage:', e);
+  }
+};
+
+export const addTeacherAssignment = (assignmentData) => {
+  const current = getStoredAssignments();
+  const nextSNo = current.length > 0 ? Math.max(...current.map(a => a.sNo || 0)) + 1 : 1;
+  const newAssignment = {
+    sNo: nextSNo,
+    code: assignmentData.code || 'BCA501',
+    subject: assignmentData.subject || 'COMPUTER GRAPHICS',
+    fileName: assignmentData.fileName || `${assignmentData.title || 'Assignment'}.pdf`,
+    fileType: assignmentData.fileType || 'pdf',
+    uploadedFile: null,
+    topic: assignmentData.topic || assignmentData.title || 'Coursework Assignment',
+    questions: Array.isArray(assignmentData.questions) 
+      ? assignmentData.questions 
+      : (assignmentData.questions ? assignmentData.questions.split('\n').filter(q => q.trim()) : ['Submit detailed solution according to university guidelines.']),
+    dueDate: assignmentData.dueDate || '2026-11-25',
+    createdAt: new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }),
+    uploadedByTeacher: assignmentData.uploadedByTeacher || 'Faculty Department of Computer Science',
+    isNewFacultyUpload: true,
+    submissions: [] // Initially 0 submissions
+  };
+  const updated = [newAssignment, ...current];
+  saveStoredAssignments(updated);
+  return newAssignment;
+};
+
+export const recordStudentSubmission = (sNo, studentName, rollNo, fileName) => {
+  const current = getStoredAssignments();
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) + 
+    ', ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+  const updated = current.map(asn => {
+    if (asn.sNo === sNo) {
+      const existingSubs = Array.isArray(asn.submissions) ? [...asn.submissions] : [];
+      const existingIdx = existingSubs.findIndex(s => s.rollNo === rollNo || s.studentName === studentName);
+      const submissionRecord = {
+        studentName: studentName || 'MANOJ SHARMA',
+        rollNo: rollNo || '2401031601137',
+        submittedAt: dateStr,
+        fileName: fileName || `${(studentName || 'Manoj').replace(/\s+/g, '_')}_Assign_${sNo}_Solution.pdf`,
+        fileSize: '1.8 MB',
+        status: 'SUBMITTED',
+        remarks: 'Student portal submission verified'
+      };
+      if (existingIdx >= 0) {
+        existingSubs[existingIdx] = submissionRecord;
+      } else {
+        existingSubs.unshift(submissionRecord);
+      }
+      return {
+        ...asn,
+        uploadedFile: fileName,
+        submissions: existingSubs
+      };
+    }
+    return asn;
+  });
+
+  saveStoredAssignments(updated);
+  return updated;
+};
+
