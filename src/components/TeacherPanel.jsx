@@ -757,14 +757,6 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <LineChart className="w-4 h-4 text-blue-600" /> Academic Performance
               </span>
-
-              <button
-                onClick={() => setShowPerformanceModal(true)}
-                className="p-1 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors"
-                title="Open Academic Performance Report"
-              >
-                <Maximize2 className="w-4 h-4" />
-              </button>
             </div>
 
             {/* Metric Snapshot */}
