@@ -2098,11 +2098,8 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                 </div>
                 <div>
                   <h3 className="text-lg font-black text-slate-900">
-                    Official Student Coursework & Assignments Directory
+                    Assignment
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">
-                    Maharishi University of Information Technology • BCA Semester V • Total 58 Assignments
-                  </p>
                 </div>
               </div>
               <button
@@ -2219,10 +2216,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
             </div>
 
             {/* Modal Footer */}
-            <div className="flex justify-between items-center pt-2 border-t border-slate-200">
-              <span className="text-xs text-slate-500 font-medium">
-                Total {filteredMuitAssignments.length} of {assignments.length} assignments displayed
-              </span>
+            <div className="flex justify-end items-center pt-2 border-t border-slate-200">
               <button
                 onClick={() => setShowAllAssignmentsModal(false)}
                 className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md"
