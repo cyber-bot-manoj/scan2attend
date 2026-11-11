@@ -59,7 +59,6 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
   const [assignmentUploadToast, setAssignmentUploadToast] = useState(null);
   const [remindedStudents, setRemindedStudents] = useState({});
   const [showPerformanceModal, setShowPerformanceModal] = useState(false);
-  const [selectedPerformanceSubject, setSelectedPerformanceSubject] = useState('ALL');
   const [performanceTab, setPerformanceTab] = useState('TIMELINE'); // 'TIMELINE', 'SUBJECTS', 'COHORT'
 
   // Teacher Upload Form state
@@ -750,43 +749,26 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
           </div>
         </div>
 
-        {/* CARD 4: ACADEMIC PERFORMANCE OVER TIME & ANALYTICS */}
+        {/* CARD 4: ACADEMIC PERFORMANCE */}
         <div className="card-3d p-6 space-y-4 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
           <div className="space-y-3">
             {/* Header */}
             <div className="flex justify-between items-center h-6">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <LineChart className="w-4 h-4 text-blue-600" /> Academic Performance Over Time
+                <LineChart className="w-4 h-4 text-blue-600" /> Academic Performance
               </span>
 
               <button
                 onClick={() => setShowPerformanceModal(true)}
                 className="p-1 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors"
-                title="Open Detailed Academic Analytics Breakdown"
+                title="Open Academic Performance Report"
               >
                 <Maximize2 className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Subject / Scope Quick Filter */}
-            <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b border-slate-200 text-[10px] font-bold h-7">
-              {['ALL', 'BCA501', 'BCA502', 'BCA503', 'BCA504'].map((code) => (
-                <button
-                  key={code}
-                  onClick={() => setSelectedPerformanceSubject(code)}
-                  className={`px-2 py-0.5 rounded-md transition-all shrink-0 ${
-                    selectedPerformanceSubject === code
-                      ? 'bg-blue-600 text-white font-black shadow-xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
-                >
-                  {code === 'ALL' ? 'Overall Semester' : code}
-                </button>
-              ))}
-            </div>
-
             {/* Metric Snapshot */}
-            <div className="flex items-baseline justify-between pt-0.5">
+            <div className="flex items-baseline justify-between pt-1">
               <div>
                 <div className="flex items-center gap-1.5">
                   <span className="text-2xl font-black text-slate-900 tracking-tight">94.6%</span>
@@ -803,8 +785,8 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
             </div>
 
             {/* SVG Dual-Line Progression Trend Chart */}
-            <div className="w-full h-24 pt-1 relative">
-              <svg className="w-full h-full" viewBox="0 0 300 70" fill="none">
+            <div className="w-full h-36 pt-2 relative">
+              <svg className="w-full h-full" viewBox="0 0 300 80" fill="none">
                 <defs>
                   <linearGradient id="academicScoreGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0%" stopColor="#2563eb" stopOpacity="0.30" />
@@ -812,24 +794,24 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
                   </linearGradient>
                 </defs>
                 {/* 75% Cutoff Reference Line */}
-                <line x1="0" y1="46" x2="300" y2="46" stroke="#94a3b8" strokeDasharray="3 3" strokeWidth="1" />
-                <text x="235" y="44" fill="#94a3b8" fontSize="7" fontWeight="bold">75% Benchmark</text>
+                <line x1="0" y1="52" x2="300" y2="52" stroke="#94a3b8" strokeDasharray="3 3" strokeWidth="1" />
+                <text x="228" y="49" fill="#94a3b8" fontSize="7.5" fontWeight="bold">75% Benchmark</text>
 
                 {/* Score Area Fill */}
                 <path
-                  d="M10,55 Q75,44 140,32 T220,20 T290,12 L290,70 L10,70 Z"
+                  d="M10,62 Q75,50 140,36 T220,24 T290,14 L290,80 L10,80 Z"
                   fill="url(#academicScoreGrad)"
                 />
                 {/* Academic Score Line (Blue) */}
                 <path
-                  d="M10,55 Q75,44 140,32 T220,20 T290,12"
+                  d="M10,62 Q75,50 140,36 T220,24 T290,14"
                   stroke="#2563eb"
                   strokeWidth="3"
                   strokeLinecap="round"
                 />
                 {/* Attendance Line (Emerald) */}
                 <path
-                  d="M10,48 Q75,40 140,28 T220,22 T290,10"
+                  d="M10,54 Q75,44 140,32 T220,26 T290,12"
                   stroke="#10b981"
                   strokeWidth="2"
                   strokeDasharray="4 2"
@@ -837,14 +819,14 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
                 />
 
                 {/* Data Points */}
-                <circle cx="10" cy="55" r="3.5" fill="#2563eb" stroke="#FFFFFF" strokeWidth="1.5" />
-                <circle cx="80" cy="44" r="3.5" fill="#2563eb" stroke="#FFFFFF" strokeWidth="1.5" />
-                <circle cx="150" cy="32" r="3.5" fill="#2563eb" stroke="#FFFFFF" strokeWidth="1.5" />
-                <circle cx="220" cy="20" r="3.5" fill="#2563eb" stroke="#FFFFFF" strokeWidth="1.5" />
-                <circle cx="290" cy="12" r="4.5" fill="#10b981" stroke="#FFFFFF" strokeWidth="2" />
+                <circle cx="10" cy="62" r="3.5" fill="#2563eb" stroke="#FFFFFF" strokeWidth="1.5" />
+                <circle cx="80" cy="50" r="3.5" fill="#2563eb" stroke="#FFFFFF" strokeWidth="1.5" />
+                <circle cx="150" cy="36" r="3.5" fill="#2563eb" stroke="#FFFFFF" strokeWidth="1.5" />
+                <circle cx="220" cy="24" r="3.5" fill="#2563eb" stroke="#FFFFFF" strokeWidth="1.5" />
+                <circle cx="290" cy="14" r="4.5" fill="#10b981" stroke="#FFFFFF" strokeWidth="2" />
               </svg>
               
-              <div className="flex justify-between text-[9px] text-slate-500 font-bold px-1 mt-0.5">
+              <div className="flex justify-between text-[10px] text-slate-500 font-bold px-1 mt-1">
                 <span>Jul (81%)</span>
                 <span>Aug (86%)</span>
                 <span>Sep (89%)</span>
@@ -852,27 +834,14 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
                 <span className="text-emerald-600 font-black">Nov (95%)</span>
               </div>
             </div>
-
-            {/* Performance Explanation Card */}
-            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90 text-xs space-y-1">
-              <div className="flex items-center justify-between text-[11px] font-bold">
-                <span className="text-slate-800 flex items-center gap-1">
-                  💡 <strong>Diagnostic Summary:</strong>
-                </span>
-                <span className="text-emerald-700 font-mono text-[10px]">98.5% Pass Readiness</span>
-              </div>
-              <p className="text-[10px] text-slate-600 leading-snug">
-                Student academic performance has steadily climbed by <strong>+13.4%</strong> since July commencement. High attendance compliance directly drives higher Continuous Internal Assessment (CIA) marks.
-              </p>
-            </div>
           </div>
 
           {/* Bottom Button */}
           <button
             onClick={() => setShowPerformanceModal(true)}
-            className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-[11px] transition-all shadow-md flex items-center justify-center gap-1.5 mt-1"
+            className="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-xs transition-all shadow-md flex items-center justify-center gap-1.5 mt-1"
           >
-            <TrendingUp className="w-3.5 h-3.5" /> View Detailed Academic Performance Report
+            <TrendingUp className="w-3.5 h-3.5" /> Academic Performance Report
           </button>
         </div>
 
@@ -1687,7 +1656,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
                 </div>
                 <div>
                   <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
-                    Academic Performance Over Time
+                    Academic Performance
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                       ↑ +13.4% Growth
                     </span>
