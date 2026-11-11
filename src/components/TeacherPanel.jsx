@@ -772,9 +772,6 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               <div>
                 <div className="flex items-center gap-1.5">
                   <span className="text-2xl font-black text-slate-900 tracking-tight">94.6%</span>
-                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
-                    ↑ +13.4% Growth
-                  </span>
                 </div>
                 <span className="text-[10px] text-slate-400 font-semibold block">Class Academic Index (Jul - Nov 2026)</span>
               </div>
@@ -1655,15 +1652,9 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
                   <LineChart className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                  <h3 className="text-base font-black text-slate-900">
                     Academic Performance
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      ↑ +13.4% Growth
-                    </span>
                   </h3>
-                  <p className="text-xs text-slate-500 font-medium">
-                    Maharishi University of Information Technology • BCA Semester V-B • 65 Enrolled Students
-                  </p>
                 </div>
               </div>
               <button
