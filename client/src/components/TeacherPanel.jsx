@@ -58,6 +58,9 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
   const [previewStudentSubmission, setPreviewStudentSubmission] = useState(null);
   const [assignmentUploadToast, setAssignmentUploadToast] = useState(null);
   const [remindedStudents, setRemindedStudents] = useState({});
+  const [showPerformanceModal, setShowPerformanceModal] = useState(false);
+  const [selectedPerformanceSubject, setSelectedPerformanceSubject] = useState('ALL');
+  const [performanceTab, setPerformanceTab] = useState('TIMELINE'); // 'TIMELINE', 'SUBJECTS', 'COHORT'
 
   // Teacher Upload Form state
   const [newAssignmentForm, setNewAssignmentForm] = useState({
@@ -395,6 +398,38 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
     window.URL.revokeObjectURL(url);
   };
 
+  // Academic Performance Over Time (Semester V Progression Dataset)
+  const academicTimelineData = [
+    { month: 'Jul 2026', milestone: 'Semester Commencement & Diagnostic Test', score: 81.2, attendance: 88.5, topScore: 92, submittedPct: 82, note: 'Initial baseline set for BCA V-B' },
+    { month: 'Aug 2026', milestone: 'Class Test 1 (CT-1) & Assignment Phase 1', score: 85.8, attendance: 91.0, topScore: 96, submittedPct: 87, note: 'Algorithm concepts and theory introduced' },
+    { month: 'Sep 2026', milestone: 'Mid-Term Examinations & Minor Project Synopsis', score: 89.4, attendance: 93.8, topScore: 98, submittedPct: 92, note: 'Strong performance across graphics and web tech' },
+    { month: 'Oct 2026', milestone: 'Class Test 2 (CT-2) & Lab Practical Viva', score: 92.1, attendance: 94.5, topScore: 99, submittedPct: 95, note: 'Practical coding exercises completed' },
+    { month: 'Nov 2026 (Live)', milestone: 'Pre-University Preparations & Final Assignments', score: 94.6, attendance: 95.2, topScore: 100, submittedPct: 96, note: 'Peak readiness for university semester exams' }
+  ];
+
+  const subjectPerformanceData = [
+    { code: 'BCA501', name: 'Computer Graphics', teacher: 'Mr. Dhananjay Kr. Yadav', avgScore: 95.2, passRate: 98.5, topGrade: 'A+', trend: '+7.4%', gradeDist: { aPlus: 38, a: 18, b: 7, c: 2 } },
+    { code: 'BCA502', name: 'Cryptography & Network Security', teacher: 'Dr. Gouri Shukla', avgScore: 88.6, passRate: 95.4, topGrade: 'A', trend: '+4.2%', gradeDist: { aPlus: 24, a: 26, b: 12, c: 3 } },
+    { code: 'BCA503', name: 'Web Technology', teacher: 'Mr. Rishi Mohan Awasthi', avgScore: 92.8, passRate: 96.9, topGrade: 'A+', trend: '+6.1%', gradeDist: { aPlus: 32, a: 22, b: 9, c: 2 } },
+    { code: 'BCA504', name: 'Minor Project', teacher: 'Dr. Peeyush Pathak', avgScore: 96.0, passRate: 100, topGrade: 'A+', trend: '+5.0%', gradeDist: { aPlus: 45, a: 16, b: 4, c: 0 } },
+    { code: 'BCA511', name: 'Computer Graphics Lab', teacher: 'Dr. Gouri Shukla', avgScore: 94.5, passRate: 100, topGrade: 'A+', trend: '+3.5%', gradeDist: { aPlus: 40, a: 20, b: 5, c: 0 } },
+    { code: 'BCA512', name: 'Web Technology Lab', teacher: 'Mr. Rishi Mohan Awasthi', avgScore: 93.2, passRate: 98.5, topGrade: 'A+', trend: '+4.8%', gradeDist: { aPlus: 35, a: 22, b: 7, c: 1 } }
+  ];
+
+  const handleExportAcademicReportCsv = () => {
+    const csvHeader = "Month,Milestone,Academic Score (%),Attendance (%),Top Score (%),Assignment Completion (%),Analytical Notes\n";
+    const rows = academicTimelineData.map(d => 
+      `"${d.month}","${d.milestone}","${d.score}%","${d.attendance}%","${d.topScore}%","${d.submittedPct}%","${d.note}"`
+    ).join("\n");
+    const blob = new Blob([csvHeader + rows], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Academic_Performance_Over_Time_BCA_V_2026.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-8 pb-8">
       
@@ -715,70 +750,130 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
           </div>
         </div>
 
-        {/* CARD 4: 3D SEMESTER ANALYTICS & TREND GRAPH */}
+        {/* CARD 4: ACADEMIC PERFORMANCE OVER TIME & ANALYTICS */}
         <div className="card-3d p-6 space-y-4 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
           <div className="space-y-3">
-            <div className="flex justify-between items-center">
+            {/* Header */}
+            <div className="flex justify-between items-center h-6">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <LineChart className="w-4 h-4 text-blue-600" /> Semester Analytics
+                <LineChart className="w-4 h-4 text-blue-600" /> Academic Performance Over Time
               </span>
+
+              <button
+                onClick={() => setShowPerformanceModal(true)}
+                className="p-1 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+                title="Open Detailed Academic Analytics Breakdown"
+              >
+                <Maximize2 className="w-4 h-4" />
+              </button>
             </div>
 
-            <div className="flex items-baseline justify-between pt-1">
+            {/* Subject / Scope Quick Filter */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b border-slate-200 text-[10px] font-bold h-7">
+              {['ALL', 'BCA501', 'BCA502', 'BCA503', 'BCA504'].map((code) => (
+                <button
+                  key={code}
+                  onClick={() => setSelectedPerformanceSubject(code)}
+                  className={`px-2 py-0.5 rounded-md transition-all shrink-0 ${
+                    selectedPerformanceSubject === code
+                      ? 'bg-blue-600 text-white font-black shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {code === 'ALL' ? 'Overall Semester' : code}
+                </button>
+              ))}
+            </div>
+
+            {/* Metric Snapshot */}
+            <div className="flex items-baseline justify-between pt-0.5">
               <div>
-                <span className="text-3xl font-black text-slate-900 tracking-tight">92.4%</span>
-                <span className="text-[11px] text-slate-500 font-bold block">Semester Average</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-2xl font-black text-slate-900 tracking-tight">94.6%</span>
+                  <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+                    ↑ +13.4% Growth
+                  </span>
+                </div>
+                <span className="text-[10px] text-slate-400 font-semibold block">Class Academic Index (Jul - Nov 2026)</span>
               </div>
               <div className="text-right">
-                <span className="text-emerald-600 text-xs font-black">148 Total Sessions</span>
-                <span className="text-[10px] text-slate-500 block">Department Rank #1</span>
+                <span className="text-blue-700 text-xs font-black block">95.2% Attendance</span>
+                <span className="text-[10px] text-slate-400 font-mono block">r = +0.89 Correlation</span>
               </div>
             </div>
 
-            {/* SVG Interactive Curved Trend Chart */}
-            <div className="w-full h-24 pt-2 relative">
+            {/* SVG Dual-Line Progression Trend Chart */}
+            <div className="w-full h-24 pt-1 relative">
               <svg className="w-full h-full" viewBox="0 0 300 70" fill="none">
                 <defs>
-                  <linearGradient id="teacherTrendGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#2563eb" stopOpacity="0.35" />
+                  <linearGradient id="academicScoreGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#2563eb" stopOpacity="0.30" />
                     <stop offset="100%" stopColor="#2563eb" stopOpacity="0.0" />
                   </linearGradient>
                 </defs>
+                {/* 75% Cutoff Reference Line */}
+                <line x1="0" y1="46" x2="300" y2="46" stroke="#94a3b8" strokeDasharray="3 3" strokeWidth="1" />
+                <text x="235" y="44" fill="#94a3b8" fontSize="7" fontWeight="bold">75% Benchmark</text>
+
+                {/* Score Area Fill */}
                 <path
-                  d="M0,55 Q50,30 100,40 T200,18 T300,12 L300,70 L0,70 Z"
-                  fill="url(#teacherTrendGrad)"
+                  d="M10,55 Q75,44 140,32 T220,20 T290,12 L290,70 L10,70 Z"
+                  fill="url(#academicScoreGrad)"
                 />
+                {/* Academic Score Line (Blue) */}
                 <path
-                  d="M0,55 Q50,30 100,40 T200,18 T300,12"
+                  d="M10,55 Q75,44 140,32 T220,20 T290,12"
                   stroke="#2563eb"
-                  strokeWidth="3.5"
+                  strokeWidth="3"
                   strokeLinecap="round"
                 />
-                <circle cx="15" cy="52" r="4" fill="#2563eb" stroke="#FFFFFF" strokeWidth="2" />
-                <circle cx="95" cy="40" r="4" fill="#2563eb" stroke="#FFFFFF" strokeWidth="2" />
-                <circle cx="195" cy="20" r="4" fill="#2563eb" stroke="#FFFFFF" strokeWidth="2" />
-                <circle cx="285" cy="14" r="5" fill="#10b981" stroke="#FFFFFF" strokeWidth="2" />
+                {/* Attendance Line (Emerald) */}
+                <path
+                  d="M10,48 Q75,40 140,28 T220,22 T290,10"
+                  stroke="#10b981"
+                  strokeWidth="2"
+                  strokeDasharray="4 2"
+                  strokeLinecap="round"
+                />
+
+                {/* Data Points */}
+                <circle cx="10" cy="55" r="3.5" fill="#2563eb" stroke="#FFFFFF" strokeWidth="1.5" />
+                <circle cx="80" cy="44" r="3.5" fill="#2563eb" stroke="#FFFFFF" strokeWidth="1.5" />
+                <circle cx="150" cy="32" r="3.5" fill="#2563eb" stroke="#FFFFFF" strokeWidth="1.5" />
+                <circle cx="220" cy="20" r="3.5" fill="#2563eb" stroke="#FFFFFF" strokeWidth="1.5" />
+                <circle cx="290" cy="12" r="4.5" fill="#10b981" stroke="#FFFFFF" strokeWidth="2" />
               </svg>
               
-              <div className="flex justify-between text-[10px] text-slate-500 font-bold px-1 mt-1">
-                <span>Jun (88%)</span>
-                <span>Jul (90%)</span>
-                <span>Aug (93%)</span>
-                <span className="text-emerald-600 font-black">Sep (95%)</span>
+              <div className="flex justify-between text-[9px] text-slate-500 font-bold px-1 mt-0.5">
+                <span>Jul (81%)</span>
+                <span>Aug (86%)</span>
+                <span>Sep (89%)</span>
+                <span>Oct (92%)</span>
+                <span className="text-emerald-600 font-black">Nov (95%)</span>
               </div>
+            </div>
+
+            {/* Performance Explanation Card */}
+            <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/90 text-xs space-y-1">
+              <div className="flex items-center justify-between text-[11px] font-bold">
+                <span className="text-slate-800 flex items-center gap-1">
+                  💡 <strong>Diagnostic Summary:</strong>
+                </span>
+                <span className="text-emerald-700 font-mono text-[10px]">98.5% Pass Readiness</span>
+              </div>
+              <p className="text-[10px] text-slate-600 leading-snug">
+                Student academic performance has steadily climbed by <strong>+13.4%</strong> since July commencement. High attendance compliance directly drives higher Continuous Internal Assessment (CIA) marks.
+              </p>
             </div>
           </div>
 
-          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5 text-xs">
-            <div className="flex justify-between items-center text-[11px] font-bold">
-              <span className="text-slate-800">BCA501 (Computer Graphics):</span>
-              <span className="text-emerald-600 font-mono">95.2% (Peak)</span>
-            </div>
-            <div className="flex justify-between items-center text-[11px] font-bold">
-              <span className="text-slate-800">BCA503 (Web Technology):</span>
-              <span className="text-blue-600 font-mono">92.8% (Stable)</span>
-            </div>
-          </div>
+          {/* Bottom Button */}
+          <button
+            onClick={() => setShowPerformanceModal(true)}
+            className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold text-[11px] transition-all shadow-md flex items-center justify-center gap-1.5 mt-1"
+          >
+            <TrendingUp className="w-3.5 h-3.5" /> View Detailed Academic Performance Report
+          </button>
         </div>
 
         {/* CARD 5: ASSIGNMENT MANAGEMENT & STUDENT SUBMISSIONS TRACKER */}
@@ -1572,6 +1667,261 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
                 className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md"
               >
                 Close Preview
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* MODAL 4: DETAILED ACADEMIC PERFORMANCE OVER TIME MODAL */}
+      {showPerformanceModal && (
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="max-w-4xl w-full bg-white rounded-3xl p-6 space-y-4 shadow-2xl border border-slate-200 max-h-[92vh] flex flex-col">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-blue-50 text-blue-600 rounded-2xl border border-blue-200 shadow-inner">
+                  <LineChart className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900 flex items-center gap-2">
+                    Academic Performance Over Time
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      ↑ +13.4% Growth
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Maharishi University of Information Technology • BCA Semester V-B • 65 Enrolled Students
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowPerformanceModal(false)}
+                className="p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* 4 Summary Performance Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <div className="p-3 bg-blue-50/70 rounded-2xl border border-blue-200 text-center">
+                <span className="text-[10px] uppercase font-bold text-blue-600 block tracking-wider">Current Score</span>
+                <span className="text-xl font-black text-blue-900 font-mono">94.6%</span>
+                <span className="text-[10px] text-blue-600 block font-bold">↑ +13.4% from Baseline</span>
+              </div>
+              <div className="p-3 bg-emerald-50/70 rounded-2xl border border-emerald-200 text-center">
+                <span className="text-[10px] uppercase font-bold text-emerald-600 block tracking-wider">Attendance Alignment</span>
+                <span className="text-xl font-black text-emerald-700 font-mono">95.2%</span>
+                <span className="text-[10px] text-emerald-600 block font-medium">r = +0.89 Correlation</span>
+              </div>
+              <div className="p-3 bg-purple-50/70 rounded-2xl border border-purple-200 text-center">
+                <span className="text-[10px] uppercase font-bold text-purple-600 block tracking-wider">Coursework Rate</span>
+                <span className="text-xl font-black text-purple-700 font-mono">94.0%</span>
+                <span className="text-[10px] text-purple-600 block font-medium">58 Total Assignments</span>
+              </div>
+              <div className="p-3 bg-indigo-50/70 rounded-2xl border border-indigo-200 text-center">
+                <span className="text-[10px] uppercase font-bold text-indigo-600 block tracking-wider">Pass Readiness</span>
+                <span className="text-xl font-black text-indigo-700 font-mono">98.5%</span>
+                <span className="text-[10px] text-indigo-600 block font-bold">Est. Distinction Rank #1</span>
+              </div>
+            </div>
+
+            {/* Sub-Navigation Tabs */}
+            <div className="flex items-center gap-1.5 bg-slate-100 p-1.5 rounded-xl text-xs font-bold">
+              <button
+                onClick={() => setPerformanceTab('TIMELINE')}
+                className={`flex-1 py-1.5 rounded-lg transition-all ${
+                  performanceTab === 'TIMELINE' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                📅 Timeline Progression (Jul - Nov)
+              </button>
+              <button
+                onClick={() => setPerformanceTab('SUBJECTS')}
+                className={`flex-1 py-1.5 rounded-lg transition-all ${
+                  performanceTab === 'SUBJECTS' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                📚 Subject-by-Subject Breakdown
+              </button>
+              <button
+                onClick={() => setPerformanceTab('COHORT')}
+                className={`flex-1 py-1.5 rounded-lg transition-all ${
+                  performanceTab === 'COHORT' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                🎓 Student Cohort & Diagnostic Insights
+              </button>
+            </div>
+
+            {/* Tab 1: Timeline Progression Table */}
+            {performanceTab === 'TIMELINE' && (
+              <div className="space-y-3 flex-1 overflow-y-auto pr-1">
+                <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
+                  <table className="w-full text-left border-collapse text-xs">
+                    <thead className="bg-slate-900 text-white font-bold text-[11px] uppercase">
+                      <tr>
+                        <th className="py-2.5 px-3">Month</th>
+                        <th className="py-2.5 px-3">Academic Milestone / Assessment</th>
+                        <th className="py-2.5 px-3 text-center">Class Avg</th>
+                        <th className="py-2.5 px-3 text-center">Attendance</th>
+                        <th className="py-2.5 px-3 text-center">Assignments</th>
+                        <th className="py-2.5 px-3">Diagnostic Faculty Notes</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
+                      {academicTimelineData.map((d, i) => (
+                        <tr key={i} className="hover:bg-slate-50 transition-colors">
+                          <td className="py-2 px-3 font-bold text-slate-900 font-mono">
+                            {d.month}
+                          </td>
+                          <td className="py-2 px-3 font-extrabold text-indigo-900">
+                            {d.milestone}
+                          </td>
+                          <td className="py-2 px-3 text-center font-bold text-blue-600 font-mono">
+                            {d.score}%
+                          </td>
+                          <td className="py-2 px-3 text-center font-bold text-emerald-600 font-mono">
+                            {d.attendance}%
+                          </td>
+                          <td className="py-2 px-3 text-center font-bold text-purple-600 font-mono">
+                            {d.submittedPct}%
+                          </td>
+                          <td className="py-2 px-3 text-slate-500 text-[11px]">
+                            {d.note}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="p-3.5 bg-blue-50 rounded-2xl border border-blue-200 text-xs space-y-1.5">
+                  <p className="font-bold text-blue-900">
+                    💡 Explanatory Analysis of Growth Over Time:
+                  </p>
+                  <p className="text-blue-800 text-[11px] leading-relaxed">
+                    Student performance steadily accelerated from <strong>81.2% in July</strong> to <strong>94.6% in November</strong>. The introduction of real-time geofence attendance verification eliminated proxy attendance, resulting in improved daily classroom concentration. Continuous internal assessment (CIA) marks reflect deeper conceptual clarity in Computer Graphics, Cryptography, and Web Technologies.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Tab 2: Subject-by-Subject Breakdown */}
+            {performanceTab === 'SUBJECTS' && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1 overflow-y-auto pr-1">
+                {subjectPerformanceData.map((sub) => (
+                  <div key={sub.code} className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono font-black text-indigo-700 bg-indigo-50 px-1.5 py-0.2 rounded border border-indigo-200 text-[10px]">
+                            {sub.code}
+                          </span>
+                          <span className="font-black text-slate-900 text-xs">{sub.name}</span>
+                        </div>
+                        <span className="text-[10px] text-slate-400 font-medium block mt-0.5">Faculty: {sub.teacher}</span>
+                      </div>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300">
+                        {sub.trend}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center text-xs pt-1 border-t border-slate-200/80">
+                      <div>
+                        <span className="text-[10px] text-slate-400 block font-medium">Average Score</span>
+                        <span className="font-mono font-black text-slate-900 text-sm">{sub.avgScore}%</span>
+                      </div>
+                      <div className="text-center">
+                        <span className="text-[10px] text-slate-400 block font-medium">Pass Readiness</span>
+                        <span className="font-mono font-black text-emerald-700 text-sm">{sub.passRate}%</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-[10px] text-slate-400 block font-medium">Predominant Grade</span>
+                        <span className="font-mono font-black text-indigo-700 text-sm">{sub.topGrade}</span>
+                      </div>
+                    </div>
+
+                    {/* Grade Distribution Bar */}
+                    <div className="space-y-1 pt-1">
+                      <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Grade Distribution (65 Students)</span>
+                      <div className="w-full h-2 rounded-full overflow-hidden bg-slate-200 flex">
+                        <div style={{ width: `${(sub.gradeDist.aPlus / 65) * 100}%` }} className="bg-emerald-500" title={`A+: ${sub.gradeDist.aPlus}`}></div>
+                        <div style={{ width: `${(sub.gradeDist.a / 65) * 100}%` }} className="bg-blue-500" title={`A: ${sub.gradeDist.a}`}></div>
+                        <div style={{ width: `${(sub.gradeDist.b / 65) * 100}%` }} className="bg-amber-400" title={`B: ${sub.gradeDist.b}`}></div>
+                        <div style={{ width: `${(sub.gradeDist.c / 65) * 100}%` }} className="bg-red-400" title={`C: ${sub.gradeDist.c}`}></div>
+                      </div>
+                      <div className="flex justify-between text-[9px] text-slate-500 font-mono">
+                        <span>A+ ({sub.gradeDist.aPlus})</span>
+                        <span>A ({sub.gradeDist.a})</span>
+                        <span>B ({sub.gradeDist.b})</span>
+                        <span>C ({sub.gradeDist.c})</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Tab 3: Cohort & Diagnostic Insights */}
+            {performanceTab === 'COHORT' && (
+              <div className="space-y-3.5 flex-1 overflow-y-auto pr-1 text-xs">
+                {/* 4 Tiers */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-center">
+                    <span className="text-[10px] font-bold text-emerald-600 block uppercase">Distinction Tier (&gt;85%)</span>
+                    <span className="text-lg font-black text-emerald-800 font-mono">42 Students</span>
+                    <span className="text-[10px] text-emerald-600 block font-semibold">64.6% of class</span>
+                  </div>
+                  <div className="p-3 bg-blue-50 rounded-2xl border border-blue-200 text-center">
+                    <span className="text-[10px] font-bold text-blue-600 block uppercase">First Class Tier (70-84%)</span>
+                    <span className="text-lg font-black text-blue-800 font-mono">18 Students</span>
+                    <span className="text-[10px] text-blue-600 block font-semibold">27.7% of class</span>
+                  </div>
+                  <div className="p-3 bg-amber-50 rounded-2xl border border-amber-200 text-center">
+                    <span className="text-[10px] font-bold text-amber-600 block uppercase">Second Class Tier (60-69%)</span>
+                    <span className="text-lg font-black text-amber-800 font-mono">4 Students</span>
+                    <span className="text-[10px] text-amber-600 block font-semibold">6.2% of class</span>
+                  </div>
+                  <div className="p-3 bg-red-50 rounded-2xl border border-red-200 text-center">
+                    <span className="text-[10px] font-bold text-red-600 block uppercase">Support Needed (&lt;60%)</span>
+                    <span className="text-lg font-black text-red-800 font-mono">1 Student</span>
+                    <span className="text-[10px] text-red-600 block font-semibold">1.5% of class</span>
+                  </div>
+                </div>
+
+                {/* Explanatory Deep Dive */}
+                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                  <h4 className="font-black text-slate-900 text-xs flex items-center gap-1.5">
+                    🎓 Key Academic Performance Explanations & Faculty Insights:
+                  </h4>
+                  <ul className="space-y-1.5 text-slate-700 text-[11px] list-disc list-inside leading-relaxed">
+                    <li><strong>Attendance Correlation (+0.89):</strong> Students with &gt;90% verified attendance demonstrated an average internal test score of 91.5%, compared to 68.2% for those below the 75% attendance threshold.</li>
+                    <li><strong>Coursework & Practical Impact:</strong> Timely completion of the 58 MUIT official assignments accounted for a direct 18% improvement in problem-solving speed during Class Test 2 (CT-2).</li>
+                    <li><strong>Department Standing:</strong> BCA Section V-B maintains the #1 academic ranking across the Faculty of Computer Science and Engineering for the Autumn 2026 term.</li>
+                    <li><strong>Action Plan for At-Risk Students:</strong> Special weekend revision tutorials scheduled for cryptography modular arithmetic and hidden surface algorithms.</li>
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            {/* Modal Footer */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2 border-t border-slate-200">
+              <button
+                onClick={handleExportAcademicReportCsv}
+                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center gap-1.5 border border-slate-200 transition-colors"
+              >
+                <Download className="w-3.5 h-3.5 text-blue-600" /> Export Academic Analytics CSV
+              </button>
+
+              <button
+                onClick={() => setShowPerformanceModal(false)}
+                className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md"
+              >
+                Close Report
               </button>
             </div>
 
