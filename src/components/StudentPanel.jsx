@@ -32,9 +32,13 @@ import {
   ChevronRight,
   Download,
   UploadCloud,
-  Paperclip
+  Paperclip,
+  Search,
+  Eye,
+  Plus
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { MUIT_ASSIGNMENTS } from './muitAssignmentsData';
 
 export default function StudentPanel({ user, activeSession, setActiveSession, setActiveTab, onNewAttendance }) {
   const [step, setStep] = useState(1); // 1: Main Dashboard, 2: Verification Flow, 3: Success Confirmation
@@ -397,176 +401,48 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   const [showFullReportModal, setShowFullReportModal] = useState(false);
   const [selectedAuditRecord, setSelectedAuditRecord] = useState(null);
 
-  // Official MUIT Student ERP Portal - Assignments & Coursework (https://stdlogin.muituniversity.in/Student/VAssignment)
-  const MUIT_ASSIGNMENT_PORTAL_URL = 'https://stdlogin.muituniversity.in/Student/VAssignment';
-  const [assignmentFilter, setAssignmentFilter] = useState('ALL');
-  const [selectedAssignment, setSelectedAssignment] = useState(null);
-  const [assignmentSubmitSuccess, setAssignmentSubmitSuccess] = useState(false);
-  const [submittingAssignmentId, setSubmittingAssignmentId] = useState(null);
+  // Official MUIT Student Coursework & Assignments Database (All 58 items from MUIT Portal)
+  const [assignments, setAssignments] = useState(MUIT_ASSIGNMENTS);
+  const [assignmentSubjectFilter, setAssignmentSubjectFilter] = useState('ALL');
+  const [assignmentSearch, setAssignmentSearch] = useState('');
+  const [selectedAssignmentDoc, setSelectedAssignmentDoc] = useState(null);
+  const [uploadingAssignment, setUploadingAssignment] = useState(null);
+  const [showAllAssignmentsModal, setShowAllAssignmentsModal] = useState(false);
+  const [uploadToast, setUploadToast] = useState(null);
+  const [uploadFileNameInput, setUploadFileNameInput] = useState('');
 
-  const [assignments, setAssignments] = useState([
-    {
-      id: 'ASN-BCA501-03',
-      code: 'BCA501',
-      subject: 'Computer Graphics (BCA501)',
-      faculty: 'Mr. Dhananjay Kr. Yadav',
-      facultyShort: 'DKY',
-      title: 'Rasterization & 2D/3D Geometric Transformations',
-      description: 'Implement Bresenham’s Line Drawing algorithm and 2D/3D composite transformations (rotation about an arbitrary pivot, shearing, and scaling) in C++ / OpenGL. Provide formal mathematical derivation and terminal screenshots.',
-      assignedDate: '04 Nov 2026',
-      dueDate: '18 Nov 2026',
-      dueTime: '11:59 PM',
-      isPending: true,
-      status: 'PENDING',
-      maxMarks: 20,
-      obtainedMarks: null,
-      attachmentName: 'BCA501_Assignment_03_RasterOps.pdf',
-      attachmentSize: '1.4 MB',
-      submissionType: 'PDF Report / C++ Source Archive (.zip)',
-      instructions: 'Submit a well-documented PDF containing source code snippets, algorithm derivations, and output terminal screenshots with your University Roll No. visible.'
-    },
-    {
-      id: 'ASN-BCA502-02',
-      code: 'BCA502',
-      subject: 'Cryptography & Network Security (BCA502)',
-      faculty: 'Dr. Gouri Shukla',
-      facultyShort: 'GS',
-      title: 'Asymmetric Cryptography: RSA & Diffie-Hellman Key Exchange',
-      description: 'Solve mathematical problems on modular exponentiation using repeated squaring. Demonstrate RSA key generation (p=61, q=53), encrypt message M=65, and analyze the man-in-the-middle vulnerability in unauthenticated Diffie-Hellman key exchange.',
-      assignedDate: '06 Nov 2026',
-      dueDate: '20 Nov 2026',
-      dueTime: '05:00 PM',
-      isPending: true,
-      status: 'PENDING',
-      maxMarks: 25,
-      obtainedMarks: null,
-      attachmentName: 'BCA502_CNS_ProblemSet2.pdf',
-      attachmentSize: '2.1 MB',
-      submissionType: 'Handwritten scanned PDF or LaTeX document',
-      instructions: 'All numerical calculations must display step-by-step extended Euclidean algorithm calculations. Late submissions will attract a 10% penalty.'
-    },
-    {
-      id: 'ASN-BCA503-04',
-      code: 'BCA503',
-      subject: 'Web Technology (BCA503)',
-      faculty: 'Mr. Rishi Mohan Awasthi',
-      facultyShort: 'RMA',
-      title: 'RESTful API Architecture & Secure JWT Session Auth',
-      description: 'Design and deploy modular Node.js/Express API with role-based JWT bearer authentication, Bcrypt password hashing, and MongoDB Mongoose models for university student records.',
-      assignedDate: '28 Oct 2026',
-      dueDate: '12 Nov 2026',
-      dueTime: '11:59 PM',
-      isPending: false,
-      status: 'SUBMITTED',
-      submittedDate: '09 Nov 2026, 04:32 PM',
-      submittedFileName: 'ManojSharma_2401031601137_WebTech_Assignment4.zip',
-      maxMarks: 20,
-      obtainedMarks: null,
-      facultyRemark: 'Submission received. Evaluation in progress by RMA.',
-      attachmentName: 'BCA503_WebTech_API_Specification.pdf',
-      attachmentSize: '3.2 MB',
-      submissionType: 'ZIP Archive containing server code + Postman Collection',
-      instructions: 'Include Postman export collection v2.1 and readme instructions with sample API credentials.'
-    },
-    {
-      id: 'ASN-BCA504-01',
-      code: 'BCA504',
-      subject: 'Minor Project (BCA504)',
-      faculty: 'Dr. Peeyush Pathak',
-      facultyShort: 'PP',
-      title: 'System Requirements Specification (SRS) & Architecture Design',
-      description: 'Submit comprehensive IEEE-830 compliant SRS document for your chosen BCA Capstone project. Include functional/non-functional requirements, UML Class diagrams, Sequence diagrams, and ER schema.',
-      assignedDate: '15 Oct 2026',
-      dueDate: '05 Nov 2026',
-      dueTime: '04:00 PM',
-      isPending: false,
-      status: 'EVALUATED',
-      submittedDate: '03 Nov 2026, 02:15 PM',
-      submittedFileName: 'Scan2Attend_SRS_ManojSharma_BCA504.pdf',
-      maxMarks: 50,
-      obtainedMarks: 48,
-      grade: 'A+',
-      facultyRemark: 'Excellent work. Architecture and geofencing sequence flow clearly outlined. Approved for development phase.',
-      attachmentName: 'BCA504_SRS_MUIT_Guidelines_Template.pdf',
-      attachmentSize: '4.5 MB',
-      submissionType: 'PDF Document (Formatted as per MUIT CS Guidelines)',
-      instructions: 'Approved synopsis topic must strictly match presentation slides.'
-    },
-    {
-      id: 'ASN-BCA511-02',
-      code: 'BCA511',
-      subject: 'Computer Graphics Lab (BCA511)',
-      faculty: 'Dr. Gouri Shukla & Mr. Rishi Mohan Awasthi',
-      facultyShort: 'GS / RMA',
-      title: 'Practical Lab 4: Cohen-Sutherland Line Clipping Simulation',
-      description: 'Write complete executable code for Cohen-Sutherland line clipping with OutCode region classification (Left, Right, Bottom, Top). Render input polygon boundaries and clipped lines.',
-      assignedDate: '20 Oct 2026',
-      dueDate: '02 Nov 2026',
-      dueTime: '02:00 PM',
-      isPending: false,
-      status: 'EVALUATED',
-      submittedDate: '01 Nov 2026, 11:20 AM',
-      submittedFileName: 'BCA511_Lab4_CohenSutherland_2401031601137.cpp',
-      maxMarks: 25,
-      obtainedMarks: 24,
-      grade: 'A+',
-      facultyRemark: 'Well verified with test coordinates and clean visual plot output.',
-      attachmentName: 'BCA511_Lab_Manual_CohenSutherland.pdf',
-      attachmentSize: '1.8 MB',
-      submissionType: 'C++ Source Code file (.cpp)',
-      instructions: 'Include terminal screenshots showing inside, partially inside, and outside test vectors.'
-    },
-    {
-      id: 'ASN-ACE511-01',
-      code: 'ACE511',
-      subject: 'Industrial Internship (ACE511)',
-      faculty: 'Mr. Imtiyaz Haq',
-      facultyShort: 'IH',
-      title: 'Internship Bi-Weekly Progress Log & Industry Mentor Evaluation',
-      description: 'Submit fortnightly signed timesheets, technological stack summary, and verified milestone evaluation report endorsed by industry host organization manager.',
-      assignedDate: '10 Nov 2026',
-      dueDate: '25 Nov 2026',
-      dueTime: '05:00 PM',
-      isPending: true,
-      status: 'PENDING',
-      maxMarks: 50,
-      obtainedMarks: null,
-      attachmentName: 'ACE511_BiWeekly_Log_Format.pdf',
-      attachmentSize: '850 KB',
-      submissionType: 'Scanned PDF with official seal & signature',
-      instructions: 'Must be endorsed with seal of host company / supervisor signature before scanning.'
-    }
-  ]);
-
-  const filteredAssignments = assignments.filter(item => {
-    if (assignmentFilter === 'ALL') return true;
-    return item.status === assignmentFilter;
+  const filteredMuitAssignments = assignments.filter(asn => {
+    const matchesSubject = assignmentSubjectFilter === 'ALL' || asn.code === assignmentSubjectFilter;
+    const q = assignmentSearch.trim().toLowerCase();
+    const matchesSearch = !q || 
+      asn.subject.toLowerCase().includes(q) ||
+      asn.code.toLowerCase().includes(q) ||
+      asn.fileName.toLowerCase().includes(q) ||
+      asn.sNo.toString() === q;
+    return matchesSubject && matchesSearch;
   });
 
-  const handleSimulateSubmitAssignment = (asnId) => {
-    setSubmittingAssignmentId(asnId);
-    setTimeout(() => {
-      const nowStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' + new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-      const studentFile = `${(user?.name || 'Manoj_Sharma').replace(/\s+/g, '_')}_Solution.pdf`;
-      setAssignments(prev => prev.map(a => {
-        if (a.id === asnId) {
-          const updated = {
-            ...a,
-            status: 'SUBMITTED',
-            isPending: false,
-            submittedDate: nowStr,
-            submittedFileName: studentFile,
-            facultyRemark: 'Submission received online. Awaiting faculty evaluation.'
-          };
-          setSelectedAssignment(updated);
-          return updated;
-        }
-        return a;
+  const handleUploadAssignment = (sNo, customName) => {
+    const fileName = customName || uploadFileNameInput.trim() || `${(user?.name || 'Manoj_Sharma').replace(/\s+/g, '_')}_Assignment_${sNo}_Solution.pdf`;
+    setAssignments(prev => prev.map(a => {
+      if (a.sNo === sNo) {
+        return {
+          ...a,
+          uploadedFile: fileName
+        };
+      }
+      return a;
+    }));
+    if (selectedAssignmentDoc && selectedAssignmentDoc.sNo === sNo) {
+      setSelectedAssignmentDoc(prev => ({
+        ...prev,
+        uploadedFile: fileName
       }));
-      setSubmittingAssignmentId(null);
-      setAssignmentSubmitSuccess(true);
-      setTimeout(() => setAssignmentSubmitSuccess(false), 4000);
-    }, 800);
+    }
+    setUploadingAssignment(null);
+    setUploadFileNameInput('');
+    setUploadToast(`Assignment #${sNo} solution uploaded successfully!`);
+    setTimeout(() => setUploadToast(null), 4000);
   };
 
   const [attendanceLogs, setAttendanceLogs] = useState([
@@ -1336,183 +1212,166 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           </button>
         </div>
 
-        {/* CARD 5: OFFICIAL MUIT COURSEWORK & ASSIGNMENTS PORTAL (https://stdlogin.muituniversity.in/Student/VAssignment) */}
+        {/* CARD 5: OFFICIAL MUIT COURSEWORK & ASSIGNMENTS TABLE (58 ASSIGNMENTS) */}
         <div className="card-3d p-5 space-y-3 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
           <div className="space-y-3">
-            {/* Header with Title and Official Direct ERP Link */}
+            {/* Header */}
             <div className="flex justify-between items-center">
-              <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <BookOpen className="w-4 h-4 text-indigo-600" /> MUIT Assignments (VAssignment)
-              </span>
-              <a
-                href={MUIT_ASSIGNMENT_PORTAL_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[10px] font-bold border border-indigo-200/80 transition-colors shadow-2xs group"
-                title="Open Official MUIT ERP Assignment Portal"
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-2xs">
+                  <FileText className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
+                    Student Assignments
+                  </h4>
+                  <span className="text-[10px] text-slate-400 font-medium">
+                    Maharishi University • BCA Semester V ({assignments.length} Total)
+                  </span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowAllAssignmentsModal(true)}
+                className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold shadow-xs transition-all flex items-center gap-1"
+                title="Expand full assignment window"
               >
-                <span>ERP Portal</span>
-                <ExternalLink className="w-2.5 h-2.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-              </a>
+                <Eye className="w-3 h-3" /> Full View
+              </button>
             </div>
 
-            {/* Official University ERP Live Link Banner */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 text-white p-3.5 border border-indigo-500/30 shadow-md">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl pointer-events-none"></div>
-              <div className="flex items-center justify-between gap-2 relative z-10">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-8 h-8 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 shrink-0">
-                    <FileText className="w-4 h-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[11px] font-black text-amber-300 tracking-wide uppercase">
-                        MUIT Student ERP
-                      </span>
-                      <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 text-[8px] font-mono font-bold border border-emerald-500/30">
-                        LIVE
-                      </span>
-                    </div>
-                    <p className="text-[9px] text-slate-300 font-mono truncate">
-                      stdlogin.muituniversity.in/Student/VAssignment
-                    </p>
-                  </div>
-                </div>
+            {/* Quick Search & Filter Strip */}
+            <div className="space-y-2">
+              <div className="relative">
+                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search by subject, code, or file name..."
+                  value={assignmentSearch}
+                  onChange={(e) => setAssignmentSearch(e.target.value)}
+                  className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all"
+                />
+                {assignmentSearch && (
+                  <button
+                    onClick={() => setAssignmentSearch('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                )}
+              </div>
 
-                <a
-                  href={MUIT_ASSIGNMENT_PORTAL_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="shrink-0 px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 text-[10px] font-black transition-all shadow-md flex items-center gap-1 group"
-                >
-                  <span>Open URL</span>
-                  <ExternalLink className="w-3 h-3 group-hover:scale-110 transition-transform" />
-                </a>
+              {/* Subject Filter Pills */}
+              <div className="flex items-center gap-1 text-[10px] font-bold overflow-x-auto py-0.5 scrollbar-none">
+                {['ALL', 'BCA501', 'BCA502', 'BCA503', 'BCA504', 'BCA511', 'BCA512'].map((code) => {
+                  const count = code === 'ALL' 
+                    ? assignments.length 
+                    : assignments.filter(a => a.code === code).length;
+                  return (
+                    <button
+                      key={code}
+                      onClick={() => setAssignmentSubjectFilter(code)}
+                      className={`px-2 py-0.5 rounded-md shrink-0 transition-all ${
+                        assignmentSubjectFilter === code
+                          ? 'bg-emerald-600 text-white font-black shadow-xs'
+                          : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+                      }`}
+                    >
+                      {code} ({count})
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
-            {/* Filter Pills */}
-            <div className="flex items-center justify-between gap-1 pt-0.5">
-              <div className="flex items-center gap-1 text-[10px] font-bold overflow-x-auto py-0.5">
-                <button
-                  onClick={() => setAssignmentFilter('ALL')}
-                  className={`px-2 py-0.5 rounded-md transition-all ${
-                    assignmentFilter === 'ALL'
-                      ? 'bg-slate-900 text-white font-black shadow-xs'
-                      : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
-                  }`}
-                >
-                  All ({assignments.length})
-                </button>
-                <button
-                  onClick={() => setAssignmentFilter('PENDING')}
-                  className={`px-2 py-0.5 rounded-md transition-all ${
-                    assignmentFilter === 'PENDING'
-                      ? 'bg-amber-500 text-slate-950 font-black shadow-xs'
-                      : 'bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200/50'
-                  }`}
-                >
-                  Pending ({assignments.filter(a => a.status === 'PENDING').length})
-                </button>
-                <button
-                  onClick={() => setAssignmentFilter('SUBMITTED')}
-                  className={`px-2 py-0.5 rounded-md transition-all ${
-                    assignmentFilter === 'SUBMITTED'
-                      ? 'bg-blue-600 text-white font-black shadow-xs'
-                      : 'bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/50'
-                  }`}
-                >
-                  Submitted ({assignments.filter(a => a.status === 'SUBMITTED').length})
-                </button>
-                <button
-                  onClick={() => setAssignmentFilter('EVALUATED')}
-                  className={`px-2 py-0.5 rounded-md transition-all ${
-                    assignmentFilter === 'EVALUATED'
-                      ? 'bg-emerald-600 text-white font-black shadow-xs'
-                      : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/50'
-                  }`}
-                >
-                  Graded ({assignments.filter(a => a.status === 'EVALUATED').length})
-                </button>
+            {/* MUIT Official Assignment Table View */}
+            <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
+              <div className="h-64 overflow-y-auto overflow-x-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead className="sticky top-0 z-10 bg-[#257ba0] text-white font-bold text-[10px] tracking-wide uppercase shadow-sm">
+                    <tr>
+                      <th className="py-2 px-2 text-center w-10">S.No</th>
+                      <th className="py-2 px-2 w-16">Subject Code</th>
+                      <th className="py-2 px-2.5">Subject Name</th>
+                      <th className="py-2 px-2.5">File</th>
+                      <th className="py-2 px-2 text-center">Uploaded</th>
+                      <th className="py-2 px-2 text-center w-16">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
+                    {filteredMuitAssignments.map((asn) => (
+                      <tr 
+                        key={asn.sNo} 
+                        className="hover:bg-emerald-50/40 transition-colors group cursor-pointer"
+                        onClick={(e) => {
+                          if (e.target.closest('button.upload-btn')) return;
+                          setSelectedAssignmentDoc(asn);
+                        }}
+                      >
+                        <td className="py-2 px-2 text-center font-mono font-bold text-slate-600 text-[11px]">
+                          {asn.sNo}
+                        </td>
+                        <td className="py-2 px-2 font-mono font-bold text-slate-800 text-[10px]">
+                          {asn.code}
+                        </td>
+                        <td className="py-2 px-2.5 font-bold text-slate-800 text-[10px] truncate max-w-[130px]" title={asn.subject}>
+                          {asn.subject}
+                        </td>
+                        <td className="py-2 px-2.5">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedAssignmentDoc(asn);
+                            }}
+                            className="px-2 py-1 rounded bg-[#4caf50] hover:bg-[#43a047] text-white text-[10px] font-bold shadow-2xs flex items-center gap-1 transition-all group-hover:shadow"
+                            title="Click to open assignment"
+                          >
+                            <Download className="w-3 h-3 shrink-0" />
+                            <span className="truncate max-w-[130px] sm:max-w-[170px]">{asn.fileName}</span>
+                          </button>
+                        </td>
+                        <td className="py-2 px-2 text-center">
+                          {asn.uploadedFile ? (
+                            <span className="inline-block px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono text-[9px] font-bold border border-emerald-300 truncate max-w-[100px]" title={asn.uploadedFile}>
+                              ✓ Submitted
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 font-mono text-[10px]">—</span>
+                          )}
+                        </td>
+                        <td className="py-2 px-2 text-center">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setUploadingAssignment(asn);
+                            }}
+                            className="upload-btn px-2.5 py-1 rounded bg-[#4caf50] hover:bg-[#43a047] text-white text-[10px] font-bold shadow-2xs flex items-center justify-center gap-0.5 mx-auto transition-all"
+                            title="Upload solution"
+                          >
+                            <span>+</span> Upload
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                    {filteredMuitAssignments.length === 0 && (
+                      <tr>
+                        <td colSpan={6} className="py-8 text-center text-slate-400 text-xs">
+                          No matching assignments found.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
-            </div>
-
-            {/* Scrollable Assignment Stream */}
-            <div className="h-56 overflow-y-auto space-y-2 pr-1">
-              {filteredAssignments.map((asn) => (
-                <div
-                  key={asn.id}
-                  onClick={() => setSelectedAssignment(asn)}
-                  className="p-2.5 rounded-xl bg-slate-50 hover:bg-white border border-slate-200/90 hover:border-indigo-400 hover:shadow-md cursor-pointer transition-all duration-200 space-y-1.5 group relative overflow-hidden"
-                >
-                  {/* Left status vertical strip */}
-                  <div className={`absolute top-0 left-0 bottom-0 w-1 ${
-                    asn.status === 'PENDING' ? 'bg-amber-500' :
-                    asn.status === 'SUBMITTED' ? 'bg-blue-500' : 'bg-emerald-500'
-                  }`} />
-
-                  <div className="flex items-center justify-between pl-1">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="text-[9px] font-black font-mono px-1.5 py-0.5 rounded bg-white text-indigo-700 border border-slate-200 shadow-2xs">
-                        {asn.code}
-                      </span>
-                      <span className="text-[10px] font-bold text-slate-700 truncate max-w-[130px]">
-                        {asn.subject.split('(')[0]}
-                      </span>
-                    </div>
-
-                    {asn.status === 'PENDING' && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300 text-[9px] font-black shrink-0">
-                        <Clock className="w-2.5 h-2.5 text-amber-700" /> Due: {asn.dueDate.split(' ')[0]} {asn.dueDate.split(' ')[1]}
-                      </span>
-                    )}
-                    {asn.status === 'SUBMITTED' && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100 text-blue-900 border border-blue-300 text-[9px] font-black shrink-0">
-                        <CheckCircle2 className="w-2.5 h-2.5 text-blue-700" /> Submitted
-                      </span>
-                    )}
-                    {asn.status === 'EVALUATED' && (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300 text-[9px] font-black shrink-0">
-                        <Sparkles className="w-2.5 h-2.5 text-emerald-700" /> {asn.obtainedMarks}/{asn.maxMarks} ({asn.grade})
-                      </span>
-                    )}
-                  </div>
-
-                  <h5 className="text-[11px] font-black text-slate-900 group-hover:text-indigo-600 transition-colors line-clamp-1 pl-1">
-                    {asn.title}
-                  </h5>
-
-                  <div className="flex items-center justify-between text-[9px] pl-1 pt-1 border-t border-slate-200/60 text-slate-500">
-                    <span className="truncate max-w-[150px]">
-                      By: <strong className="text-slate-800">{asn.facultyShort || asn.faculty}</strong>
-                    </span>
-                    <span className="font-bold text-indigo-600 flex items-center gap-0.5 group-hover:translate-x-0.5 transition-transform">
-                      View Task <ChevronRight className="w-2.5 h-2.5" />
-                    </span>
-                  </div>
-                </div>
-              ))}
-
-              {filteredAssignments.length === 0 && (
-                <div className="text-center py-8 text-slate-400 text-xs">
-                  No assignments found in this filter.
-                </div>
-              )}
             </div>
           </div>
 
-          {/* Card Bottom CTA */}
-          <div className="space-y-1.5 pt-1">
-            <a
-              href={MUIT_ASSIGNMENT_PORTAL_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white font-extrabold text-xs transition-all shadow-md flex items-center justify-center gap-2 group"
-            >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>Open stdlogin.muituniversity.in (VAssignment)</span>
-              <ExternalLink className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </a>
+          {/* Footer note */}
+          <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1 border-t border-slate-100">
+            <span>Showing {filteredMuitAssignments.length} of {assignments.length} assignments</span>
+            <span className="text-emerald-700 font-bold flex items-center gap-1">
+              💡 Click any green button to open
+            </span>
           </div>
         </div>
 
@@ -2017,227 +1876,395 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
         </div>
       )}
 
-      {/* OFFICIAL MUIT ASSIGNMENT DETAILS & SUBMISSION MODAL (https://stdlogin.muituniversity.in/Student/VAssignment) */}
-      {selectedAssignment && (
+      {/* OFFICIAL MUIT ASSIGNMENT DOCUMENT VIEWER & DETAILS MODAL */}
+      {selectedAssignmentDoc && (
         <div className="fixed inset-0 z-[99999] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
           <div className="max-w-2xl w-full bg-white text-slate-900 border border-slate-200 rounded-3xl p-6 relative shadow-2xl space-y-5 max-h-[92vh] overflow-y-auto">
             
             {/* Modal Header */}
             <div className="flex justify-between items-start border-b border-slate-200 pb-4">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-2xl border border-indigo-200 shadow-inner">
+                <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-200 shadow-inner">
                   <BookOpen className="w-6 h-6" />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded border border-indigo-200">
-                      {selectedAssignment.code}
+                    <span className="text-[10px] font-mono font-bold bg-slate-900 text-white px-2 py-0.5 rounded">
+                      S.No #{selectedAssignmentDoc.sNo}
+                    </span>
+                    <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200">
+                      {selectedAssignmentDoc.code}
                     </span>
                     <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">
-                      MUIT Coursework Assignment
+                      {selectedAssignmentDoc.subject}
                     </span>
                   </div>
                   <h3 className="text-base sm:text-lg font-black text-slate-900 tracking-tight mt-0.5">
-                    {selectedAssignment.title}
+                    {selectedAssignmentDoc.fileName}
                   </h3>
                 </div>
               </div>
               <button
-                onClick={() => setSelectedAssignment(null)}
+                onClick={() => setSelectedAssignmentDoc(null)}
                 className="p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Quick Metrics Bar */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200 text-center">
-              <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                <span className="text-[10px] text-slate-400 font-bold uppercase block">Subject</span>
-                <span className="text-xs font-black text-slate-900 truncate block mt-0.5" title={selectedAssignment.subject}>
-                  {selectedAssignment.code}
-                </span>
-              </div>
-              <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                <span className="text-[10px] text-slate-400 font-bold uppercase block">Faculty</span>
-                <span className="text-xs font-black text-slate-900 truncate block mt-0.5">
-                  {selectedAssignment.facultyShort || selectedAssignment.faculty}
-                </span>
-              </div>
-              <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                <span className="text-[10px] text-slate-400 font-bold uppercase block">Max Marks</span>
-                <span className="text-xs font-black text-indigo-600 font-mono block mt-0.5">
-                  {selectedAssignment.maxMarks} Marks
-                </span>
-              </div>
-              <div className="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
-                <span className="text-[10px] text-slate-400 font-bold uppercase block">Due Date</span>
-                <span className="text-xs font-black text-amber-600 font-mono block mt-0.5">
-                  {selectedAssignment.dueDate}
-                </span>
-              </div>
-            </div>
-
-            {/* Detailed Description */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                <FileText className="w-4 h-4 text-indigo-600" /> Assignment Brief & Instructions
-              </h4>
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-700 space-y-2 leading-relaxed">
-                <p className="font-semibold text-slate-900">{selectedAssignment.description}</p>
-                <div className="pt-2 border-t border-slate-200/80 text-[11px] text-slate-600 space-y-1">
-                  <div><strong>Submission Guidelines:</strong> {selectedAssignment.instructions}</div>
-                  <div><strong>Allowed File Types:</strong> {selectedAssignment.submissionType}</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Reference Attachment Box */}
-            <div className="p-3 rounded-2xl bg-indigo-50/50 border border-indigo-100 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-white border border-indigo-200 flex items-center justify-center text-indigo-600 shadow-2xs">
-                  <Paperclip className="w-4 h-4" />
-                </div>
-                <div>
-                  <h5 className="text-xs font-bold text-slate-900">{selectedAssignment.attachmentName}</h5>
-                  <span className="text-[10px] text-slate-500 font-mono">{selectedAssignment.attachmentSize} • Official Course PDF</span>
-                </div>
-              </div>
-
-              <button
-                onClick={() => alert(`📥 Downloading question paper: ${selectedAssignment.attachmentName}`)}
-                className="px-3 py-1.5 rounded-xl bg-white hover:bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold transition-all shadow-2xs flex items-center gap-1.5"
-              >
-                <Download className="w-3.5 h-3.5" /> Download PDF
-              </button>
-            </div>
-
-            {/* Status / Submission Area */}
-            {selectedAssignment.status === 'EVALUATED' && (
-              <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                    <span className="text-xs font-black text-emerald-900 uppercase">Assignment Evaluated & Graded</span>
-                  </div>
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-600 text-white font-mono font-black text-xs">
-                    Score: {selectedAssignment.obtainedMarks}/{selectedAssignment.maxMarks} ({selectedAssignment.grade})
-                  </span>
-                </div>
-                <p className="text-xs text-emerald-800 font-medium bg-white/70 p-2.5 rounded-xl border border-emerald-200/60">
-                  <strong>Faculty Feedback:</strong> "{selectedAssignment.facultyRemark}"
+            {/* Official University Assignment Document Sheet */}
+            <div className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-4">
+              {/* Document Header */}
+              <div className="border-b border-slate-300 pb-3 text-center space-y-1">
+                <h4 className="text-sm font-black text-slate-900 uppercase tracking-wider">
+                  Maharishi University of Information Technology
+                </h4>
+                <p className="text-[11px] text-slate-600 font-semibold">
+                  Faculty of Science & Technology • Department of Computer Applications
                 </p>
-                <div className="text-[10px] text-slate-500 font-mono">
-                  Submitted file: {selectedAssignment.submittedFileName} on {selectedAssignment.submittedDate}
-                </div>
+                <p className="text-[10px] text-emerald-700 font-mono font-bold">
+                  Course: BCA Semester V • Subject: {selectedAssignmentDoc.subject} ({selectedAssignmentDoc.code})
+                </p>
               </div>
-            )}
 
-            {selectedAssignment.status === 'SUBMITTED' && (
-              <div className="p-4 rounded-2xl bg-blue-50 border border-blue-200 space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5 text-blue-600" />
-                    <span className="text-xs font-black text-blue-900 uppercase">Submitted — Under Evaluation</span>
-                  </div>
-                  <span className="px-2.5 py-0.5 rounded-full bg-blue-200 text-blue-900 font-mono font-bold text-[10px]">
-                    Pending Grade
-                  </span>
-                </div>
-                <div className="text-xs text-blue-900 bg-white/70 p-2.5 rounded-xl border border-blue-200/60 space-y-1">
-                  <div><strong>File:</strong> <span className="font-mono text-[11px]">{selectedAssignment.submittedFileName}</span></div>
-                  <div><strong>Turned in:</strong> {selectedAssignment.submittedDate}</div>
-                  <div><strong>Remarks:</strong> {selectedAssignment.facultyRemark}</div>
-                </div>
+              {/* Assignment Topic */}
+              <div className="bg-white p-3 rounded-xl border border-slate-200/80 shadow-2xs">
+                <span className="text-[10px] text-slate-400 font-bold uppercase block">Core Topic / Curriculum Focus</span>
+                <p className="text-xs font-black text-slate-800 mt-0.5">
+                  {selectedAssignmentDoc.topic}
+                </p>
               </div>
-            )}
 
-            {selectedAssignment.status === 'PENDING' && (
-              <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-black text-amber-900 uppercase flex items-center gap-1.5">
-                    <Clock className="w-4 h-4 text-amber-600" /> Online Solution Submission
-                  </span>
-                  <span className="text-[10px] text-amber-800 font-mono font-bold">
-                    Due by {selectedAssignment.dueTime}
-                  </span>
-                </div>
-
-                {assignmentSubmitSuccess ? (
-                  <div className="p-3 bg-emerald-600 text-white rounded-xl text-center text-xs font-bold animate-fadeIn flex items-center justify-center gap-2">
-                    <CheckCircle2 className="w-4 h-4" /> Solution uploaded successfully! Status updated to SUBMITTED.
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    <div className="border-2 border-dashed border-amber-300 rounded-xl p-4 text-center bg-white/60 hover:bg-white transition-colors cursor-pointer">
-                      <UploadCloud className="w-6 h-6 text-amber-600 mx-auto mb-1" />
-                      <p className="text-xs font-bold text-slate-800">
-                        Drag and drop your assignment solution file here, or click to browse
-                      </p>
-                      <p className="text-[10px] text-slate-500 font-mono mt-0.5">
-                        PDF, DOCX, ZIP (Max 15MB) • Enrollment No: {user?.rollNo || '2401031601137'}
-                      </p>
+              {/* Questions List */}
+              <div className="space-y-2">
+                <span className="text-[11px] font-black text-slate-800 uppercase tracking-wide block">
+                  Questions / Problem Statement:
+                </span>
+                <div className="space-y-2">
+                  {selectedAssignmentDoc.questions && selectedAssignmentDoc.questions.map((q, idx) => (
+                    <div key={idx} className="p-3 bg-white rounded-xl border border-slate-200 text-xs text-slate-800 space-y-1 shadow-2xs">
+                      <div className="flex items-start gap-2">
+                        <span className="font-mono font-black text-emerald-700 text-xs shrink-0">Q{idx + 1}.</span>
+                        <p className="font-medium text-slate-800 leading-relaxed">{q}</p>
+                      </div>
                     </div>
+                  ))}
+                </div>
+              </div>
 
+              {/* Download Document Action */}
+              <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-2xs">
+                    {selectedAssignmentDoc.fileType === 'docx' ? 'DOC' : 'PDF'}
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold text-slate-900 block truncate max-w-[280px]">
+                      {selectedAssignmentDoc.fileName}
+                    </span>
+                    <span className="text-[10px] text-slate-500 font-mono">
+                      Official Course Assignment File
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => {
+                    const element = document.createElement('a');
+                    const file = new Blob([
+                      `MAHARISHI UNIVERSITY OF INFORMATION TECHNOLOGY\n` +
+                      `Subject: ${selectedAssignmentDoc.subject} (${selectedAssignmentDoc.code})\n` +
+                      `Assignment File: ${selectedAssignmentDoc.fileName}\n` +
+                      `Topic: ${selectedAssignmentDoc.topic}\n\n` +
+                      `QUESTIONS:\n` +
+                      selectedAssignmentDoc.questions.map((q, i) => `${i + 1}. ${q}`).join('\n\n')
+                    ], { type: 'text/plain' });
+                    element.href = URL.createObjectURL(file);
+                    element.download = selectedAssignmentDoc.fileName;
+                    document.body.appendChild(element);
+                    element.click();
+                    document.body.removeChild(element);
+                  }}
+                  className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-2xs flex items-center gap-1.5 transition-all"
+                >
+                  <Download className="w-3.5 h-3.5" /> Download File
+                </button>
+              </div>
+
+              {/* Solution Upload Status */}
+              <div className="p-3.5 rounded-xl bg-white border border-slate-200 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black text-slate-900 uppercase">
+                    Your Submission Status
+                  </span>
+                  {selectedAssignmentDoc.uploadedFile ? (
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-bold border border-emerald-300">
+                      ✓ Uploaded
+                    </span>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10px] font-bold border border-amber-300">
+                      Pending Submission
+                    </span>
+                  )}
+                </div>
+
+                {selectedAssignmentDoc.uploadedFile ? (
+                  <div className="p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 font-medium flex items-center justify-between">
+                    <div>
+                      <strong className="block text-emerald-950 font-mono text-[11px]">{selectedAssignmentDoc.uploadedFile}</strong>
+                      <span className="text-[10px] text-emerald-700">Uploaded successfully to student records</span>
+                    </div>
                     <button
-                      onClick={() => handleSimulateSubmitAssignment(selectedAssignment.id)}
-                      disabled={submittingAssignmentId === selectedAssignment.id}
-                      className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black text-xs transition-all shadow-md flex items-center justify-center gap-2"
+                      onClick={() => setUploadingAssignment(selectedAssignmentDoc)}
+                      className="px-2.5 py-1 rounded bg-white hover:bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-bold"
                     >
-                      {submittingAssignmentId === selectedAssignment.id ? (
-                        <>
-                          <RefreshCw className="w-4 h-4 animate-spin" /> Uploading to MUIT Server...
-                        </>
-                      ) : (
-                        <>
-                          <UploadCloud className="w-4 h-4" /> Submit Assignment Online
-                        </>
-                      )}
+                      Re-upload
                     </button>
                   </div>
+                ) : (
+                  <button
+                    onClick={() => setUploadingAssignment(selectedAssignmentDoc)}
+                    className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md flex items-center justify-center gap-1.5 transition-all"
+                  >
+                    <span>+</span> Upload Assignment Solution
+                  </button>
                 )}
               </div>
-            )}
-
-            {/* Official Link Banner in Modal */}
-            <div className="p-3 rounded-2xl bg-slate-900 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs">
-              <div className="flex items-center gap-2 truncate">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
-                <span className="text-slate-300 truncate">Official Portal:</span>
-                <code className="text-indigo-300 text-[10px] font-mono truncate">
-                  https://stdlogin.muituniversity.in/Student/VAssignment
-                </code>
-              </div>
-              <a
-                href={MUIT_ASSIGNMENT_PORTAL_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="shrink-0 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs flex items-center gap-1 transition-all"
-              >
-                Open in MUIT Portal <ExternalLink className="w-3 h-3" />
-              </a>
             </div>
 
-            {/* Modal Bottom Buttons */}
-            <div className="pt-2 border-t border-slate-200 flex justify-between items-center gap-3">
-              <a
-                href={MUIT_ASSIGNMENT_PORTAL_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-xs flex items-center gap-1.5 transition-colors"
-              >
-                <ExternalLink className="w-3.5 h-3.5" /> Direct ERP Access
-              </a>
-
+            {/* Bottom Actions */}
+            <div className="pt-2 border-t border-slate-200 flex justify-end gap-2">
               <button
-                onClick={() => setSelectedAssignment(null)}
+                onClick={() => setSelectedAssignmentDoc(null)}
                 className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md"
               >
-                Close
+                Close Assignment
               </button>
             </div>
 
           </div>
+        </div>
+      )}
+
+      {/* QUICK ASSIGNMENT SOLUTION UPLOAD MODAL */}
+      {uploadingAssignment && (
+        <div className="fixed inset-0 z-[99999] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="max-w-md w-full bg-white text-slate-900 rounded-3xl p-6 space-y-4 shadow-2xl border border-slate-200">
+            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <UploadCloud className="w-5 h-5 text-emerald-600" />
+                <div>
+                  <h3 className="text-sm font-black text-slate-900">Upload Assignment Solution</h3>
+                  <span className="text-[10px] text-slate-500 font-mono">
+                    #{uploadingAssignment.sNo} • {uploadingAssignment.code} - {uploadingAssignment.subject}
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => setUploadingAssignment(null)}
+                className="p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-700"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-1">
+              <span className="text-[10px] text-slate-400 font-bold uppercase block">Target Assignment</span>
+              <p className="font-bold text-slate-900">{uploadingAssignment.fileName}</p>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-slate-700 block">Solution File Name / Notes:</label>
+              <input
+                type="text"
+                placeholder={`Manoj_Sharma_${uploadingAssignment.code}_Solution.pdf`}
+                value={uploadFileNameInput}
+                onChange={(e) => setUploadFileNameInput(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-emerald-500 focus:bg-white"
+              />
+              <div className="border-2 border-dashed border-emerald-300 rounded-xl p-4 text-center bg-emerald-50/40 hover:bg-emerald-50 transition-colors cursor-pointer">
+                <UploadCloud className="w-7 h-7 text-emerald-600 mx-auto mb-1" />
+                <p className="text-xs font-bold text-slate-800">
+                  Select your assignment solution file
+                </p>
+                <p className="text-[10px] text-slate-500 font-mono mt-0.5">
+                  PDF, DOCX, ZIP (Max 15MB) • Roll No: {user?.rollNo || '2401031601137'}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-2 pt-2 border-t border-slate-100">
+              <button
+                onClick={() => setUploadingAssignment(null)}
+                className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleUploadAssignment(uploadingAssignment.sNo)}
+                className="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md flex items-center justify-center gap-1.5"
+              >
+                <Check className="w-4 h-4" /> Submit Solution
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* EXPANDED FULL-SCREEN ASSIGNMENTS PORTAL MODAL (58 ITEMS) */}
+      {showAllAssignmentsModal && (
+        <div className="fixed inset-0 z-[99999] bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 animate-fadeIn">
+          <div className="max-w-5xl w-full bg-white text-slate-900 border border-slate-200 rounded-3xl p-6 relative shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+            
+            {/* Modal Header */}
+            <div className="flex justify-between items-center border-b border-slate-200 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-2xl border border-emerald-200 shadow-inner">
+                  <FileText className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">
+                    Official Student Coursework & Assignments Directory
+                  </h3>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Maharishi University of Information Technology • BCA Semester V • Total 58 Assignments
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowAllAssignmentsModal(false)}
+                className="p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Filter and Search Bar */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200">
+              <div className="relative flex-1">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  placeholder="Search across all 58 assignments..."
+                  value={assignmentSearch}
+                  onChange={(e) => setAssignmentSearch(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-white border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 shadow-2xs"
+                />
+              </div>
+
+              <div className="flex items-center gap-1 overflow-x-auto py-1 text-[11px] font-bold">
+                {['ALL', 'BCA501', 'BCA502', 'BCA503', 'BCA504', 'BCA511', 'BCA512'].map((code) => {
+                  const count = code === 'ALL' 
+                    ? assignments.length 
+                    : assignments.filter(a => a.code === code).length;
+                  return (
+                    <button
+                      key={code}
+                      onClick={() => setAssignmentSubjectFilter(code)}
+                      className={`px-2.5 py-1 rounded-lg shrink-0 transition-all ${
+                        assignmentSubjectFilter === code
+                          ? 'bg-emerald-600 text-white font-black shadow-xs'
+                          : 'bg-white hover:bg-slate-200 text-slate-700 border border-slate-200'
+                      }`}
+                    >
+                      {code} ({count})
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Complete 58 Table */}
+            <div className="border border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
+              <div className="max-h-[55vh] overflow-y-auto">
+                <table className="w-full text-left border-collapse text-xs">
+                  <thead className="sticky top-0 z-10 bg-[#257ba0] text-white font-bold text-[11px] tracking-wide uppercase shadow-sm">
+                    <tr>
+                      <th className="py-2.5 px-3 text-center w-12">S.No</th>
+                      <th className="py-2.5 px-3 w-20">Subject Code</th>
+                      <th className="py-2.5 px-3">Subject Name</th>
+                      <th className="py-2.5 px-3">File</th>
+                      <th className="py-2.5 px-3 text-center">Uploaded file</th>
+                      <th className="py-2.5 px-3 text-center w-20">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
+                    {filteredMuitAssignments.map((asn) => (
+                      <tr 
+                        key={asn.sNo} 
+                        className="hover:bg-emerald-50/50 transition-colors cursor-pointer group"
+                        onClick={() => setSelectedAssignmentDoc(asn)}
+                      >
+                        <td className="py-2 px-3 text-center font-mono font-bold text-slate-600 text-xs">
+                          {asn.sNo}
+                        </td>
+                        <td className="py-2 px-3 font-mono font-bold text-slate-900 text-xs">
+                          {asn.code}
+                        </td>
+                        <td className="py-2 px-3 font-bold text-slate-900 text-xs">
+                          {asn.subject}
+                        </td>
+                        <td className="py-2 px-3">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedAssignmentDoc(asn);
+                            }}
+                            className="px-2.5 py-1.5 rounded bg-[#4caf50] hover:bg-[#43a047] text-white text-[11px] font-bold shadow-2xs flex items-center gap-1.5 transition-all"
+                            title="Click to open assignment"
+                          >
+                            <Download className="w-3.5 h-3.5 shrink-0" />
+                            <span className="truncate max-w-[260px]">{asn.fileName}</span>
+                          </button>
+                        </td>
+                        <td className="py-2 px-3 text-center">
+                          {asn.uploadedFile ? (
+                            <span className="inline-block px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono text-[10px] font-bold border border-emerald-300">
+                              ✓ {asn.uploadedFile}
+                            </span>
+                          ) : (
+                            <span className="text-slate-400 font-mono text-xs">—</span>
+                          )}
+                        </td>
+                        <td className="py-2 px-3 text-center">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setUploadingAssignment(asn);
+                            }}
+                            className="px-3 py-1.5 rounded bg-[#4caf50] hover:bg-[#43a047] text-white text-[11px] font-bold shadow-2xs flex items-center justify-center gap-1 mx-auto transition-all"
+                          >
+                            <span>+</span> Upload
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex justify-between items-center pt-2 border-t border-slate-200">
+              <span className="text-xs text-slate-500 font-medium">
+                Total {filteredMuitAssignments.length} of {assignments.length} assignments displayed
+              </span>
+              <button
+                onClick={() => setShowAllAssignmentsModal(false)}
+                className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-md"
+              >
+                Close Full Directory
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* TOAST FEEDBACK NOTIFICATION */}
+      {uploadToast && (
+        <div className="fixed bottom-6 right-6 z-[999999] bg-emerald-600 text-white px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-2 text-xs font-bold animate-bounce">
+          <CheckCircle2 className="w-4 h-4" /> {uploadToast}
         </div>
       )}
 
