@@ -787,16 +787,8 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
             {/* Header */}
             <div className="flex justify-between items-center h-6">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                <BookOpen className="w-4 h-4 text-indigo-600" /> Assignment
+                <BookOpen className="w-4 h-4 text-indigo-600" /> Upload Assignment
               </span>
-
-              <button
-                onClick={() => setShowTeacherUploadModal(true)}
-                className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold shadow-xs transition-all flex items-center gap-1"
-                title="Upload New Coursework Assignment"
-              >
-                <Plus className="w-3 h-3" /> Upload Assignment
-              </button>
             </div>
 
             {/* Subject Filter Pills */}
@@ -900,7 +892,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
             onClick={() => setShowTeacherUploadModal(true)}
             className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black transition-all shadow-md flex items-center justify-center gap-1.5 mt-1"
           >
-            <Plus className="w-3.5 h-3.5" /> + Upload New Assignment for Students
+            <Plus className="w-3.5 h-3.5" /> Upload New Assignment
           </button>
         </div>
 
