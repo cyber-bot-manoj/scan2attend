@@ -35,7 +35,8 @@ import {
   Paperclip,
   Search,
   Eye,
-  Plus
+  Plus,
+  Maximize2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { MUIT_ASSIGNMENTS } from './muitAssignmentsData';
@@ -968,16 +969,16 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
         {/* CARD 1: 3D REAL-TIME GEOFENCE RADAR STATUS */}
-        <div className="card-3d p-6 space-y-4 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
+        <div className="card-3d p-5 space-y-3 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
+          <div className="space-y-3">
+            <div className="flex justify-between items-center h-6">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <MapPin className="w-4 h-4 text-blue-600" /> GPS Geofence Radar
               </span>
             </div>
 
             {/* Radar Box */}
-            <div className={`p-4 rounded-2xl text-white space-y-3 relative overflow-hidden border shadow-md transition-all ${
+            <div className={`p-3.5 rounded-2xl text-white space-y-2.5 relative overflow-hidden border shadow-md transition-all ${
               isWithinGeofence
                 ? 'bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 border-slate-800'
                 : 'bg-gradient-to-br from-slate-900 via-slate-950 to-red-950 border-red-800/60'
@@ -1028,9 +1029,9 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
         </div>
 
         {/* CARD 2: DYNAMIC QR SCANNER & CAMERA PORTAL */}
-        <div className="card-3d p-6 space-y-4 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
+        <div className="card-3d p-5 space-y-3 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
           <div className="space-y-3">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center h-6">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <QrCode className="w-4 h-4 text-indigo-600" /> QR Verification Gateway
               </span>
@@ -1050,7 +1051,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           <button
             onClick={handleStartAttendance}
             disabled={timeLeft === 0}
-            className={`w-full py-3 rounded-xl font-black text-xs transition-all shadow-md flex items-center justify-center gap-2 ${
+            className={`w-full py-2.5 rounded-xl font-black text-xs transition-all shadow-md flex items-center justify-center gap-2 mt-1 ${
               timeLeft > 0 
                 ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20' 
                 : 'bg-slate-200 text-slate-400 cursor-not-allowed'
@@ -1154,14 +1155,17 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           <div className="space-y-2.5">
             
             {/* Card Header */}
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center h-6">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <FileText className="w-4 h-4 text-emerald-600" /> Attendance History
+              </span>
+              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                89.2% Overall
               </span>
             </div>
 
             {/* Subject Quick Filter Pills */}
-            <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b border-slate-200 text-[10px] font-bold">
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b border-slate-200 text-[10px] font-bold h-7">
               {['ALL', 'BCA501', 'BCA502', 'BCA503', 'BCA511'].map(sub => (
                 <button
                   key={sub}
@@ -1178,7 +1182,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
             </div>
 
             {/* Attendance Logs List */}
-            <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
+            <div className="space-y-1.5 h-[180px] overflow-y-auto pr-1">
               {attendanceLogs
                 .filter(log => semesterFilterSubject === 'ALL' || log.subject.includes(semesterFilterSubject))
                 .map((log, idx) => (
@@ -1212,193 +1216,165 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           </button>
         </div>
 
-        {/* CARD 5: OFFICIAL MUIT COURSEWORK & ASSIGNMENTS TABLE (58 ASSIGNMENTS) */}
+        {/* CARD 5: OFFICIAL MUIT COURSEWORK & ASSIGNMENTS (58 ASSIGNMENTS) */}
         <div className="card-3d p-5 space-y-3 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
-          <div className="space-y-3">
-            {/* Header */}
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shadow-2xs">
-                  <FileText className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-black text-slate-900 uppercase tracking-wider">
-                    Student Assignments
-                  </h4>
-                  <span className="text-[10px] text-slate-400 font-medium">
-                    Maharishi University • BCA Semester V ({assignments.length} Total)
-                  </span>
-                </div>
-              </div>
+          <div className="space-y-2.5">
+            
+            {/* Card Header: Just "Assignment" on left, Fullscreen icon on right */}
+            <div className="flex justify-between items-center h-6">
+              <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                <BookOpen className="w-4 h-4 text-indigo-600" /> Assignment
+              </span>
 
               <button
                 onClick={() => setShowAllAssignmentsModal(true)}
-                className="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold shadow-xs transition-all flex items-center gap-1"
-                title="Expand full assignment window"
+                className="p-1 rounded-md text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors"
+                title="Fullscreen"
               >
-                <Eye className="w-3 h-3" /> Full View
+                <Maximize2 className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Quick Search & Filter Strip */}
-            <div className="space-y-2">
-              <div className="relative">
-                <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  placeholder="Search by subject, code, or file name..."
-                  value={assignmentSearch}
-                  onChange={(e) => setAssignmentSearch(e.target.value)}
-                  className="w-full pl-8 pr-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:bg-white transition-all"
-                />
-                {assignmentSearch && (
-                  <button
-                    onClick={() => setAssignmentSearch('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                )}
-              </div>
+            {/* Subject Filter Pills */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b border-slate-200 text-[10px] font-bold h-7">
+              {['ALL', 'BCA501', 'BCA502', 'BCA503', 'BCA504', 'BCA511', 'BCA512'].map((code) => (
+                <button
+                  key={code}
+                  onClick={() => setAssignmentSubjectFilter(code)}
+                  className={`px-2 py-0.5 rounded-md transition-all shrink-0 ${
+                    assignmentSubjectFilter === code
+                      ? 'bg-emerald-600 text-white font-black shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {code}
+                </button>
+              ))}
+            </div>
 
-              {/* Subject Filter Pills */}
-              <div className="flex items-center gap-1 text-[10px] font-bold overflow-x-auto py-0.5 scrollbar-none">
-                {['ALL', 'BCA501', 'BCA502', 'BCA503', 'BCA504', 'BCA511', 'BCA512'].map((code) => {
-                  const count = code === 'ALL' 
-                    ? assignments.length 
-                    : assignments.filter(a => a.code === code).length;
-                  return (
+            {/* Assignment Cards Stream - Vertical Cards: NO horizontal scroll! */}
+            <div className="space-y-1.5 h-[180px] overflow-y-auto pr-1">
+              {filteredMuitAssignments.map((asn) => (
+                <div
+                  key={asn.sNo}
+                  onClick={() => setSelectedAssignmentDoc(asn)}
+                  className="p-2 rounded-xl bg-slate-50 border border-slate-200/90 hover:border-emerald-400 hover:bg-white transition-all cursor-pointer space-y-1.5 group"
+                >
+                  {/* Top Line: S.No + Code + Subject Name */}
+                  <div className="flex items-center justify-between text-[10px]">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="font-mono font-bold bg-slate-200 text-slate-800 px-1 py-0.2 rounded text-[9px]">
+                        #{asn.sNo}
+                      </span>
+                      <span className="font-mono font-black text-emerald-700 bg-emerald-50 px-1 py-0.2 rounded border border-emerald-200 text-[9px]">
+                        {asn.code}
+                      </span>
+                      <span className="font-extrabold text-slate-900 truncate max-w-[140px]" title={asn.subject}>
+                        {asn.subject}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Green File Button */}
+                  <div>
                     <button
-                      key={code}
-                      onClick={() => setAssignmentSubjectFilter(code)}
-                      className={`px-2 py-0.5 rounded-md shrink-0 transition-all ${
-                        assignmentSubjectFilter === code
-                          ? 'bg-emerald-600 text-white font-black shadow-xs'
-                          : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
-                      }`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedAssignmentDoc(asn);
+                      }}
+                      className="w-full px-2 py-1 rounded-lg bg-[#4caf50] hover:bg-[#43a047] text-white text-[11px] font-bold shadow-2xs flex items-center gap-1.5 text-left transition-all"
+                      title="Click to open assignment"
                     >
-                      {code} ({count})
+                      <Download className="w-3 h-3 shrink-0" />
+                      <span className="truncate">{asn.fileName}</span>
                     </button>
-                  );
-                })}
-              </div>
-            </div>
+                  </div>
 
-            {/* MUIT Official Assignment Table View */}
-            <div className="border border-slate-200 rounded-xl overflow-hidden shadow-2xs">
-              <div className="h-64 overflow-y-auto overflow-x-auto">
-                <table className="w-full text-left border-collapse text-xs">
-                  <thead className="sticky top-0 z-10 bg-[#257ba0] text-white font-bold text-[10px] tracking-wide uppercase shadow-sm">
-                    <tr>
-                      <th className="py-2 px-2 text-center w-10">S.No</th>
-                      <th className="py-2 px-2 w-16">Subject Code</th>
-                      <th className="py-2 px-2.5">Subject Name</th>
-                      <th className="py-2 px-2.5">File</th>
-                      <th className="py-2 px-2 text-center">Uploaded</th>
-                      <th className="py-2 px-2 text-center w-16">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 text-slate-700 font-medium">
-                    {filteredMuitAssignments.map((asn) => (
-                      <tr 
-                        key={asn.sNo} 
-                        className="hover:bg-emerald-50/40 transition-colors group cursor-pointer"
-                        onClick={(e) => {
-                          if (e.target.closest('button.upload-btn')) return;
-                          setSelectedAssignmentDoc(asn);
-                        }}
-                      >
-                        <td className="py-2 px-2 text-center font-mono font-bold text-slate-600 text-[11px]">
-                          {asn.sNo}
-                        </td>
-                        <td className="py-2 px-2 font-mono font-bold text-slate-800 text-[10px]">
-                          {asn.code}
-                        </td>
-                        <td className="py-2 px-2.5 font-bold text-slate-800 text-[10px] truncate max-w-[130px]" title={asn.subject}>
-                          {asn.subject}
-                        </td>
-                        <td className="py-2 px-2.5">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedAssignmentDoc(asn);
-                            }}
-                            className="px-2 py-1 rounded bg-[#4caf50] hover:bg-[#43a047] text-white text-[10px] font-bold shadow-2xs flex items-center gap-1 transition-all group-hover:shadow"
-                            title="Click to open assignment"
-                          >
-                            <Download className="w-3 h-3 shrink-0" />
-                            <span className="truncate max-w-[130px] sm:max-w-[170px]">{asn.fileName}</span>
-                          </button>
-                        </td>
-                        <td className="py-2 px-2 text-center">
-                          {asn.uploadedFile ? (
-                            <span className="inline-block px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-mono text-[9px] font-bold border border-emerald-300 truncate max-w-[100px]" title={asn.uploadedFile}>
-                              ✓ Submitted
-                            </span>
-                          ) : (
-                            <span className="text-slate-400 font-mono text-[10px]">—</span>
-                          )}
-                        </td>
-                        <td className="py-2 px-2 text-center">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setUploadingAssignment(asn);
-                            }}
-                            className="upload-btn px-2.5 py-1 rounded bg-[#4caf50] hover:bg-[#43a047] text-white text-[10px] font-bold shadow-2xs flex items-center justify-center gap-0.5 mx-auto transition-all"
-                            title="Upload solution"
-                          >
-                            <span>+</span> Upload
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                    {filteredMuitAssignments.length === 0 && (
-                      <tr>
-                        <td colSpan={6} className="py-8 text-center text-slate-400 text-xs">
-                          No matching assignments found.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                  {/* Underneath: Upload Status & Action Button - clean and stacked */}
+                  <div className="flex items-center justify-between gap-1.5 pt-1 border-t border-slate-200/70 text-[10px]">
+                    <div className="truncate min-w-0 flex items-center gap-1">
+                      <span className="text-slate-400 text-[9px]">Upload:</span>
+                      {asn.uploadedFile ? (
+                        <span className="text-emerald-700 font-bold font-mono text-[9px] truncate" title={asn.uploadedFile}>
+                          ✓ {asn.uploadedFile}
+                        </span>
+                      ) : (
+                        <span className="text-slate-400 text-[9px]">Not uploaded</span>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setUploadingAssignment(asn);
+                      }}
+                      className="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] shrink-0 shadow-2xs flex items-center gap-0.5 transition-all"
+                    >
+                      <Plus className="w-2.5 h-2.5" /> Upload
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {filteredMuitAssignments.length === 0 && (
+                <div className="py-6 text-center text-slate-400 text-xs">
+                  No matching assignments found.
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Footer note */}
-          <div className="flex items-center justify-between text-[10px] text-slate-500 pt-1 border-t border-slate-100">
-            <span>Showing {filteredMuitAssignments.length} of {assignments.length} assignments</span>
-            <span className="text-emerald-700 font-bold flex items-center gap-1">
-              💡 Click any green button to open
-            </span>
-          </div>
+          {/* Card 5 Bottom Button - identical height & styling to Card 4 */}
+          <button
+            onClick={() => setShowAllAssignmentsModal(true)}
+            className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-[11px] transition-all shadow-md flex items-center justify-center gap-1.5 mt-1"
+          >
+            <Maximize2 className="w-3.5 h-3.5" /> View All Assignments ({assignments.length})
+          </button>
         </div>
 
         {/* CARD 6: RECENT NOTIFICATIONS & OFFICIAL MUIT NOTICE BOARD VERTICAL TICKER */}
-        <div className="card-3d p-6 space-y-4 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
-          <div className="space-y-3">
-            <div className="flex justify-between items-center">
+        <div className="card-3d p-5 space-y-3 flex flex-col justify-between hover:shadow-2xl transition-all duration-300">
+          <div className="space-y-2.5">
+            <div className="flex justify-between items-center h-6">
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <Bell className="w-4 h-4 text-amber-500 animate-bounce" /> Notice Board
               </span>
-              
+              <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
+                Live Updates
+              </span>
+            </div>
+
+            {/* Category Filter Pills to match Card 4 & 5 secondary row */}
+            <div className="flex items-center gap-1 overflow-x-auto pb-1 border-b border-slate-200 text-[10px] font-bold h-7">
+              {['ALL', 'Academic', 'Exams', 'Events', 'Urgent'].map((cat) => (
+                <button
+                  key={cat}
+                  className={`px-2 py-0.5 rounded-md transition-all shrink-0 ${
+                    cat === 'ALL'
+                      ? 'bg-blue-600 text-white font-black shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {cat}
+                </button>
+              ))}
             </div>
 
             {/* Continuous Vertical Ticker (Official MUIT Portal Upward Scroll Effect) */}
-            <div className="notice-ticker-wrapper rounded-2xl bg-slate-50 border border-slate-200/90 p-2 shadow-inner">
+            <div className="notice-ticker-wrapper rounded-xl bg-slate-50 border border-slate-200/90 p-1.5 shadow-inner !h-[180px]">
               <div className="notice-ticker-content">
                 {[...noticeItems, ...noticeItems].map((item, idx) => (
                   <div
                     key={idx}
                     onClick={() => setSelectedNotification(item)}
-                    className="p-2.5 rounded-xl bg-white border border-slate-200/80 cursor-pointer hover:border-blue-400 hover:shadow-md transition-all space-y-1 group"
+                    className="p-2 rounded-xl bg-white border border-slate-200/80 cursor-pointer hover:border-blue-400 hover:shadow-md transition-all space-y-1 group"
                   >
-                    <div className="flex justify-between font-extrabold text-slate-900 text-xs">
-                      <span className="flex items-center gap-1.5 text-slate-900 group-hover:text-blue-600 transition-colors">
+                    <div className="flex justify-between font-extrabold text-slate-900 text-[11px]">
+                      <span className="flex items-center gap-1 text-slate-900 group-hover:text-blue-600 transition-colors">
                         {item.icon} {item.title}
                       </span>
-                      <span className="text-[10px] text-blue-600 font-mono font-bold">{item.time}</span>
+                      <span className="text-[9px] text-blue-600 font-mono font-bold">{item.time}</span>
                     </div>
                     <p className="text-[10px] text-slate-600 font-medium line-clamp-1">
                       {item.summary}
@@ -1407,13 +1383,11 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                 ))}
               </div>
             </div>
-
-            
           </div>
 
           <button
             onClick={() => alert('📢 Notice Board sync complete!')}
-            className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black transition-all shadow-md flex items-center justify-center gap-1.5"
+            className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 mt-1"
           >
             <Bell className="w-3.5 h-3.5" /> Notice Board
           </button>
