@@ -26,9 +26,9 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
     {
       id: 'msg_welcome',
       sender: 'bot',
-      text: `Hello **${user?.name || 'Student'}**! 👋 I am your **AI Campus Assistant**.\n\nI can assist you with your attendance records, 50m geofence rules, 5-minute QR codes, SMS alert dispatches, and class schedules. Ask me anything!`,
+      text: `Hey **${user?.name || 'Dost'}**! 👋 Main hoon tumhara **Gemini Campus Buddy** 😊\n\nAttendance, 50m geofence rules, 5-minute QR scan, ya timetable se related koi bhi baat ho — bilkul apne dost ki tarah pucho! Main hamesha tumhari help ke liye yahan hoon. 🚀✨`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      source: 'AI Assistant'
+      source: 'Gemini Buddy'
     }
   ]);
 
@@ -68,29 +68,59 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
     setLoading(true);
 
     try {
-      // Send request to backend Gemini endpoint
-      const res = await fetch('/api/gemini/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: text,
-          userContext: {
-            name: user?.name,
-            role: user?.role,
-            rollNo: user?.rollNo,
-            classSection: user?.classSection
-          }
-        })
-      });
+      let data = null;
+      // 1. Try relative endpoint (Vite proxy / production)
+      try {
+        const res = await fetch('/api/gemini/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: text,
+            userContext: {
+              name: user?.name,
+              role: user?.role,
+              rollNo: user?.rollNo,
+              classSection: user?.classSection
+            }
+          })
+        });
+        if (res.ok) {
+          data = await res.json();
+        }
+      } catch (proxyErr) {
+        console.warn('Relative fetch failed, trying direct localhost:5000...', proxyErr);
+      }
 
-      const data = await res.json();
+      // 2. If relative failed or no response, try direct backend URL
+      if (!data || !data.success) {
+        try {
+          const directRes = await fetch('http://localhost:5000/api/gemini/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              message: text,
+              userContext: {
+                name: user?.name,
+                role: user?.role,
+                rollNo: user?.rollNo,
+                classSection: user?.classSection
+              }
+            })
+          });
+          if (directRes.ok) {
+            data = await directRes.json();
+          }
+        } catch (directErr) {
+          console.warn('Direct backend fetch failed:', directErr);
+        }
+      }
 
       let replyText = '';
       let sourceInfo = 'AI Chatbot';
 
-      if (data.success && data.reply) {
+      if (data && data.success && data.reply) {
         replyText = data.reply;
-        sourceInfo = 'AI Assistant';
+        sourceInfo = data.source || 'Gemini AI';
       } else {
         replyText = generateFallbackResponse(text, user);
         sourceInfo = 'Smart Campus AI';

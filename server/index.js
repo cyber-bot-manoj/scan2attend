@@ -455,46 +455,63 @@ app.post(['/api/auth/register-faculty', '/api/auth/register-teacher'], (req, res
 // GEMINI AI CHATBOT ROUTE
 // -------------------------------------------------------------
 app.post('/api/gemini/chat', async (req, res) => {
-  const { message, apiKey, userContext } = req.body;
-  const key = apiKey || process.env.GEMINI_API_KEY;
+  const { message, userContext } = req.body;
+  const key = process.env.GEMINI_API_KEY;
 
   if (!message) {
     return res.status(400).json({ success: false, message: 'Message is required' });
   }
 
-  const systemInstruction = `You are "Gemini AI Campus Assistant", a helpful AI embedded in Scan2Attend Smart Geofence & QR System.
-User Context: ${userContext ? JSON.stringify(userContext) : 'Campus User'}.
-Scan2Attend details:
-- Geofence constraint: 50 Meters around classroom.
-- Dynamic QR code expiration: 5 Minutes.
-- Live camera face verification with liveness mode.
-- Instant SMS Notifications dispatched via SMS gateway.`;
+  const systemInstruction = `You are "Gemini Campus Buddy / AI Assistant", an extremely friendly, approachable, and smart campus companion for the Scan2Attend system.
+User Context: ${userContext ? JSON.stringify(userContext) : 'Campus Member'}.
+
+CRITICAL PERSONALITY & TONE RULES:
+1. Mirror the User's Language & Style Exactly:
+   - If user speaks in casual Hinglish/Hindi (e.g. "bhai", "yaar", "kaise hoga"), respond in the same friendly, casual Hinglish buddy tone ("Arre bhai tension mat le...", "Dekh dost...").
+   - If user speaks formal Hindi or English, respond politely and formally.
+   - If user speaks casual English, be friendly and modern.
+2. Super Friendly & Supportive:
+   - Talk like a supportive college senior or close friend, never like a cold robot.
+   - Use warm emojis (😊, 🚀, 👍, 📱, ✨, 🙌) to make conversations fun and helpful.
+3. System Rules:
+   - 50-meter classroom geofence constraint.
+   - 5-minute dynamic QR code expiration.
+   - Live face verification with camera liveness.
+   - Instant SMS alerts for attendance and alerts.`;
 
   if (key) {
-    try {
-      const apiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: `${systemInstruction}\n\nUser Prompt: ${message}` }]
-            }
-          ]
-        })
-      });
-      
-      const data = await apiRes.json();
-      if (data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
-        return res.json({
-          success: true,
-          reply: data.candidates[0].content.parts[0].text,
-          source: 'Gemini 1.5 Flash API'
+    const candidateModels = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.1-flash-lite'];
+    for (const model of candidateModels) {
+      try {
+        const apiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                role: 'user',
+                parts: [{ text: `${systemInstruction}\n\nUser Prompt: ${message}` }]
+              }
+            ]
+          }),
+          signal: AbortSignal.timeout(7000)
         });
+
+        const data = await apiRes.json();
+        if (apiRes.ok && data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
+          return res.json({
+            success: true,
+            reply: data.candidates[0].content.parts[0].text,
+            model: model,
+            source: `Gemini AI (${model})`
+          });
+        }
+        console.warn(`[Gemini] Model ${model} returned:`, data.error?.message || apiRes.statusText);
+      } catch (err) {
+        console.warn(`[Gemini] Model ${model} error:`, err.message);
       }
-    } catch (err) {
-      console.error('Gemini API Fetch Error:', err);
     }
   }
 
@@ -519,7 +536,7 @@ Scan2Attend details:
   res.json({
     success: true,
     reply: reply,
-    source: key ? 'Fallback AI' : 'Gemini AI Assistant'
+    source: 'Fallback AI'
   });
 });
 
@@ -908,4 +925,3 @@ if (require.main === module) {
 }
 
 module.exports = app;
-
