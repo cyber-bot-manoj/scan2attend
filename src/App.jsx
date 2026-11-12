@@ -54,6 +54,34 @@ export default function App() {
     }
   });
 
+  // Anti-Inspect Code Protection (Disable Right-Click, Inspect, DevTools Shortcuts)
+  useEffect(() => {
+    const handleContextMenu = (e) => e.preventDefault();
+    const handleKeyDown = (e) => {
+      const isCtrlOrMeta = e.ctrlKey || e.metaKey;
+      const key = (e.key || '').toUpperCase();
+      if (
+        e.key === 'F12' ||
+        e.keyCode === 123 ||
+        (isCtrlOrMeta && (
+          (e.shiftKey && (key === 'I' || key === 'J' || key === 'C')) ||
+          key === 'U' ||
+          key === 'S'
+        ))
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    };
+    window.addEventListener('contextmenu', handleContextMenu, { capture: true });
+    window.addEventListener('keydown', handleKeyDown, { capture: true });
+    return () => {
+      window.removeEventListener('contextmenu', handleContextMenu);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   useEffect(() => {
     if (activeSession?.expiresAt > Date.now()) {
       localStorage.setItem('activeQrSession', JSON.stringify(activeSession));
