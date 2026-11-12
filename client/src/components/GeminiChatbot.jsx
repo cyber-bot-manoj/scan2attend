@@ -1,19 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Sparkles, 
   Send, 
   X, 
   Bot, 
   User, 
   Maximize2, 
   Minimize2,
-  HelpCircle,
-  ShieldCheck,
-  MapPin,
-  Clock,
-  MessageSquare,
-  Zap,
-  CheckCircle2
+  Sparkles
 } from 'lucide-react';
 
 export default function GeminiChatbot({ user, isSettingsOpen = false }) {
@@ -21,18 +14,17 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const inputRef = useRef(null);
+  const chatEndRef = useRef(null);
   
   const [messages, setMessages] = useState([
     {
       id: 'msg_welcome',
       sender: 'bot',
-      text: `Hey **${user?.name || 'Dost'}**! 👋 Main hoon tumhara **Gemini Campus Buddy** 😊\n\nAttendance, 50m geofence rules, 5-minute QR scan, ya timetable se related koi bhi baat ho — bilkul apne dost ki tarah pucho! Main hamesha tumhari help ke liye yahan hoon. 🚀✨`,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      source: 'Gemini Buddy'
+      text: `Hey **${user?.name || 'Dost'}**! 👋 Attendance, 50m geofence rules, 5-minute QR scan, ya timetable se related koi bhi sawal ho — bejhijhak pucho! Main hamesha tumhari help ke liye yahan hoon. 🚀✨`,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     }
   ]);
-
-  const chatEndRef = useRef(null);
 
   // Hide completely when any modal is open
   const [hideForModal, setHideForModal] = useState(false);
@@ -50,10 +42,10 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
     if (isOpen) {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isOpen]);
+  }, [messages, isOpen, loading]);
 
   const handleSendMessage = async (textToSend) => {
-    const text = textToSend || inputMessage.trim();
+    const text = (textToSend || inputMessage).trim();
     if (!text || loading) return;
 
     const userMsg = {
@@ -64,14 +56,19 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
     };
 
     setMessages(prev => [...prev, userMsg]);
-    if (!textToSend) setInputMessage('');
+    setInputMessage(''); // Clear immediately so user can type next question without delay
     setLoading(true);
 
     try {
       let data = null;
-      // 1. Try relative endpoint (Vite proxy / production)
+
+      // Primary fast endpoint: direct port 5000 if on localhost, else relative /api
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const primaryUrl = isLocal ? 'http://localhost:5000/api/gemini/chat' : '/api/gemini/chat';
+      const fallbackUrl = primaryUrl === '/api/gemini/chat' ? 'http://localhost:5000/api/gemini/chat' : '/api/gemini/chat';
+
       try {
-        const res = await fetch('/api/gemini/chat', {
+        const res = await fetch(primaryUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -82,19 +79,19 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
               rollNo: user?.rollNo,
               classSection: user?.classSection
             }
-          })
+          }),
+          signal: AbortSignal.timeout(7000)
         });
         if (res.ok) {
           data = await res.json();
         }
-      } catch (proxyErr) {
-        console.warn('Relative fetch failed, trying direct localhost:5000...', proxyErr);
+      } catch (err1) {
+        console.warn('Primary chatbot fetch failed, trying secondary...', err1);
       }
 
-      // 2. If relative failed or no response, try direct backend URL
       if (!data || !data.success) {
         try {
-          const directRes = await fetch('http://localhost:5000/api/gemini/chat', {
+          const res2 = await fetch(fallbackUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -105,26 +102,20 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
                 rollNo: user?.rollNo,
                 classSection: user?.classSection
               }
-            })
+            }),
+            signal: AbortSignal.timeout(7000)
           });
-          if (directRes.ok) {
-            data = await directRes.json();
+          if (res2.ok) {
+            data = await res2.json();
           }
-        } catch (directErr) {
-          console.warn('Direct backend fetch failed:', directErr);
+        } catch (err2) {
+          console.warn('Secondary chatbot fetch failed:', err2);
         }
       }
 
-      let replyText = '';
-      let sourceInfo = 'AI Chatbot';
-
-      if (data && data.success && data.reply) {
-        replyText = data.reply;
-        sourceInfo = data.source || 'Gemini AI';
-      } else {
-        replyText = generateFallbackResponse(text, user);
-        sourceInfo = 'Smart Campus AI';
-      }
+      let replyText = (data && data.success && data.reply)
+        ? data.reply
+        : generateFallbackResponse(text, user);
 
       setMessages(prev => [
         ...prev,
@@ -132,103 +123,98 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
           id: 'bot_msg_' + Date.now(),
           sender: 'bot',
           text: replyText,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          source: sourceInfo
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
       ]);
     } catch (err) {
-      console.warn('API error, executing fallback AI response:', err);
+      console.warn('Chatbot error:', err);
       const fallbackReply = generateFallbackResponse(text, user);
-      
       setMessages(prev => [
         ...prev,
         {
           id: 'bot_msg_' + Date.now(),
           sender: 'bot',
           text: fallbackReply,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          source: 'AI Assistant'
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         }
       ]);
     } finally {
       setLoading(false);
+      // Auto-refocus input so the user can immediately type the next message
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 50);
     }
   };
 
   const generateFallbackResponse = (query, currentUser) => {
-    const q = query.toLowerCase();
-    const userName = currentUser?.name || 'Student';
+    const q = (query || '').toLowerCase();
+    const userName = currentUser?.name || 'Dost';
 
     if (q.includes('attendance') || q.includes('present') || q.includes('mark') || q.includes('absent')) {
-      return `📊 **Attendance Information for ${userName}:**\n\n- **Status:** Active Present sessions logged.\n- **Rules:** Attendance requires 3 checks:\n  1. Scanning active teacher QR code\n  2. Being within **50 meters** classroom geofence\n  3. Passing live camera face verification.\n- **SMS Dispatch:** Delivered immediately to registered phone.`;
+      return `📊 **Attendance lagane ke 3 simple steps:**\n\n1. Teacher ka active QR code scan karo (5 min valid)\n2. Classroom ke 50m radius ke andar raho\n3. Camera se live face verify pass karo.\nBas attendance lag jayegi aur confirmation SMS mil jayega! ✨`;
     } 
     
     if (q.includes('geofence') || q.includes('radius') || q.includes('location') || q.includes('meter') || q.includes('distance')) {
-      return `📍 **Geofence Security System:**\n\n- **Allowed Radius:** Exactly **50 Meters** around the teacher's classroom GPS coordinates.\n- **Out-of-Range Handling:** If you scan from >50 meters away, the system automatically flags attendance as **ABSENT** and dispatches an immediate SMS alert to your phone!`;
+      return `📍 **50-Meter Geofence Rule:**\nClassroom se maximum 50 meters ke andar hi attendance lagti hai. 50m se bahar hone par out-of-range flag aur absent lag jata hai.`;
     }
 
     if (q.includes('qr') || q.includes('timer') || q.includes('time') || q.includes('expire') || q.includes('code')) {
-      return `⏱ **Dynamic QR Session Timer:**\n\n- **Validity:** Teacher QR codes expire in **5 Minutes**.\n- **Purpose:** Prevents proxy attendance and link sharing across off-campus students.`;
+      return `⏱ **5-Minute QR Code:**\nTeacher ka QR code sirf 5 minute tak active rehta hai taaki koi proxy na ho sake. Jaise hi QR generate ho, turant scan karein! 👍`;
     }
 
     if (q.includes('sms') || q.includes('notification') || q.includes('alert') || q.includes('mobile')) {
-      return `📱 **Instant SMS Notification Engine:**\n\n- Powered by automated SMS Gateway.\n- Triggers SMS for:\n  • Present attendance verification\n  • Out-of-geofence attempts\n  • Low attendance warnings (<75% threshold).`;
-    }
-
-    if (q.includes('teacher') || q.includes('admin') || q.includes('role')) {
-      return `🎓 **Role Overview:**\n\n- **Student:** Scans QR code within 50m & passes face check.\n- **Teacher:** Launches 5-min QR session & monitors live student feed.\n- **Admin:** Configures GPS coordinates, geofence radius & manages user profiles.`;
+      return `📱 **Instant SMS Dispatches:**\nAttendance confirm hone par ya low attendance hone par student aur parents ko instant SMS alert send hota hai.`;
     }
 
     if (q.includes('hi') || q.includes('hello') || q.includes('hey') || q.includes('namaste')) {
-      return `👋 Hello **${userName}**! How can I help you today with your attendance, classroom geofencing, or QR sessions?`;
+      return `👋 Hello **${userName}**! Aaj attendance, 50m geofence ya class timetable se related kya help chahiye? 😊`;
     }
 
-    return `✨ **AI Campus Assistant:**\n\nThank you for asking! I am trained on **Scan2Attend** smart attendance features including:\n- 50-meter GPS Geofencing\n- 5-minute dynamic QR expiration\n- Live camera face verification\n- Instant SMS alerts & parent dispatches\n\nHow else can I assist you today?`;
+    return `✨ Main aapki help ke liye taiyaar hoon! Scan2Attend ke 50m geofence, 5-minute QR validity, ya face verification ke baare me kuch bhi pucho.`;
   };
 
   const quickPrompts = [
-    { label: '📊 Attendance Rules', query: 'What are the attendance rules and geofence distance?' },
-    { label: '📍 How 50m Geofencing works', query: 'Explain how 50m geofencing works' },
-    { label: '⏱ QR Code validity timer', query: 'How long is QR code valid?' },
-    { label: '📱 SMS Alerts dispatches', query: 'How do SMS notification alerts work?' }
+    { label: '📊 Attendance Rules', query: 'Attendance kaise lagaye?' },
+    { label: '📍 50m Geofence', query: '50m geofencing rule kya hai?' },
+    { label: '⏱ QR Validity', query: 'QR code kitne time valid rehta hai?' },
+    { label: '📱 SMS Alerts', query: 'SMS alerts kab aate hain?' }
   ];
 
   if (isSettingsOpen || hideForModal) return null;
 
   return (
     <>
-      {/* FLOATING ACTION BUTTON - LOWER CORNER OF DASHBOARD */}
+      {/* FLOATING ACTION BUTTON */}
       {!isOpen && (
         <div id="gemini-chatbot-root" className="gemini-chatbot-container fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 animate-bounce-short">
           <button
-            onClick={() => setIsOpen(true)}
-            className="group relative flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-[#2979FF] via-[#7C4DFF] to-[#FF4081] text-white rounded-full shadow-2xl hover:shadow-indigo-500/50 hover:scale-105 transition-all duration-300 border-2 border-white/40"
+            onClick={() => {
+              setIsOpen(true);
+              setTimeout(() => inputRef.current?.focus(), 150);
+            }}
+            className="group relative flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-[#2979FF] via-[#7C4DFF] to-[#FF4081] text-white rounded-full shadow-2xl hover:shadow-indigo-500/50 hover:scale-105 transition-all duration-300 border-2 border-white/40 cursor-pointer"
           >
             <div className="relative">
               <Bot className="w-5 h-5 text-yellow-300" />
               <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full ring-2 ring-white animate-ping"></span>
             </div>
             <span className="text-xs font-black tracking-wide pr-1">AI Chatbot</span>
-            
-            {/* Tooltip on hover */}
-            <span className="absolute right-0 bottom-full mb-2 hidden group-hover:block bg-slate-900 text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-lg whitespace-nowrap">
-              Ask AI Chatbot Assistant
-            </span>
           </button>
         </div>
       )}
 
-      {/* EXPANDABLE CHATBOT WINDOW */}
+      {/* FULL RESPONSIVE CHAT WINDOW (FULLSCREEN ON MOBILE, FLOATING ON DESKTOP) */}
       {isOpen && (
         <div 
-          className={`gemini-chatbot-container fixed z-40 transition-all duration-300 ease-in-out flex flex-col bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden ${
+          className={`gemini-chatbot-container fixed z-50 transition-all duration-300 ease-in-out flex flex-col bg-white shadow-2xl overflow-hidden ${
             isExpanded 
-              ? 'inset-4 sm:inset-10 w-auto h-auto' 
-              : 'bottom-6 right-4 sm:right-6 w-[92vw] sm:w-[400px] h-[580px] max-h-[85vh]'
+              ? 'inset-2 sm:inset-6 rounded-2xl sm:rounded-3xl sm:border sm:border-slate-200' 
+              : 'inset-0 sm:inset-auto sm:bottom-6 sm:right-6 sm:w-[420px] sm:h-[620px] sm:max-h-[88vh] sm:rounded-3xl sm:border sm:border-slate-200'
           }`}
         >
           {/* TOP HEADER */}
-          <div className="bg-gradient-to-r from-[#2979FF] via-[#673AB7] to-[#EC4899] p-4 text-white flex items-center justify-between shadow-md relative overflow-hidden">
+          <div className="bg-gradient-to-r from-[#2979FF] via-[#673AB7] to-[#EC4899] p-4 text-white flex items-center justify-between shadow-md relative overflow-hidden shrink-0">
             <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
 
             <div className="flex items-center gap-3 z-10">
@@ -236,40 +222,38 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
                 <Bot className="w-5 h-5" />
               </div>
               <div>
-                <div className="flex items-center gap-1.5">
-                  <h3 className="font-black text-sm tracking-wide">AI Chatbot</h3>
-                  <span className="bg-white/20 text-white text-[9px] font-bold px-1.5 py-0.5 rounded-full backdrop-blur-xs border border-white/20">
-                    Live
-                  </span>
-                </div>
-                <p className="text-[10px] text-white/80 font-medium flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Smart Campus Attendance Bot
+                <h3 className="font-black text-sm tracking-wide">AI Assistant</h3>
+                <p className="text-[11px] text-emerald-300 font-semibold flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                  Online
                 </p>
               </div>
             </div>
 
-            {/* HEADER ACTIONS (Without API Key Icon) */}
+            {/* HEADER ACTIONS */}
             <div className="flex items-center gap-1 z-10">
               <button
+                type="button"
                 onClick={() => setIsExpanded(!isExpanded)}
                 title={isExpanded ? "Restore view" : "Expand view"}
-                className="hidden sm:block p-2 rounded-xl hover:bg-white/15 text-white/90 transition-all"
+                className="hidden sm:block p-2 rounded-xl hover:bg-white/15 text-white/90 transition-all cursor-pointer"
               >
                 {isExpanded ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
               </button>
 
               <button
+                type="button"
                 onClick={() => setIsOpen(false)}
-                className="p-2 rounded-xl hover:bg-white/20 text-white transition-all ml-1"
+                className="p-2.5 rounded-xl hover:bg-white/20 text-white transition-all cursor-pointer active:scale-95"
+                title="Close chat"
               >
-                <X className="w-5 h-5" />
+                <X className="w-6 h-6 sm:w-5 sm:h-5" />
               </button>
             </div>
           </div>
 
           {/* MESSAGES SCROLL AREA */}
-          <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-[#FAF8F5]">
+          <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-[#FAF8F5] overscroll-contain">
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -281,9 +265,9 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
                   </div>
                 )}
 
-                <div className={`max-w-[82%] space-y-1 ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
+                <div className={`max-w-[85%] space-y-1 ${msg.sender === 'user' ? 'items-end' : 'items-start'}`}>
                   <div
-                    className={`p-3 rounded-2xl text-xs leading-relaxed ${
+                    className={`p-3.5 rounded-2xl text-xs sm:text-[13px] leading-relaxed ${
                       msg.sender === 'user'
                         ? 'bg-[#2979FF] text-white rounded-br-none shadow-md font-medium'
                         : 'bg-white text-slate-800 border border-slate-200/80 rounded-bl-none shadow-xs font-normal'
@@ -302,11 +286,6 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
 
                   <div className="flex items-center gap-2 text-[10px] text-slate-400 px-1">
                     <span>{msg.timestamp}</span>
-                    {msg.source && (
-                      <span className="text-[9px] bg-slate-200/70 text-slate-600 px-1.5 rounded-md font-semibold">
-                        {msg.source}
-                      </span>
-                    )}
                   </div>
                 </div>
 
@@ -324,9 +303,9 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
                 <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#2979FF] to-[#7C4DFF] flex items-center justify-center text-yellow-300 shrink-0 animate-pulse">
                   <Bot className="w-4 h-4" />
                 </div>
-                <div className="bg-white border border-slate-200 p-3 rounded-2xl rounded-bl-none text-xs text-slate-500 flex items-center gap-2 shadow-xs">
+                <div className="bg-white border border-slate-200 p-3 rounded-2xl rounded-bl-none text-xs text-slate-600 flex items-center gap-2 shadow-xs">
                   <span className="w-2 h-2 bg-[#2979FF] rounded-full animate-ping"></span>
-                  <span>AI Chatbot is generating response...</span>
+                  <span>AI reply generate kar raha hai...</span>
                 </div>
               </div>
             )}
@@ -335,12 +314,13 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
           </div>
 
           {/* QUICK SUGGESTION PILLS */}
-          <div className="px-3 py-2 bg-white border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto text-xs no-scrollbar">
+          <div className="px-3 py-2 bg-white border-t border-slate-100 flex items-center gap-1.5 overflow-x-auto text-xs no-scrollbar shrink-0">
             {quickPrompts.map((prompt, i) => (
               <button
                 key={i}
+                type="button"
                 onClick={() => handleSendMessage(prompt.query)}
-                className="whitespace-nowrap px-2.5 py-1 bg-[#FAF8F5] hover:bg-indigo-50 hover:text-indigo-600 border border-slate-200 rounded-full text-[11px] font-semibold text-slate-600 transition-all shrink-0"
+                className="whitespace-nowrap px-3 py-1.5 bg-[#FAF8F5] hover:bg-indigo-50 hover:text-indigo-600 border border-slate-200 rounded-full text-[11px] font-semibold text-slate-600 transition-all shrink-0 cursor-pointer active:scale-95"
               >
                 {prompt.label}
               </button>
@@ -348,7 +328,7 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
           </div>
 
           {/* FOOTER INPUT BOX */}
-          <div className="p-3 bg-white border-t border-slate-200">
+          <div className="p-3 bg-white border-t border-slate-200 shrink-0">
             <form
               onSubmit={(e) => {
                 e.preventDefault();
@@ -357,23 +337,26 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
               className="flex items-center gap-2"
             >
               <input
+                ref={inputRef}
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
-                placeholder="Ask AI Chatbot about attendance, geofence..."
-                className="flex-1 bg-[#FAF8F5] border border-slate-200 rounded-2xl px-4 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#2979FF] focus:bg-white transition-all font-medium"
+                placeholder="Message type karein..."
+                className="flex-1 bg-[#FAF8F5] border border-slate-200 rounded-2xl px-4 py-3 text-sm text-slate-800 focus:outline-none focus:border-[#2979FF] focus:bg-white transition-all font-medium"
+                autoComplete="off"
               />
 
               <button
                 type="submit"
                 disabled={!inputMessage.trim() || loading}
-                className={`p-2.5 rounded-2xl text-white font-bold transition-all shadow-md ${
+                aria-label="Send message"
+                className={`p-3 rounded-2xl text-white font-bold transition-all shadow-md shrink-0 ${
                   inputMessage.trim() && !loading
-                    ? 'bg-gradient-to-r from-[#2979FF] to-[#7C4DFF] hover:opacity-90 scale-102 cursor-pointer'
-                    : 'bg-slate-300 cursor-not-allowed'
+                    ? 'bg-gradient-to-r from-[#2979FF] to-[#7C4DFF] hover:opacity-90 active:scale-95 cursor-pointer'
+                    : 'bg-slate-300 opacity-60 cursor-not-allowed'
                 }`}
               >
-                <Send className="w-4 h-4" />
+                <Send className="w-5 h-5" />
               </button>
             </form>
           </div>

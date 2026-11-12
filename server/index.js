@@ -462,22 +462,13 @@ app.post('/api/gemini/chat', async (req, res) => {
     return res.status(400).json({ success: false, message: 'Message is required' });
   }
 
-  const systemInstruction = `You are "Gemini Campus Buddy / AI Assistant", an extremely friendly, approachable, and smart campus companion for the Scan2Attend system.
+  const systemInstruction = `You are a friendly, helpful campus AI assistant for students and teachers using the Scan2Attend system.
 User Context: ${userContext ? JSON.stringify(userContext) : 'Campus Member'}.
 
-CRITICAL PERSONALITY & TONE RULES:
-1. Mirror the User's Language & Style Exactly:
-   - If user speaks in casual Hinglish/Hindi (e.g. "bhai", "yaar", "kaise hoga"), respond in the same friendly, casual Hinglish buddy tone ("Arre bhai tension mat le...", "Dekh dost...").
-   - If user speaks formal Hindi or English, respond politely and formally.
-   - If user speaks casual English, be friendly and modern.
-2. Super Friendly & Supportive:
-   - Talk like a supportive college senior or close friend, never like a cold robot.
-   - Use warm emojis (😊, 🚀, 👍, 📱, ✨, 🙌) to make conversations fun and helpful.
-3. System Rules:
-   - 50-meter classroom geofence constraint.
-   - 5-minute dynamic QR code expiration.
-   - Live face verification with camera liveness.
-   - Instant SMS alerts for attendance and alerts.`;
+CRITICAL STYLE & TONE:
+1. Mirror User Style: If user speaks casual Hinglish/Hindi, reply in casual friendly Hinglish. If English, reply in friendly English.
+2. Fast & Concise: Keep replies punchy, clear, and under 3-4 bullet points (max 100-150 words) so they read quickly on mobile.
+3. System Rules: 50m geofence, 5-minute QR validity, live face check, instant SMS confirmations.`;
 
   if (key) {
     const candidateModels = ['gemini-3.5-flash-lite', 'gemini-3.5-flash', 'gemini-3.1-flash-lite'];
@@ -494,18 +485,20 @@ CRITICAL PERSONALITY & TONE RULES:
                 role: 'user',
                 parts: [{ text: `${systemInstruction}\n\nUser Prompt: ${message}` }]
               }
-            ]
+            ],
+            generationConfig: {
+              maxOutputTokens: 350,
+              temperature: 0.5
+            }
           }),
-          signal: AbortSignal.timeout(7000)
+          signal: AbortSignal.timeout(6000)
         });
 
         const data = await apiRes.json();
         if (apiRes.ok && data.candidates && data.candidates[0]?.content?.parts[0]?.text) {
           return res.json({
             success: true,
-            reply: data.candidates[0].content.parts[0].text,
-            model: model,
-            source: `Gemini AI (${model})`
+            reply: data.candidates[0].content.parts[0].text
           });
         }
         console.warn(`[Gemini] Model ${model} returned:`, data.error?.message || apiRes.statusText);
@@ -535,8 +528,7 @@ CRITICAL PERSONALITY & TONE RULES:
 
   res.json({
     success: true,
-    reply: reply,
-    source: 'Fallback AI'
+    reply: reply
   });
 });
 
