@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Send, 
   X, 
-  Bot, 
   User, 
   Maximize2, 
   Minimize2,
@@ -195,8 +194,8 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
             }}
             className="group relative flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-[#2979FF] via-[#7C4DFF] to-[#FF4081] text-white rounded-full shadow-2xl hover:shadow-indigo-500/50 hover:scale-105 transition-all duration-300 border-2 border-white/40 cursor-pointer"
           >
-            <div className="relative">
-              <Bot className="w-5 h-5 text-yellow-300" />
+            <div className="relative w-6 h-6 flex items-center justify-center bg-white rounded-full p-0.5 shadow-sm">
+              <img src="/scan2attend-logo.svg" alt="Scan2Attend" className="w-4 h-4 object-contain" />
               <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full ring-2 ring-white animate-ping"></span>
             </div>
             <span className="text-xs font-black tracking-wide pr-1">AI Chatbot</span>
@@ -218,8 +217,8 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
             <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
 
             <div className="flex items-center gap-3 z-10">
-              <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30 text-yellow-300 shadow-inner">
-                <Bot className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-2xl bg-white p-1.5 flex items-center justify-center border border-white/50 shadow-md">
+                <img src="/scan2attend-logo.svg" alt="Scan2Attend Logo" className="w-full h-full object-contain" />
               </div>
               <div>
                 <h3 className="font-black text-sm tracking-wide">AI Assistant</h3>
@@ -260,8 +259,8 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
                 className={`flex gap-2.5 ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.sender === 'bot' && (
-                  <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#2979FF] to-[#7C4DFF] flex items-center justify-center text-yellow-300 shrink-0 shadow-xs mt-0.5">
-                    <Bot className="w-4 h-4" />
+                  <div className="w-7 h-7 rounded-xl bg-white p-1 flex items-center justify-center shrink-0 shadow-xs mt-0.5 border border-slate-200">
+                    <img src="/scan2attend-logo.svg" alt="Scan2Attend" className="w-full h-full object-contain" />
                   </div>
                 )}
 
@@ -300,8 +299,8 @@ export default function GeminiChatbot({ user, isSettingsOpen = false }) {
             {/* TYPING INDICATOR */}
             {loading && (
               <div className="flex gap-2.5 items-center">
-                <div className="w-7 h-7 rounded-xl bg-gradient-to-tr from-[#2979FF] to-[#7C4DFF] flex items-center justify-center text-yellow-300 shrink-0 animate-pulse">
-                  <Bot className="w-4 h-4" />
+                <div className="w-7 h-7 rounded-xl bg-white p-1 flex items-center justify-center shrink-0 shadow-xs animate-pulse border border-slate-200">
+                  <img src="/scan2attend-logo.svg" alt="Scan2Attend" className="w-full h-full object-contain" />
                 </div>
                 <div className="bg-white border border-slate-200 p-3 rounded-2xl rounded-bl-none text-xs text-slate-600 flex items-center gap-2 shadow-xs">
                   <span className="w-2 h-2 bg-[#2979FF] rounded-full animate-ping"></span>
