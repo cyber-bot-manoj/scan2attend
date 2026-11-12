@@ -23,6 +23,10 @@ import {
 } from 'lucide-react';
 
 export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
+  const ALLOWED_ADMINS = ['manojs082007@gmail.com', 'maneeshsingh99648@gmail.com'];
+  const adminEmail = (user?.email || '').trim().toLowerCase();
+  const isAuthorizedAdmin = user?.role === 'ADMIN' && ALLOWED_ADMINS.includes(adminEmail);
+
   const [data, setData] = useState({
     students: [],
     teachers: [],
@@ -188,6 +192,22 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
     setTimeout(() => setSmsNoticeSent(false), 3500);
   };
 
+  if (!isAuthorizedAdmin) {
+    return (
+      <div className="min-h-[50vh] flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-2xl border border-red-200 text-center space-y-4">
+          <div className="w-16 h-16 mx-auto rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-2xl">
+            <Lock className="w-8 h-8 text-red-600" />
+          </div>
+          <h2 className="text-xl font-black text-slate-900">Admin Access Restricted</h2>
+          <p className="text-xs text-slate-600 leading-relaxed font-medium">
+            This dashboard is strictly restricted to authorized administrators (<strong className="text-slate-800">manojs082007@gmail.com</strong> and <strong className="text-slate-800">maneeshsingh99648@gmail.com</strong>).
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8 pb-8">
       
@@ -213,7 +233,7 @@ export default function AdminPanel({ user, globalAttendanceRecords = [] }) {
                   </h1>
                 </div>
                 <p className="text-xs text-slate-300 font-medium">
-                  Server Cluster ID: <span className="font-mono text-amber-200 font-bold">NODE-2026-ADM</span>
+                  Administrator: <span className="font-bold text-amber-200">{user?.name || 'Admin'}</span> ({user?.email}) • Node: <span className="font-mono text-amber-200 font-bold">NODE-2026-ADM</span>
                 </p>
               </div>
             </div>

@@ -24,6 +24,31 @@ import {
   Navigation
 } from 'lucide-react';
 
+const getUserPhoto = (currentUser) => {
+  if (!currentUser) return null;
+  if (currentUser.role === 'TEACHER') return '/faculty_dhananjay_yadav.jpg';
+
+  const email = (currentUser.email || '').trim().toLowerCase();
+  const name = (currentUser.name || '').trim().toLowerCase();
+
+  // 1. Maneesh Singh
+  if (email === 'maneeshsingh99648@gmail.com' || name.includes('maneesh singh')) {
+    return '/maneesh_singh_profile.jpg';
+  }
+  // 2. Manoj Sharma
+  if (email === 'manojs082007@gmail.com' || email === 'ssindia10677@gmail.com' || name.includes('manoj sharma')) {
+    return '/manoj_sharma_profile.jpg';
+  }
+  // 3. User with custom photo
+  if (currentUser.photo && currentUser.photo !== '/manoj_sharma_profile.jpg') {
+    return currentUser.photo;
+  }
+  if (currentUser.faceProfile && !currentUser.faceProfile.startsWith('data:image/svg') && currentUser.faceProfile !== '/manoj_sharma_profile.jpg') {
+    return currentUser.faceProfile;
+  }
+  return null;
+};
+
 export default function Navbar({ 
   user, 
   setUser, 
@@ -274,20 +299,18 @@ export default function Navbar({
                       onClick={() => setShowProfileMenu(!showProfileMenu)}
                       className="flex items-center gap-2 p-1 rounded-xl hover:bg-[#FAF8F5] border border-transparent hover:border-[#E2E8F0] transition-all"
                     >
-                      <div className="w-8 h-8 rounded-full overflow-hidden border border-[#2979FF] shadow-xs flex-shrink-0 bg-[#2979FF]/10 flex items-center justify-center text-white font-bold text-xs">
-                        <img 
-                          src={user.role === 'TEACHER' ? '/faculty_dhananjay_yadav.jpg' : '/manoj_sharma_profile.jpg'} 
-                          alt="Profile" 
-                          className="w-full h-full object-cover object-[center_top]"
-                          onError={(e) => { 
-                            if (user.role === 'TEACHER') {
-                              e.currentTarget.src = 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=400&q=80';
-                            } else {
+                      <div className="w-8 h-8 rounded-full overflow-hidden border border-[#2979FF] shadow-xs flex-shrink-0 bg-[#2979FF]/10 flex items-center justify-center text-white font-bold text-xs relative">
+                        {getUserPhoto(user) ? (
+                          <img 
+                            src={getUserPhoto(user)} 
+                            alt="Profile" 
+                            className="w-full h-full object-cover object-[center_top]"
+                            onError={(e) => { 
                               e.currentTarget.style.display = 'none'; 
-                            }
-                          }}
-                        />
-                        <span className="text-[#2979FF] font-black">{user.name.charAt(0)}</span>
+                            }}
+                          />
+                        ) : null}
+                        <span className="text-[#2979FF] font-black">{user.name ? user.name.charAt(0).toUpperCase() : 'U'}</span>
                       </div>
                       <div className="hidden xl:block text-left">
                         <span className="block text-xs font-extrabold text-[#212121] leading-tight">

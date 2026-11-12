@@ -107,6 +107,13 @@ export default function LoginModal({ setUser, setActiveTab }) {
     const emailTrim = email.trim();
     const emailLower = emailTrim.toLowerCase();
 
+    // Enforce authorized administrator emails: only manojs082007@gmail.com and maneeshsingh99648@gmail.com
+    const ALLOWED_ADMINS = ['manojs082007@gmail.com', 'maneeshsingh99648@gmail.com'];
+    if (selectedRole === 'ADMIN' && !ALLOWED_ADMINS.includes(emailLower)) {
+      setError('Access denied: Only authorized administrators (manojs082007@gmail.com, maneeshsingh99648@gmail.com) can access the admin dashboard.');
+      return;
+    }
+
     // Students CANNOT log in without signing up first, and demo student login is completely blocked!
     if (emailLower === 'student@school.edu' || (selectedRole === 'STUDENT' && emailLower === 'student')) {
       setError('Demo student credentials are disabled. Students must Sign Up first with their email and OTP.');
@@ -205,6 +212,10 @@ export default function LoginModal({ setUser, setActiveTab }) {
           performFallbackAuth();
         } else if (emailLower === 'manojs082007@gmail.com' && password === 'manojk') {
           performFallbackAuth();
+        } else if (emailLower === 'maneeshsingh99648@gmail.com' && password === 'maneesh123' && selectedRole === 'ADMIN') {
+          performFallbackAuth();
+        } else if (emailLower === 'maneeshsingh99648@gmail.com' && (password === 'student' || password === 'maneesh123') && selectedRole === 'STUDENT') {
+          performFallbackAuth();
         } else {
           setError(
             selectedRole === 'STUDENT'
@@ -222,6 +233,10 @@ export default function LoginModal({ setUser, setActiveTab }) {
       if (emailLower === 'teacher@school.edu' && password === 'teacher') {
         performFallbackAuth();
       } else if (emailLower === 'manojs082007@gmail.com' && password === 'manojk') {
+        performFallbackAuth();
+      } else if (emailLower === 'maneeshsingh99648@gmail.com' && password === 'maneesh123' && selectedRole === 'ADMIN') {
+        performFallbackAuth();
+      } else if (emailLower === 'maneeshsingh99648@gmail.com' && (password === 'student' || password === 'maneesh123') && selectedRole === 'STUDENT') {
         performFallbackAuth();
       } else {
         const allLocal = [
@@ -253,8 +268,10 @@ export default function LoginModal({ setUser, setActiveTab }) {
 
   const performFallbackAuth = () => {
     let mockUser = null;
+    const emailTrim = email.trim();
+    const emailLower = emailTrim.toLowerCase();
 
-    if (email.toLowerCase().includes('teacher') || selectedRole === 'TEACHER') {
+    if (emailLower.includes('teacher') || selectedRole === 'TEACHER') {
       mockUser = {
         id: 'teacher_1',
         name: 'Mr. Dhananjay Kr. Yadav',
@@ -265,13 +282,37 @@ export default function LoginModal({ setUser, setActiveTab }) {
         designation: 'Assistant Professor',
         mobile: '+91 9876543211'
       };
-    } else if (email.trim().toLowerCase() === 'manojs082007@gmail.com' && password === 'manojk') {
+    } else if (emailLower === 'manojs082007@gmail.com' && password === 'manojk') {
       mockUser = {
         id: 'admin_1',
         name: 'System Admin',
         email: 'manojs082007@gmail.com',
         role: 'ADMIN',
-        mobile: '+91 8840034446'
+        mobile: '+91 8840034446',
+        photo: '/manoj_sharma_profile.jpg'
+      };
+    } else if (emailLower === 'maneeshsingh99648@gmail.com' && password === 'maneesh123' && selectedRole === 'ADMIN') {
+      mockUser = {
+        id: 'admin_2',
+        name: 'Maneesh Singh',
+        email: 'maneeshsingh99648@gmail.com',
+        role: 'ADMIN',
+        mobile: '9651900398',
+        photo: '/maneesh_singh_profile.jpg'
+      };
+    } else if (emailLower === 'maneeshsingh99648@gmail.com' && selectedRole === 'STUDENT') {
+      mockUser = {
+        id: 'student_45',
+        name: 'MANEESH SINGH',
+        email: 'maneeshsingh99648@gmail.com',
+        role: 'STUDENT',
+        rollNo: '2401031601135',
+        enrollmentNo: 'MUIT0124031115',
+        mobile: '9651900398',
+        section: 'Section B',
+        classSection: 'B.C.A - Semester V (Section B)',
+        faceProfile: '/maneesh_singh_profile.jpg',
+        photo: '/maneesh_singh_profile.jpg'
       };
     } else {
       setError(
@@ -401,6 +442,10 @@ export default function LoginModal({ setUser, setActiveTab }) {
     }
 
     setLoading(true);
+    const isManeesh = signUpEmail.trim().toLowerCase() === 'maneeshsingh99648@gmail.com' || name.trim().toLowerCase().includes('maneesh singh');
+    const isManoj = signUpEmail.trim().toLowerCase() === 'manojs082007@gmail.com' || signUpEmail.trim().toLowerCase() === 'ssindia10677@gmail.com' || name.trim().toLowerCase().includes('manoj sharma');
+    const studentPhoto = isManeesh ? '/maneesh_singh_profile.jpg' : isManoj ? '/manoj_sharma_profile.jpg' : null;
+
     const newStudentData = {
       id: 'student_' + Date.now(),
       name: name.trim().toUpperCase(),
@@ -409,11 +454,12 @@ export default function LoginModal({ setUser, setActiveTab }) {
       role: 'STUDENT',
       rollNo: rollNo ? rollNo.trim() : ('240103160' + Math.floor(1000 + Math.random() * 9000)),
       enrollmentNo: 'MUIT' + Math.floor(1000000000 + Math.random() * 9000000000),
-      mobile: mobile ? mobile.trim() : '8840034446',
+      mobile: mobile ? mobile.trim() : '',
       section: 'Section B',
       classSection: classSection.trim(),
       fatherName: 'STUDENT PARENT',
-      faceProfile: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%232563eb" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>'
+      faceProfile: studentPhoto || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%232563eb" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>',
+      photo: studentPhoto || undefined
     };
 
     try {

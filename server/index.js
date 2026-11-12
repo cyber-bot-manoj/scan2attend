@@ -51,11 +51,29 @@ app.post('/api/login', (req, res) => {
     });
   }
 
+  const ALLOWED_ADMINS = ['manojs082007@gmail.com', 'maneeshsingh99648@gmail.com'];
+  if (role === 'ADMIN' && !ALLOWED_ADMINS.includes(emailLower)) {
+    return res.status(403).json({
+      success: false,
+      message: 'Access denied: Only authorized administrators (manojs082007@gmail.com, maneeshsingh99648@gmail.com) can access.'
+    });
+  }
+
   const db = readDB();
-  const user = db.users.find(u => 
+
+  // Find user by email and password, prioritizing matching role
+  let user = db.users.find(u => 
     (u.email.toLowerCase() === emailLower || (u.email_alt && u.email_alt.toLowerCase() === emailLower)) && 
-    u.password === password
+    u.password === password &&
+    (!role || u.role === role || (role === 'TEACHER' && u.role === 'FACULTY') || (role === 'FACULTY' && u.role === 'TEACHER'))
   );
+
+  if (!user) {
+    user = db.users.find(u => 
+      (u.email.toLowerCase() === emailLower || (u.email_alt && u.email_alt.toLowerCase() === emailLower)) && 
+      u.password === password
+    );
+  }
 
   if (!user) {
     const roleMsg = (role === 'TEACHER' || role === 'FACULTY')
@@ -68,6 +86,24 @@ app.post('/api/login', (req, res) => {
 
   if (role === 'ADMIN' && user.role !== 'ADMIN') {
     return res.status(403).json({ success: false, message: 'Access denied: User is not an authorized administrator.' });
+  }
+
+  if (user.role === 'ADMIN' && !ALLOWED_ADMINS.includes(user.email.toLowerCase())) {
+    return res.status(403).json({ success: false, message: 'Access denied: Only authorized administrators can access.' });
+  }
+
+  // Profile photo handling
+  let userPhoto = user.photo || null;
+  let userFaceProfile = user.faceProfile || null;
+  const lowerEmail = user.email.toLowerCase();
+  const lowerName = (user.name || '').toLowerCase();
+
+  if (lowerEmail === 'maneeshsingh99648@gmail.com' || lowerName.includes('maneesh singh')) {
+    userPhoto = '/maneesh_singh_profile.jpg';
+    userFaceProfile = '/maneesh_singh_profile.jpg';
+  } else if (lowerEmail === 'manojs082007@gmail.com' || lowerEmail === 'ssindia10677@gmail.com' || lowerName.includes('manoj sharma')) {
+    userPhoto = '/manoj_sharma_profile.jpg';
+    userFaceProfile = '/manoj_sharma_profile.jpg';
   }
 
   res.json({
@@ -86,7 +122,8 @@ app.post('/api/login', (req, res) => {
       section: user.section || 'Section B',
       classSection: user.classSection || null,
       mobile: user.mobile,
-      faceProfile: user.faceProfile || null
+      faceProfile: userFaceProfile,
+      photo: userPhoto
     }
   });
 });
@@ -127,7 +164,12 @@ app.post('/api/auth/send-otp', async (req, res) => {
     (u.email_alt && u.email_alt.toLowerCase() === email.toLowerCase())
   );
   if (existingUser) {
-    return res.status(400).json({ success: false, message: 'An account with this email already exists. Please Sign In.' });
+    // If student in pre-seeded roster with default 'student' password, allow OTP so they can activate with their custom password & mobile!
+    if (existingUser.role === 'STUDENT' && existingUser.password === 'student') {
+      // allow OTP
+    } else {
+      return res.status(400).json({ success: false, message: 'An account with this email already exists. Please Sign In.' });
+    }
   }
 
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
@@ -311,28 +353,53 @@ app.post('/api/auth/register-student', (req, res) => {
     return res.status(400).json({ success: false, message: 'Name, email, and password are required' });
   }
 
+  const emailLower = email.trim().toLowerCase();
   const db = readDB();
-  const existingUser = db.users.find(u => 
-    u.email.toLowerCase() === email.toLowerCase() || 
-    (u.email_alt && u.email_alt.toLowerCase() === email.toLowerCase())
+  const existingIndex = db.users.findIndex(u => 
+    u.role === 'STUDENT' && (
+      u.email.toLowerCase() === emailLower || 
+      (u.email_alt && u.email_alt.toLowerCase() === emailLower)
+    )
   );
-  if (existingUser) {
-    return res.status(400).json({ success: false, message: 'User already exists with this email' });
+
+  const isManeesh = emailLower === 'maneeshsingh99648@gmail.com' || name.toLowerCase().includes('maneesh singh');
+  const isManoj = emailLower === 'manojs082007@gmail.com' || emailLower === 'ssindia10677@gmail.com' || name.toLowerCase().includes('manoj sharma');
+  const photoUrl = isManeesh ? '/maneesh_singh_profile.jpg' : isManoj ? '/manoj_sharma_profile.jpg' : null;
+
+  if (existingIndex !== -1) {
+    // Activate or update existing roster entry
+    const existing = db.users[existingIndex];
+    existing.name = name.trim().toUpperCase();
+    existing.password = password;
+    if (mobile && mobile.trim()) existing.mobile = mobile.trim();
+    if (rollNo && rollNo.trim()) existing.rollNo = rollNo.trim();
+    if (classSection && classSection.trim()) existing.classSection = classSection.trim();
+    if (photoUrl) {
+      existing.faceProfile = photoUrl;
+      existing.photo = photoUrl;
+    }
+    writeDB(db);
+    return res.json({
+      success: true,
+      message: 'Student account activated/updated successfully!',
+      user: existing
+    });
   }
 
   const newStudent = {
     id: 'student_' + Date.now(),
-    name: name.trim(),
-    email: email.trim().toLowerCase(),
+    name: name.trim().toUpperCase(),
+    email: emailLower,
     password: password,
     role: 'STUDENT',
     rollNo: rollNo ? rollNo.trim() : ('240103160' + Math.floor(1000 + Math.random() * 9000)),
     enrollmentNo: 'MUIT' + Math.floor(1000000000 + Math.random() * 9000000000),
-    mobile: mobile ? mobile.trim() : '8840034446',
+    mobile: mobile ? mobile.trim() : '',
     section: 'Section B',
     classSection: classSection ? classSection.trim() : 'B.C.A - Semester V (Section B)',
     fatherName: 'STUDENT PARENT',
-    faceProfile: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%232563eb" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>'
+    faceProfile: photoUrl || 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="%232563eb" stroke-width="2"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>',
+    photo: photoUrl || undefined
   };
 
   db.users.push(newStudent);

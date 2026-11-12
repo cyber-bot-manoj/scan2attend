@@ -36,13 +36,44 @@ import {
   Search,
   Eye,
   Plus,
-  Maximize2
+  Maximize2,
+  User
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { MUIT_ASSIGNMENTS, getStoredAssignments, recordStudentSubmission } from './muitAssignmentsData';
 
 export default function StudentPanel({ user, activeSession, setActiveSession, setActiveTab, onNewAttendance }) {
   const [step, setStep] = useState(1); // 1: Main Dashboard, 2: Verification Flow, 3: Success Confirmation
+
+  // Helper to determine student's profile photo:
+  // - Maneesh Singh gets Maneesh's uploaded photo
+  // - Manoj Sharma gets Manoj's photo
+  // - Other students without a photo are left blank (null)
+  const getStudentPhoto = () => {
+    const userEmail = (user?.email || '').trim().toLowerCase();
+    const userName = (user?.name || '').trim().toLowerCase();
+
+    // 1. Maneesh Singh (email or name)
+    if (userEmail === 'maneeshsingh99648@gmail.com' || userName.includes('maneesh singh')) {
+      return '/maneesh_singh_profile.jpg';
+    }
+
+    // 2. Manoj Sharma only
+    if (userEmail === 'manojs082007@gmail.com' || userEmail === 'ssindia10677@gmail.com' || userName.includes('manoj sharma')) {
+      return '/manoj_sharma_profile.jpg';
+    }
+
+    // 3. Custom photo if provided and not Manoj's
+    if (user?.photo && user.photo !== '/manoj_sharma_profile.jpg') {
+      return user.photo;
+    }
+    if (user?.faceProfile && !user.faceProfile.startsWith('data:image/svg') && user.faceProfile !== '/manoj_sharma_profile.jpg') {
+      return user.faceProfile;
+    }
+
+    // 4. Blank if no photo
+    return null;
+  };
   // Live Real-Time Official MUIT Timetable Engine (Program: BCA, Semester: V-B, Room: B-302)
   const [liveNow, setLiveNow] = useState(new Date());
 
@@ -353,8 +384,8 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
       title: 'Parent SMS Dispatch Delivered',
       time: '10m ago',
       type: 'PARENT SMS GATEWAY',
-      summary: 'Confirmation SMS dispatched to registered parent mobile +91 8840034446.',
-      details: 'Official attendance verification notification SMS successfully dispatched to registered parent mobile number +91 8840034446. Cryptographic status tag: DELIVERED.',
+      summary: `Confirmation SMS dispatched to registered parent mobile ${user?.mobile || user?.phone ? ('+91 ' + (user?.mobile || user?.phone).replace('+91', '').trim()) : '+91 Registered Mobile'}.`,
+      details: `Official attendance verification notification SMS successfully dispatched to registered parent mobile number ${user?.mobile || user?.phone ? ('+91 ' + (user?.mobile || user?.phone).replace('+91', '').trim()) : '+91 Registered Mobile'}. Cryptographic status tag: DELIVERED.`,
       icon: <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
     },
     {
@@ -441,7 +472,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   });
 
   const handleUploadAssignment = (sNo, customName) => {
-    const fileName = customName || uploadFileNameInput.trim() || `${(user?.name || 'Manoj_Sharma').replace(/\s+/g, '_')}_Assignment_${sNo}_Solution.pdf`;
+    const fileName = customName || uploadFileNameInput.trim() || `${(user?.name || 'Student').replace(/\s+/g, '_')}_Assignment_${sNo}_Solution.pdf`;
     const updated = recordStudentSubmission(sNo, user?.name, user?.rollNo, fileName);
     setAssignments(updated);
     if (selectedAssignmentDoc && selectedAssignmentDoc.sNo === sNo) {
@@ -503,7 +534,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   // Automatic Voice & Chime Synthesizer Engine for Student Dashboard
   const playVoiceAlertNotification = () => {
     setVoiceAlertPlaying(true);
-    const studentName = user ? user.name : 'Manoj Sharma';
+    const studentName = user ? user.name : 'Student';
     const text = `Attention! 5-minute QR active. Mark attendance now!`;
 
     try {
@@ -774,7 +805,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
   };
 
   const useSimulatedSnapshot = () => {
-    setFaceSnapshot('/manoj_sharma_profile.jpg');
+    setFaceSnapshot(getStudentPhoto() || '/student_profile_avatar.png');
     setLivenessChecked(true);
     stopCamera();
   };
@@ -833,9 +864,9 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
         subject: activeSession?.className || 'Computer Graphics (BCA501)',
         instructor: 'Mr. Dhananjay Kr. Yadav (DKY)',
         room: 'Room B-302 • MUIT Lucknow',
-        studentName: user ? user.name : 'Manoj Sharma',
-        rollNo: user ? user.rollNo : '2401031601137',
-        course: 'B.C.A • Semester 5',
+        studentName: user ? user.name : 'Student',
+        rollNo: user ? (user.rollNo || user.enrollmentNo || 'N/A') : 'N/A',
+        course: user?.classSection || 'B.C.A • Semester 5',
         timestamp: fullTimestamp,
         timeAgo: 'Just Now',
         status: finalStatus,
@@ -843,7 +874,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
         livenessScore: isFaceVerified ? '99.4% (Verified)' : 'Failed',
         gpsCoords: `${studentLat.toFixed(5)}, ${studentLng.toFixed(5)}`,
         reason: !isWithinGeofence ? `Geofence Violation: Area se bahar (${distanceMeters}m from MUIT Lucknow Campus)` : undefined,
-        smsStatus: `Dispatched to ${user ? user.mobile : '8840034446'}`
+        smsStatus: `Dispatched to ${user ? (user.mobile || user.phone || 'Registered Mobile') : 'Registered Mobile'}`
       };
 
       setLiveRecord(passRecord);
@@ -890,12 +921,18 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
           
           <div className="flex items-center gap-5">
             <div className="relative shrink-0">
-              <img 
-                src="/manoj_sharma_profile.jpg" 
-                alt="Student Profile Photo" 
-                onError={(event) => { event.currentTarget.src = '/student_profile_avatar.png'; }}
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover object-[center_top] border-2 border-indigo-400/40 shadow-xl ring-4 ring-indigo-500/20"
-              />
+              {getStudentPhoto() ? (
+                <img 
+                  src={getStudentPhoto()} 
+                  alt="Student Profile Photo" 
+                  onError={(event) => { event.currentTarget.style.display = 'none'; }}
+                  className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover object-[center_top] border-2 border-indigo-400/40 shadow-xl ring-4 ring-indigo-500/20"
+                />
+              ) : (
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-slate-800/80 border-2 border-dashed border-indigo-400/30 flex items-center justify-center text-slate-400 shadow-xl ring-4 ring-indigo-500/10">
+                  <User className="w-8 h-8 text-slate-500" />
+                </div>
+              )}
               <span className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-1 rounded-full border-2 border-slate-900 shadow-md">
                 <CheckCircle2 className="w-3.5 h-3.5" />
               </span>
@@ -904,19 +941,19 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
             <div className="space-y-1">
               <div className="flex items-center gap-2.5 flex-wrap">
                 <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                  {user ? user.name : 'Manoj Sharma'}
+                  {user ? user.name : 'Student Portal'}
                 </h2>
                 <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 text-[11px] font-mono font-extrabold">
-                  ID: {user ? (user.rollNo || '2401031601137') : '2401031601137'}
+                  ID: {user ? (user.rollNo || user.enrollmentNo || 'N/A') : 'N/A'}
                 </span>
               </div>
 
               <p className="text-xs text-slate-300 font-medium">
-                B.C.A • Semester 5 • Mobile: <span className="font-mono text-indigo-200 font-bold">8840034446</span>
+                {user?.classSection || 'B.C.A • Semester 5'} • Mobile: <span className="font-mono text-indigo-200 font-bold">{user?.mobile || user?.phone || 'Not Provided'}</span>
               </p>
 
               <p className="text-xs text-slate-400 font-medium hidden sm:block">
-                Email: manojs082007@gmail.com
+                Email: {user?.email || 'Not Provided'}
               </p>
             </div>
           </div>
@@ -2066,7 +2103,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
               <label className="text-xs font-bold text-slate-700 block">Solution File Name / Notes:</label>
               <input
                 type="text"
-                placeholder={`Manoj_Sharma_${uploadingAssignment.code}_Solution.pdf`}
+                placeholder={`${(user?.name || 'Student').replace(/\s+/g, '_')}_${uploadingAssignment.code}_Solution.pdf`}
                 value={uploadFileNameInput}
                 onChange={(e) => setUploadFileNameInput(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-900 focus:outline-none focus:border-emerald-500 focus:bg-white"
@@ -2077,7 +2114,7 @@ export default function StudentPanel({ user, activeSession, setActiveSession, se
                   Select your assignment solution file
                 </p>
                 <p className="text-[10px] text-slate-500 font-mono mt-0.5">
-                  PDF, DOCX, ZIP (Max 15MB) • Roll No: {user?.rollNo || '2401031601137'}
+                  PDF, DOCX, ZIP (Max 15MB) • Roll No: {user?.rollNo || user?.enrollmentNo || 'N/A'}
                 </p>
               </div>
             </div>
