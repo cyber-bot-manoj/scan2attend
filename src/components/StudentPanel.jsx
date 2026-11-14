@@ -710,11 +710,7 @@ export default function StudentPanel({
           const realDist = Math.round(calculateHaversineDistance(lat, lng, targetLat, targetLng));
           setDistanceMeters(realDist);
           setGpsStatus('LIVE_GPS');
-          if (realDist <= 50) {
-            setGpsMessage(`Geofence Verified: ${realDist}m away (Inside 50m Perimeter)`);
-          } else {
-            setGpsMessage(`Area se bahar: ${realDist}m away from classroom (Limit: 50m)`);
-          }
+          setGpsMessage('');
           setGpsLoading(false);
         },
         (err) => {
@@ -757,11 +753,7 @@ export default function StudentPanel({
           const realDist = Math.round(calculateHaversineDistance(lat, lng, targetLat, targetLng));
           setDistanceMeters(realDist);
           setGpsStatus('LIVE_GPS');
-          if (realDist <= 50) {
-            setGpsMessage(`Geofence Verified: ${realDist}m from classroom (Inside 50m Perimeter)`);
-          } else {
-            setGpsMessage(`Area se bahar: ${realDist}m away from classroom (Limit: 50m)`);
-          }
+          setGpsMessage('');
           setGpsLoading(false);
         },
         (err) => {
@@ -791,11 +783,7 @@ export default function StudentPanel({
           const realDist = Math.round(calculateHaversineDistance(lat, lng, targetLat, targetLng));
           setDistanceMeters(realDist);
           setGpsStatus('LIVE_GPS');
-          if (realDist <= 50) {
-            setGpsMessage(`Geofence Verified: ${realDist}m from classroom (Inside 50m Perimeter)`);
-          } else {
-            setGpsMessage(`Area se bahar: ${realDist}m away from classroom (Limit: 50m)`);
-          }
+          setGpsMessage('');
           setGpsLoading(false);
         },
         (err) => {
@@ -1917,14 +1905,14 @@ export default function StudentPanel({
                     <div className="space-y-1">
                       <strong className={`block text-sm font-black ${isWithinGeofence ? 'text-emerald-300' : 'text-red-300'}`}>
                         {isWithinGeofence 
-                          ? `✅ GEOFENCE VERIFIED (${distanceMeters}m from classroom)`
-                          : `❌ GEOFENCE VIOLATION: Area Se Bahar (${distanceMeters}m Away)`
+                          ? `✅ GEOFENCE VERIFIED (${distanceMeters}m from College Campus)`
+                          : `❌ GEOFENCE VIOLATION: Area Se Bahar (${distanceMeters}m Door)`
                         }
                       </strong>
                       <p className="text-xs text-slate-300 leading-relaxed">
                         {isWithinGeofence
-                          ? `You are inside the strictly mandated 50-meter classroom perimeter at MUIT Lucknow. Geofencing check is successfully PASSED.`
-                          : `You are ${distanceMeters} meters away from the classroom. The maximum allowed limit is 50 meters. You must be physically inside the classroom to record attendance.`
+                          ? `You are inside the strictly mandated 50-meter classroom perimeter at MUIT Lucknow College Campus. Geofencing check is successfully PASSED.`
+                          : `Aap MUIT Lucknow College Campus ke 50-meter range se bahar hain (${distanceMeters}m door, limit 50m). Attendance keval college campus me physically present hone par hi lag sakti hai.`
                         }
                       </p>
                     </div>
@@ -1943,14 +1931,14 @@ export default function StudentPanel({
 
                     <div className="grid grid-cols-2 gap-3 text-xs">
                       <div className="p-3 bg-slate-900 rounded-xl border border-slate-700/60">
-                        <span className="text-[10px] text-slate-400 uppercase font-bold block">Student Coordinates</span>
+                        <span className="text-[10px] text-slate-400 uppercase font-bold block">Student Live GPS</span>
                         <strong className="font-mono text-slate-200 text-xs block mt-0.5">
                           {(Number(studentLat) || MUIT_CAMPUS_LAT).toFixed(5)}° N, {(Number(studentLng) || MUIT_CAMPUS_LNG).toFixed(5)}° E
                         </strong>
                       </div>
 
                       <div className="p-3 bg-slate-900 rounded-xl border border-slate-700/60">
-                        <span className="text-[10px] text-slate-400 uppercase font-bold block">Classroom Coordinates</span>
+                        <span className="text-[10px] text-slate-400 uppercase font-bold block">College Classroom (MUIT)</span>
                         <strong className="font-mono text-slate-200 text-xs block mt-0.5">
                           {(Number(activeSession?.latitude) || MUIT_CAMPUS_LAT).toFixed(5)}° N, {(Number(activeSession?.longitude) || MUIT_CAMPUS_LNG).toFixed(5)}° E
                         </strong>
@@ -1997,8 +1985,8 @@ export default function StudentPanel({
                       </button>
                     </div>
 
-                    {gpsMessage && (
-                      <p className="text-[11px] text-slate-400 italic text-center pt-1">
+                    {gpsStatus !== 'LIVE_GPS' && gpsMessage && (
+                      <p className="text-[11px] text-red-400 italic text-center pt-1">
                         {gpsMessage}
                       </p>
                     )}

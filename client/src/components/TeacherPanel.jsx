@@ -195,24 +195,10 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
           ? (networkIp ? `http://${networkIp}:3000` : window.location.origin)
           : window.location.origin);
 
-    // Acquire faculty's live classroom location if available, otherwise default to MUIT Lucknow coordinates
-    let classroomLat = 26.9302879;
-    let classroomLng = 80.9278433;
-    if ('geolocation' in navigator) {
-      try {
-        const livePos = await new Promise((resolve) => {
-          navigator.geolocation.getCurrentPosition(resolve, () => resolve(null), {
-            enableHighAccuracy: true,
-            timeout: 2500,
-            maximumAge: 10000
-          });
-        });
-        if (livePos && livePos.coords) {
-          classroomLat = livePos.coords.latitude;
-          classroomLng = livePos.coords.longitude;
-        }
-      } catch (e) {}
-    }
+    // Official College Campus Coordinates (MUIT Lucknow Campus, IIM Road, Lucknow)
+    const classroomLat = 26.9302879;
+    const classroomLng = 80.9278433;
+    const classroomRadius = 50;
 
     const webUrl = `${effectiveHost}/?action=attend&session=qr_${generatedAt}&classId=${selectedClassId}&code=${selectedClassId.toUpperCase()}&subject=${encodeURIComponent(className)}&expiresAt=${expiresAt}&lat=${classroomLat}&lng=${classroomLng}&radius=50`;
     const fallbackQrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(webUrl)}&size=600&margin=4&ecLevel=M`;

@@ -638,7 +638,7 @@ export default function LoginModal({ setUser, setActiveTab, scannedSession }) {
                 <span>Admin Sign In</span>
               </div>
             </div>
-          ) : (
+          ) : !scannedSession ? (
             <div className="flex items-center bg-[#F1F5F9] p-1.5 rounded-2xl mb-6 border border-[#E2E8F0]">
               <button
                 type="button"
@@ -679,7 +679,7 @@ export default function LoginModal({ setUser, setActiveTab, scannedSession }) {
                 <span>Sign Up</span>
               </button>
             </div>
-          )}
+          ) : null}
           
           {/* SUCCESS NOTICE POPUP BANNER (Auto-dismisses after 5 seconds) */}
           {successNotice && (
@@ -712,74 +712,58 @@ export default function LoginModal({ setUser, setActiveTab, scannedSession }) {
           {/* ========================================================= */}
           {authMode === 'SIGN_IN' && (
             <div>
-              <div className="mb-4">
-                <h2 className="text-2xl font-black text-[#212121]">Sign In to Your Account</h2>
+              <div className="mb-5">
+                <h2 className="text-2xl font-black text-[#212121]">
+                  {scannedSession ? 'Student Sign In' : 'Sign In to Your Account'}
+                </h2>
+                {scannedSession && (
+                  <p className="text-xs text-[#64748B] font-medium mt-1">
+                    Enter your registered email and password to verify attendance
+                  </p>
+                )}
               </div>
 
-              {/* QUICK ROLE SELECTOR TABS */}
-              <div className="grid grid-cols-3 gap-2.5 mb-5">
-                <button
-                  type="button"
-                  onClick={() => fillQuickAcc('STUDENT')}
-                  className={`p-2.5 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
-                    selectedRole === 'STUDENT'
-                      ? 'bg-[#2979FF]/10 border-[#2979FF] text-[#2979FF] shadow-xs'
-                      : 'bg-[#FAF8F5] border-[#E2E8F0] text-[#757575] hover:border-slate-300'
-                  }`}
-                >
-                  <GraduationCap className="w-4 h-4" />
-                  Student
-                </button>
+              {/* QUICK ROLE SELECTOR TABS (Hidden when scanned via QR) */}
+              {!scannedSession && (
+                <div className="grid grid-cols-3 gap-2.5 mb-5">
+                  <button
+                    type="button"
+                    onClick={() => fillQuickAcc('STUDENT')}
+                    className={`p-2.5 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
+                      selectedRole === 'STUDENT'
+                        ? 'bg-[#2979FF]/10 border-[#2979FF] text-[#2979FF] shadow-xs'
+                        : 'bg-[#FAF8F5] border-[#E2E8F0] text-[#757575] hover:border-slate-300'
+                    }`}
+                  >
+                    <GraduationCap className="w-4 h-4" />
+                    Student
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => fillQuickAcc('TEACHER')}
-                  className={`p-2.5 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
-                    selectedRole === 'TEACHER'
-                      ? 'bg-purple-500/10 border-purple-500 text-purple-600 shadow-xs'
-                      : 'bg-[#FAF8F5] border-[#E2E8F0] text-[#757575] hover:border-slate-300'
-                  }`}
-                >
-                  <UserCheck className="w-4 h-4" />
-                  Faculty
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => fillQuickAcc('TEACHER')}
+                    className={`p-2.5 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
+                      selectedRole === 'TEACHER'
+                        ? 'bg-purple-500/10 border-purple-500 text-purple-600 shadow-xs'
+                        : 'bg-[#FAF8F5] border-[#E2E8F0] text-[#757575] hover:border-slate-300'
+                    }`}
+                  >
+                    <UserCheck className="w-4 h-4" />
+                    Faculty
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => fillQuickAcc('ADMIN')}
-                  className={`p-2.5 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
-                    selectedRole === 'ADMIN'
-                      ? 'bg-amber-500/10 border-amber-500 text-amber-600 shadow-xs'
-                      : 'bg-[#FAF8F5] border-[#E2E8F0] text-[#757575] hover:border-slate-300'
-                  }`}
-                >
-                  <ShieldCheck className="w-4 h-4" />
-                  Admin
-                </button>
-              </div>
-
-              {/* CAMERA / GOOGLE LENS SCANNED ACTIVE SESSION BANNER */}
-              {scannedSession && scannedSession.expiresAt > Date.now() && (
-                <div className="p-4 bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-purple-500/10 border-2 border-indigo-500/30 rounded-2xl flex items-start gap-3 shadow-md animate-fadeIn">
-                  <div className="p-2.5 bg-indigo-600 text-white rounded-xl shadow-md shrink-0">
-                    <QrCode className="w-5 h-5 animate-pulse" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
-                      <span className="text-[11px] font-black text-indigo-700 uppercase tracking-wider flex items-center gap-1">
-                        <Sparkles className="w-3.5 h-3.5 text-indigo-600" /> QR Code Scanned (Camera / Lens)
-                      </span>
-                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black font-mono">
-                        ⏱ 5-Min Session Active
-                      </span>
-                    </div>
-                    <h4 className="text-xs font-black text-slate-900 truncate">
-                      {scannedSession.subject || scannedSession.className || 'Class Session'}
-                    </h4>
-                    <p className="text-[11px] text-slate-600 font-medium mt-0.5">
-                      Log in with your registered email & password to view student details, complete 50m geofencing & actual face verification, and record attendance.
-                    </p>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => fillQuickAcc('ADMIN')}
+                    className={`p-2.5 rounded-2xl border text-xs font-bold flex flex-col items-center gap-1 transition-all ${
+                      selectedRole === 'ADMIN'
+                        ? 'bg-amber-500/10 border-amber-500 text-amber-600 shadow-xs'
+                        : 'bg-[#FAF8F5] border-[#E2E8F0] text-[#757575] hover:border-slate-300'
+                    }`}
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    Admin
+                  </button>
                 </div>
               )}
 
@@ -835,7 +819,7 @@ export default function LoginModal({ setUser, setActiveTab, scannedSession }) {
                   disabled={loading}
                   className="w-full btn-blue justify-center py-3 text-xs font-black shadow-lg hover:shadow-indigo-500/30 mt-2 gap-2"
                 >
-                  {loading ? 'Authenticating...' : selectedRole === 'TEACHER' ? 'Enter Faculty Portal' : selectedRole === 'STUDENT' ? 'Enter Student Portal' : 'Enter Admin Portal'}
+                  {loading ? 'Authenticating...' : scannedSession ? 'Sign In & Verify Attendance' : selectedRole === 'TEACHER' ? 'Enter Faculty Portal' : selectedRole === 'STUDENT' ? 'Enter Student Portal' : 'Enter Admin Portal'}
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </form>
