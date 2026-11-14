@@ -675,7 +675,7 @@ export default function StudentPanel({
   const [gpsLoading, setGpsLoading] = useState(false);
   const [gpsStatus, setGpsStatus] = useState('LIVE_GPS');
   const [gpsMessage, setGpsMessage] = useState('');
-  const gpsStatusRef = useRef('LIVE_GPS');
+  const [gpsAccuracy, setGpsAccuracy] = useState(null);
 
   const calculateHaversineDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371e3;
@@ -691,36 +691,116 @@ export default function StudentPanel({
     return R * c;
   };
 
-  // Automatically watch browser GPS location continuously in real-time
-  useEffect(() => {
-    let watchId;
+  // Dedicated manual refresh for live GPS calibration
+  const refreshLiveGps = () => {
     setGpsLoading(true);
-
+    setGpsMessage('');
     if ('geolocation' in navigator) {
-      watchId = navigator.geolocation.watchPosition(
+      navigator.geolocation.getCurrentPosition(
         (pos) => {
-          if (gpsStatusRef.current === 'SIMULATED') return;
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
+          const acc = Math.round(pos.coords.accuracy || 0);
+          setGpsAccuracy(acc);
           setStudentLat(lat);
           setStudentLng(lng);
 
-          // Calculate real Haversine distance from MUIT Lucknow coordinates
           const targetLat = (activeSession && activeSession.latitude) ? activeSession.latitude : MUIT_CAMPUS_LAT;
           const targetLng = (activeSession && activeSession.longitude) ? activeSession.longitude : MUIT_CAMPUS_LNG;
           const realDist = Math.round(calculateHaversineDistance(lat, lng, targetLat, targetLng));
           setDistanceMeters(realDist);
           setGpsStatus('LIVE_GPS');
           if (realDist <= 50) {
-            setGpsMessage(`Geofence Verified: ${realDist}m from MUIT Campus (Inside 50m Perimeter)`);
+            setGpsMessage(`Geofence Verified: ${realDist}m away (Inside 50m Perimeter)`);
           } else {
-            setGpsMessage(`Area se bahar: ${realDist}m away from MUIT Campus (Limit: 50m)`);
+            setGpsMessage(`Area se bahar: ${realDist}m away from classroom (Limit: 50m)`);
+          }
+          setGpsLoading(false);
+        },
+        (err) => {
+          console.warn('Live GPS refresh error:', err);
+          setGpsStatus('DENIED');
+          if (err.code === 1) {
+            setGpsMessage('Location permission blocked in browser settings. Please allow location access.');
+          } else {
+            setGpsMessage('Could not retrieve live GPS coordinates. Please tap Refresh GPS to retry.');
+          }
+          setGpsLoading(false);
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+      );
+    } else {
+      setGpsStatus('UNSUPPORTED');
+      setGpsMessage('Geolocation is not supported by this browser.');
+      setGpsLoading(false);
+    }
+  };
+
+  // Automatically watch browser GPS location continuously in real-time
+  useEffect(() => {
+    let watchId;
+    setGpsLoading(true);
+
+    if ('geolocation' in navigator) {
+      // Immediate quick location fetch
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const acc = Math.round(pos.coords.accuracy || 0);
+          setGpsAccuracy(acc);
+          setStudentLat(lat);
+          setStudentLng(lng);
+
+          const targetLat = (activeSession && activeSession.latitude) ? activeSession.latitude : MUIT_CAMPUS_LAT;
+          const targetLng = (activeSession && activeSession.longitude) ? activeSession.longitude : MUIT_CAMPUS_LNG;
+          const realDist = Math.round(calculateHaversineDistance(lat, lng, targetLat, targetLng));
+          setDistanceMeters(realDist);
+          setGpsStatus('LIVE_GPS');
+          if (realDist <= 50) {
+            setGpsMessage(`Geofence Verified: ${realDist}m from classroom (Inside 50m Perimeter)`);
+          } else {
+            setGpsMessage(`Area se bahar: ${realDist}m away from classroom (Limit: 50m)`);
+          }
+          setGpsLoading(false);
+        },
+        (err) => {
+          console.warn('Initial GPS fetch error:', err);
+          if (err.code === 1) {
+            setGpsStatus('DENIED');
+            setGpsMessage('Location permission blocked in browser settings. Please allow location access.');
+          }
+          setGpsLoading(false);
+        },
+        { enableHighAccuracy: true, timeout: 8000, maximumAge: 2000 }
+      );
+
+      // Real-time continuous watcher
+      watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const acc = Math.round(pos.coords.accuracy || 0);
+          setGpsAccuracy(acc);
+          setStudentLat(lat);
+          setStudentLng(lng);
+
+          // Calculate real Haversine distance from target classroom coordinates
+          const targetLat = (activeSession && activeSession.latitude) ? activeSession.latitude : MUIT_CAMPUS_LAT;
+          const targetLng = (activeSession && activeSession.longitude) ? activeSession.longitude : MUIT_CAMPUS_LNG;
+          const realDist = Math.round(calculateHaversineDistance(lat, lng, targetLat, targetLng));
+          setDistanceMeters(realDist);
+          setGpsStatus('LIVE_GPS');
+          if (realDist <= 50) {
+            setGpsMessage(`Geofence Verified: ${realDist}m from classroom (Inside 50m Perimeter)`);
+          } else {
+            setGpsMessage(`Area se bahar: ${realDist}m away from classroom (Limit: 50m)`);
           }
           setGpsLoading(false);
         },
         (err) => {
           console.warn('Auto GPS watch error:', err);
-          if (gpsStatusRef.current !== 'SIMULATED') {
+          if (err.code === 1) {
             setGpsStatus('DENIED');
             setGpsMessage('Location permission blocked in browser settings. Please allow location access.');
           }
@@ -729,10 +809,8 @@ export default function StudentPanel({
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 2000 }
       );
     } else {
-      if (gpsStatusRef.current !== 'SIMULATED') {
-        setGpsStatus('DENIED');
-        setGpsMessage('Browser does not support Geolocation.');
-      }
+      setGpsStatus('DENIED');
+      setGpsMessage('Browser does not support Geolocation.');
       setGpsLoading(false);
     }
 
@@ -742,50 +820,6 @@ export default function StudentPanel({
       }
     };
   }, [activeSession]);
-
-  // Geofence Test Mode Switcher: For reviewing inside/outside geofence conditions easily
-  const setGeofenceTestMode = (mode) => {
-    if (mode === 'SIMULATED_PASS') {
-      gpsStatusRef.current = 'SIMULATED';
-      setGpsStatus('SIMULATED');
-      setStudentLat(26.93035);
-      setStudentLng(80.92790);
-      setDistanceMeters(12);
-      setGpsMessage('Simulated Inside Classroom (12m away • Inside 50m Perimeter - PASS)');
-    } else if (mode === 'SIMULATED_FAIL') {
-      gpsStatusRef.current = 'SIMULATED';
-      setGpsStatus('SIMULATED');
-      setStudentLat(26.93190);
-      setStudentLng(80.92980);
-      setDistanceMeters(140);
-      setGpsMessage('Simulated Outside Campus (140m away • Exceeds 50m Perimeter - FAIL)');
-    } else {
-      gpsStatusRef.current = 'LIVE_GPS';
-      setGpsStatus('LIVE_GPS');
-      if (navigator.geolocation) {
-        setGpsLoading(true);
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-            setStudentLat(lat);
-            setStudentLng(lng);
-            const targetLat = (activeSession && activeSession.latitude) ? activeSession.latitude : MUIT_CAMPUS_LAT;
-            const targetLng = (activeSession && activeSession.longitude) ? activeSession.longitude : MUIT_CAMPUS_LNG;
-            const dist = Math.round(calculateHaversineDistance(lat, lng, targetLat, targetLng));
-            setDistanceMeters(dist);
-            setGpsMessage(dist <= 50 ? `Live GPS: ${dist}m away (Inside 50m Limit)` : `Live GPS: ${dist}m away (Area Se Bahar - Limit: 50m)`);
-            setGpsLoading(false);
-          },
-          (err) => {
-            console.warn(err);
-            setGpsLoading(false);
-          },
-          { enableHighAccuracy: true }
-        );
-      }
-    }
-  };
 
   // Real-time Live Video Frame Analyzer for Actual Human Face Detection
   useEffect(() => {
@@ -1007,7 +1041,14 @@ export default function StudentPanel({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          studentId: user?.id || user?.rollNo || 'student_1',
+          studentId: user?.id || user?.rollNo || user?.email || 'student_1',
+          studentEmail: user?.email || '',
+          studentName: user?.name || 'Verified Student',
+          rollNo: user?.rollNo || user?.enrollmentNo || '',
+          enrollmentNo: user?.enrollmentNo || '',
+          classSection: user?.classSection || user?.section || 'B.C.A - Semester V (Section B)',
+          mobile: user?.mobile || '',
+          photo: user?.photo || null,
           sessionId: activeSession.sessionId,
           classId: activeSession.classId,
           qrDataString: validQrPayload,
@@ -1931,50 +1972,36 @@ export default function StudentPanel({
                         />
                       </div>
                     </div>
-                  </div>
-
-                  {/* Geofence Testing & Simulation Switcher */}
-                  <div className="p-3.5 rounded-2xl bg-indigo-950/40 border border-indigo-500/30 space-y-2">
-                    <span className="text-[11px] font-black text-indigo-300 uppercase tracking-wider block">
-                      🧪 Location Review / Simulation Switcher:
-                    </span>
-                    <div className="grid grid-cols-3 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setGeofenceTestMode('SIMULATED_PASS')}
-                        className={`py-2 px-2 rounded-xl text-[11px] font-bold border transition-all text-center ${
-                          distanceMeters <= 50 && gpsStatusRef.current === 'SIMULATED'
-                            ? 'bg-emerald-600 text-white border-emerald-400 shadow-sm'
-                            : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white'
-                        }`}
-                      >
-                        Classroom (12m - PASS)
-                      </button>
+                    {/* Live GPS Device Status & Calibration Bar */}
+                    <div className="p-3.5 rounded-xl bg-slate-900/90 border border-slate-700/80 flex items-center justify-between text-xs gap-3">
+                      <div className="flex items-center gap-2.5">
+                        <span className={`w-3 h-3 rounded-full shrink-0 ${gpsLoading ? 'bg-amber-400 animate-ping' : isWithinGeofence ? 'bg-emerald-400' : 'bg-red-400'}`} />
+                        <div>
+                          <strong className="text-slate-200 block text-xs">
+                            {gpsLoading ? 'Detecting Live Device GPS...' : isWithinGeofence ? 'Live Device GPS Active (In-Range)' : 'Live Device GPS Active (Out-of-Range)'}
+                          </strong>
+                          <span className="text-[10px] text-slate-400 block mt-0.5">
+                            {gpsAccuracy ? `Accuracy: ±${gpsAccuracy}m • Real-Time Satellite Tracking` : 'Automatic Live Geofencing'}
+                          </span>
+                        </div>
+                      </div>
 
                       <button
                         type="button"
-                        onClick={() => setGeofenceTestMode('SIMULATED_FAIL')}
-                        className={`py-2 px-2 rounded-xl text-[11px] font-bold border transition-all text-center ${
-                          distanceMeters > 50 && gpsStatusRef.current === 'SIMULATED'
-                            ? 'bg-red-600 text-white border-red-400 shadow-sm'
-                            : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white'
-                        }`}
+                        onClick={refreshLiveGps}
+                        disabled={gpsLoading}
+                        className="px-3.5 py-2 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/60 text-indigo-300 hover:text-white border border-indigo-500/40 text-[11px] font-bold transition-all flex items-center gap-1.5 shrink-0 shadow-sm"
                       >
-                        Outside (140m - FAIL)
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setGeofenceTestMode('LIVE')}
-                        className={`py-2 px-2 rounded-xl text-[11px] font-bold border transition-all text-center ${
-                          gpsStatusRef.current === 'LIVE_GPS'
-                            ? 'bg-blue-600 text-white border-blue-400 shadow-sm'
-                            : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white'
-                        }`}
-                      >
-                        Live Device GPS
+                        <RefreshCw className={`w-3.5 h-3.5 ${gpsLoading ? 'animate-spin' : ''}`} />
+                        <span>{gpsLoading ? 'Locating...' : 'Refresh GPS'}</span>
                       </button>
                     </div>
+
+                    {gpsMessage && (
+                      <p className="text-[11px] text-slate-400 italic text-center pt-1">
+                        {gpsMessage}
+                      </p>
+                    )}
                   </div>
 
                   <div className="flex gap-2 pt-1">

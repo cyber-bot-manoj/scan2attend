@@ -195,7 +195,26 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
           ? (networkIp ? `http://${networkIp}:3000` : window.location.origin)
           : window.location.origin);
 
-    const webUrl = `${effectiveHost}/?action=attend&session=qr_${generatedAt}&classId=${selectedClassId}&code=${selectedClassId.toUpperCase()}&subject=${encodeURIComponent(className)}&expiresAt=${expiresAt}&lat=26.9302879&lng=80.9278433&radius=50`;
+    // Acquire faculty's live classroom location if available, otherwise default to MUIT Lucknow coordinates
+    let classroomLat = 26.9302879;
+    let classroomLng = 80.9278433;
+    if ('geolocation' in navigator) {
+      try {
+        const livePos = await new Promise((resolve) => {
+          navigator.geolocation.getCurrentPosition(resolve, () => resolve(null), {
+            enableHighAccuracy: true,
+            timeout: 2500,
+            maximumAge: 10000
+          });
+        });
+        if (livePos && livePos.coords) {
+          classroomLat = livePos.coords.latitude;
+          classroomLng = livePos.coords.longitude;
+        }
+      } catch (e) {}
+    }
+
+    const webUrl = `${effectiveHost}/?action=attend&session=qr_${generatedAt}&classId=${selectedClassId}&code=${selectedClassId.toUpperCase()}&subject=${encodeURIComponent(className)}&expiresAt=${expiresAt}&lat=${classroomLat}&lng=${classroomLng}&radius=50`;
     const fallbackQrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(webUrl)}&size=600&margin=4&ecLevel=M`;
 
     try {
@@ -205,7 +224,9 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
         body: JSON.stringify({
           classId: selectedClassId,
           teacherId: user ? user.id : 'teacher_1',
-          hostUrl: effectiveHost
+          hostUrl: effectiveHost,
+          customLat: classroomLat,
+          customLng: classroomLng
         })
       });
       const data = await res.json();
@@ -219,6 +240,9 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
         code: selectedClassId.toUpperCase(),
         expiresAt,
         generatedAt,
+        latitude: data.qrSession?.latitude || classroomLat,
+        longitude: data.qrSession?.longitude || classroomLng,
+        radiusMeters: 50,
         webUrl: data.qrSession?.webUrl || webUrl,
         qrDataUrl: data.qrSession?.qrDataUrl || fallbackQrUrl
       };
@@ -239,6 +263,9 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
         code: selectedClassId.toUpperCase(),
         expiresAt,
         generatedAt,
+        latitude: classroomLat,
+        longitude: classroomLng,
+        radiusMeters: 50,
         webUrl,
         qrDataUrl: fallbackQrUrl
       };

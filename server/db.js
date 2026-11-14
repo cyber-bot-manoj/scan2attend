@@ -1,7 +1,11 @@
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 const DB_FILE = path.join(__dirname, 'data.json');
+const TMP_FILE = path.join(os.tmpdir(), 'scan2attend_data.json');
+
+let memoryDB = null;
 
 const initialData = {
   users: [
@@ -64,24 +68,39 @@ const initialData = {
 };
 
 function readDB() {
+  if (memoryDB) {
+    return memoryDB;
+  }
   try {
-    if (!fs.existsSync(DB_FILE)) {
-      fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2));
-      return initialData;
+    if (fs.existsSync(TMP_FILE)) {
+      const content = fs.readFileSync(TMP_FILE, 'utf8');
+      memoryDB = JSON.parse(content);
+      return memoryDB;
     }
-    const content = fs.readFileSync(DB_FILE, 'utf8');
-    return JSON.parse(content);
+    if (fs.existsSync(DB_FILE)) {
+      const content = fs.readFileSync(DB_FILE, 'utf8');
+      memoryDB = JSON.parse(content);
+      return memoryDB;
+    }
+    memoryDB = initialData;
+    return initialData;
   } catch (err) {
     console.error('Error reading DB, resetting to initial data:', err);
+    memoryDB = initialData;
     return initialData;
   }
 }
 
 function writeDB(data) {
+  memoryDB = data;
   try {
     fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
   } catch (err) {
-    console.error('Error writing DB:', err);
+    try {
+      fs.writeFileSync(TMP_FILE, JSON.stringify(data, null, 2));
+    } catch (tmpErr) {
+      console.error('Error writing DB to disk/tmp:', tmpErr);
+    }
   }
 }
 
