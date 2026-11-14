@@ -19,6 +19,7 @@ import {
   User,
   Hash,
   BookOpen,
+  QrCode,
   X
 } from 'lucide-react';
 
