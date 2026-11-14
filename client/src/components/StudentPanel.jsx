@@ -560,6 +560,18 @@ export default function StudentPanel({
   // Duplicate Attendance Prevention Check
   const isDuplicateAttendance = Boolean(
     hasMarkedAttendance ||
+    (() => {
+      try {
+        const studentKey = user?.email || user?.rollNo || user?.id || 'unknown';
+        const stored = localStorage.getItem(`s2a_attendance_${studentKey}`);
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          const today = new Date().toDateString();
+          return parsed.some(p => p.date === today && (p.sessionId === activeSession?.sessionId || p.classId === (activeSession?.classId || 'bca501')));
+        }
+      } catch (e) {}
+      return false;
+    })() ||
     (activeSession && attendanceLogs?.some(log => 
       (log.sessionId === activeSession.sessionId || log.subject === activeSession.className || log.subject === activeSession.subject) &&
       log.status === 'PRESENT' &&
@@ -1059,6 +1071,18 @@ export default function StudentPanel({
       const passRecord = data.record;
       setLiveRecord(passRecord);
       setHasMarkedAttendance(true);
+      try {
+        const studentKey = user?.email || user?.rollNo || user?.id || 'unknown';
+        const storageKey = `s2a_attendance_${studentKey}`;
+        const existing = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        existing.push({
+          date: new Date().toDateString(),
+          sessionId: activeSession?.sessionId || passRecord.sessionId,
+          classId: activeSession?.classId || 'bca501',
+          time: Date.now()
+        });
+        localStorage.setItem(storageKey, JSON.stringify(existing));
+      } catch (e) {}
       if (onNewAttendance) {
         onNewAttendance(passRecord);
       }
@@ -1674,9 +1698,6 @@ export default function StudentPanel({
                   <h3 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
                     Scan2Attend Verification Gateway
                   </h3>
-                  <p className="text-[11px] text-slate-400 font-medium">
-                    Strict Security Pipeline: QR Validity • Geofence • Biometric Face Check
-                  </p>
                 </div>
               </div>
 
@@ -1879,7 +1900,7 @@ export default function StudentPanel({
                     disabled={isDuplicateAttendance || timeLeft === 0}
                     className="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:pointer-events-none text-white text-xs font-black transition-all shadow-lg flex items-center justify-center gap-2"
                   >
-                    <span>Proceed to 50m GPS Geofencing Check</span>
+                    <span>Proceed to Geofencing Check</span>
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -1906,13 +1927,13 @@ export default function StudentPanel({
                       <strong className={`block text-sm font-black ${isWithinGeofence ? 'text-emerald-300' : 'text-red-300'}`}>
                         {isWithinGeofence 
                           ? `✅ GEOFENCE VERIFIED (${distanceMeters}m from College Campus)`
-                          : `❌ GEOFENCE VIOLATION: Area Se Bahar (${distanceMeters}m Door)`
+                          : `❌ GEOFENCE VIOLATION: Outside Classroom Range (${distanceMeters}m Away)`
                         }
                       </strong>
                       <p className="text-xs text-slate-300 leading-relaxed">
                         {isWithinGeofence
                           ? `You are inside the strictly mandated 50-meter classroom perimeter at MUIT Lucknow College Campus. Geofencing check is successfully PASSED.`
-                          : `Aap MUIT Lucknow College Campus ke 50-meter range se bahar hain (${distanceMeters}m door, limit 50m). Attendance keval college campus me physically present hone par hi lag sakti hai.`
+                          : `You are outside the 50-meter perimeter of MUIT Lucknow College Campus (${distanceMeters}m away, limit 50m). Attendance can only be marked when physically present inside the college campus.`
                         }
                       </p>
                     </div>
@@ -2079,7 +2100,7 @@ export default function StudentPanel({
                   </div>
 
                   {/* Face Verification Result Feedback */}
-                  {faceVerified ? (
+                  {faceVerified && (
                     <div className="p-3.5 bg-emerald-950/70 border border-emerald-500/50 rounded-2xl text-emerald-300 text-xs font-bold flex items-center justify-between">
                       <div className="flex items-center gap-2 text-left">
                         <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
@@ -2090,13 +2111,6 @@ export default function StudentPanel({
                       </div>
                       <span className="px-2 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase">
                         PASSED
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="p-3 bg-slate-800/80 border border-slate-700 rounded-2xl text-xs text-slate-300 text-left flex items-start gap-2.5">
-                      <Sparkles className="w-4 h-4 text-yellow-400 mt-0.5 shrink-0" />
-                      <span>
-                        Position your face inside the central oval frame. Ensure adequate lighting and face the camera directly for instant biometric verification.
                       </span>
                     </div>
                   )}
@@ -2157,16 +2171,12 @@ export default function StudentPanel({
                 <div className="space-y-4 animate-fadeIn text-left">
                   
                   <div className="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-3">
-                    <span className="text-xs font-black text-slate-300 uppercase tracking-wider block border-b border-slate-700/60 pb-2">
-                      🛡️ Comprehensive Security Pipeline Verification Checklist
-                    </span>
-
                     <div className="space-y-2 text-xs">
                       {/* Check 1: QR Validity */}
                       <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/60">
                         <div className="flex items-center gap-2">
                           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                          <span>1. Dynamic 5-Minute Class QR Code</span>
+                          <span>1. Class QR Code</span>
                         </div>
                         <span className="font-mono text-emerald-300 text-[11px] font-bold">
                           Active ({formattedTime})
@@ -2184,7 +2194,7 @@ export default function StudentPanel({
                         </span>
                       </div>
 
-                      {/* Check 3: 50m Geofencing */}
+                      {/* Check 3: Classroom Geofencing */}
                       <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900 border border-slate-700/60">
                         <div className="flex items-center gap-2">
                           {isWithinGeofence ? (
@@ -2192,7 +2202,7 @@ export default function StudentPanel({
                           ) : (
                             <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
                           )}
-                          <span>3. 50-Meter GPS Classroom Geofencing</span>
+                          <span>3. Verified Classroom Geofencing</span>
                         </div>
                         <span className={`font-mono text-[11px] font-bold ${isWithinGeofence ? 'text-emerald-300' : 'text-red-400'}`}>
                           {distanceMeters}m (Limit: 50m)
@@ -2207,7 +2217,7 @@ export default function StudentPanel({
                           ) : (
                             <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
                           )}
-                          <span>4. Live Biometric Face Verification</span>
+                          <span>4. Face Verification</span>
                         </div>
                         <span className={`text-[11px] font-bold ${faceVerified ? 'text-emerald-300' : 'text-amber-400'}`}>
                           {faceVerified ? (faceScore || 'Verified') : 'Pending Scan'}
@@ -2225,7 +2235,7 @@ export default function StudentPanel({
                           <span>5. Duplicate Submission Prevention</span>
                         </div>
                         <span className={`text-[11px] font-bold ${!isDuplicateAttendance ? 'text-emerald-300' : 'text-red-400'}`}>
-                          {!isDuplicateAttendance ? 'Verified Unique' : 'Duplicate Detected'}
+                          {!isDuplicateAttendance ? 'Verified Unique' : 'Duplicate Detected (Already Marked)'}
                         </span>
                       </div>
                     </div>
@@ -2248,10 +2258,15 @@ export default function StudentPanel({
                           <RefreshCw className="w-4 h-4 animate-spin" />
                           <span>Recording in Database & Dispatching SMS...</span>
                         </>
+                      ) : isDuplicateAttendance ? (
+                        <>
+                          <AlertTriangle className="w-4 h-4 text-red-400" />
+                          <span>Attendance Already Marked (Duplicate Blocked)</span>
+                        </>
                       ) : (
                         <>
                           <CheckCircle2 className="w-4 h-4" />
-                          <span>🚀 Confirm & Mark Attendance (PRESENT)</span>
+                          <span>🚀 Confirm & Mark Attendance</span>
                         </>
                       )}
                     </button>
