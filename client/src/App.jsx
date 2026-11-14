@@ -63,46 +63,67 @@ export default function App() {
     try {
       const params = new URLSearchParams(window.location.search);
       const action = params.get('action');
-      const sessionId = params.get('session');
+      const sessionId = params.get('session') || params.get('attend') || params.get('s');
 
       if (action === 'attend' || sessionId) {
-        const expiresAt = parseInt(params.get('expiresAt'), 10) || (Date.now() + 300000);
+        const rawExpires = params.get('expiresAt');
+        const expiresAt = rawExpires ? parseInt(rawExpires, 10) : (Date.now() + 300000);
         const subject = params.get('subject') ? decodeURIComponent(params.get('subject')) : 'Computer Graphics (BCA501)';
-        const classId = params.get('classId') || 'bca501';
-        const code = params.get('code') || 'BCA501';
+        const classId = params.get('classId') || params.get('cid') || 'bca501';
+        const code = params.get('code') || classId.toUpperCase();
         const lat = parseFloat(params.get('lat')) || 26.9302879;
         const lng = parseFloat(params.get('lng')) || 80.9278433;
         const radius = parseInt(params.get('radius'), 10) || 50;
 
-        if (expiresAt < Date.now()) {
-          setUrlDetectedNotice({
-            type: 'EXPIRED',
-            title: 'QR Code Expired',
-            message: 'This 5-minute attendance QR code has expired. Please ask faculty to generate a fresh QR code.'
-          });
-        } else {
-          const detectedSession = {
-            sessionId: sessionId || `qr_${Date.now()}`,
-            classId,
-            code,
-            className: subject,
-            subject,
-            expiresAt,
-            latitude: lat,
-            longitude: lng,
-            radiusMeters: radius,
-            campus: 'MUIT Lucknow',
-            urlScanned: true
-          };
+        const applySession = (sess) => {
+          if (sess.expiresAt < Date.now()) {
+            setUrlDetectedNotice({
+              type: 'EXPIRED',
+              title: 'QR Code Expired',
+              message: 'This 5-minute attendance QR code has expired. Please ask faculty to generate a fresh QR code.'
+            });
+          } else {
+            setActiveSession(sess);
+            localStorage.setItem('activeQrSession', JSON.stringify(sess));
+            setUrlDetectedNotice({
+              type: 'ACTIVE',
+              session: sess,
+              message: `QR code scanned via Mobile Camera / Google Lens for ${sess.className || sess.subject}.`
+            });
+            setAutoOpenVerification(true);
+          }
+        };
 
-          setActiveSession(detectedSession);
-          localStorage.setItem('activeQrSession', JSON.stringify(detectedSession));
-          setUrlDetectedNotice({
-            type: 'ACTIVE',
-            session: detectedSession,
-            message: `QR code scanned via Mobile Camera / Google Lens for ${subject}.`
-          });
-          setAutoOpenVerification(true);
+        const defaultDetectedSession = {
+          sessionId: sessionId || `qr_${Date.now()}`,
+          classId,
+          code,
+          className: subject,
+          subject,
+          expiresAt,
+          latitude: lat,
+          longitude: lng,
+          radiusMeters: radius,
+          campus: 'MUIT Lucknow',
+          urlScanned: true
+        };
+
+        applySession(defaultDetectedSession);
+
+        // Fetch fresh metadata from server if sessionId exists
+        if (sessionId) {
+          fetch(`/api/session/${sessionId}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data.success && data.session) {
+                applySession({
+                  ...defaultDetectedSession,
+                  ...data.session,
+                  urlScanned: true
+                });
+              }
+            })
+            .catch(err => console.warn('API session lookup fallback to URL params:', err));
         }
       }
     } catch (e) {

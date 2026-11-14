@@ -53,9 +53,16 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
   const [showQrModal, setShowQrModal] = useState(false);
   const [showAllFeedModal, setShowAllFeedModal] = useState(false);
 
+  // Detect if running on cloud (Vercel, Render, etc.) vs local dev
+  const isCloudHost = typeof window !== 'undefined' && 
+    window.location.hostname !== 'localhost' && 
+    window.location.hostname !== '127.0.0.1' && 
+    !window.location.hostname.startsWith('192.168.') && 
+    !window.location.hostname.startsWith('10.');
+
   // Network IP & URL Host Mode for Mobile Camera / Google Lens Scanning
   const [networkIp, setNetworkIp] = useState('192.168.29.180');
-  const [hostMode, setHostMode] = useState('NETWORK'); // 'NETWORK' (Wi-Fi IP for phone camera) or 'LOCAL' (Browser origin)
+  const [hostMode, setHostMode] = useState(isCloudHost ? 'CLOUD' : 'NETWORK'); // 'CLOUD', 'NETWORK' (Wi-Fi IP for phone camera) or 'LOCAL' (Browser origin)
   const [copiedUrl, setCopiedUrl] = useState(false);
 
   // Teacher Coursework & Assignments State
@@ -182,14 +189,14 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
     const className = classNameMap[selectedClassId] || 'Computer Graphics (BCA501)';
 
     // Effective client base host URL:
-    // When hostMode is 'NETWORK', use the machine's local Wi-Fi IP (e.g. http://192.168.29.180:3000)
-    // When hostMode is 'LOCAL', use current window.location.origin
-    const effectiveHost = hostMode === 'NETWORK'
-      ? (networkIp ? `http://${networkIp}:3000` : window.location.origin)
-      : window.location.origin;
+    const effectiveHost = (isCloudHost || hostMode === 'CLOUD')
+      ? window.location.origin
+      : (hostMode === 'NETWORK'
+          ? (networkIp ? `http://${networkIp}:3000` : window.location.origin)
+          : window.location.origin);
 
     const webUrl = `${effectiveHost}/?action=attend&session=qr_${generatedAt}&classId=${selectedClassId}&code=${selectedClassId.toUpperCase()}&subject=${encodeURIComponent(className)}&expiresAt=${expiresAt}&lat=26.9302879&lng=80.9278433&radius=50`;
-    const fallbackQrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(webUrl)}&size=450&margin=2`;
+    const fallbackQrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(webUrl)}&size=600&margin=4&ecLevel=M`;
 
     try {
       const res = await fetch('/api/teacher/generate-qr', {
@@ -728,39 +735,47 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
 
             {/* QR Host Target Mode Selector */}
             <div className="flex items-center justify-between bg-slate-100 p-1 rounded-xl text-[10px] font-bold border border-slate-200">
-              <button
-                type="button"
-                onClick={() => setHostMode('NETWORK')}
-                title="Use Wi-Fi IP address for phone camera / Google Lens scanning on the same network"
-                className={`flex-1 py-1 rounded-lg transition-all flex items-center justify-center gap-1 ${
-                  hostMode === 'NETWORK'
-                    ? 'bg-indigo-600 text-white shadow-xs font-black'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <Wifi className="w-3 h-3" /> Wi-Fi IP ({networkIp})
-              </button>
-              <button
-                type="button"
-                onClick={() => setHostMode('LOCAL')}
-                title="Use localhost for same-device browser testing"
-                className={`flex-1 py-1 rounded-lg transition-all flex items-center justify-center gap-1 ${
-                  hostMode === 'LOCAL'
-                    ? 'bg-indigo-600 text-white shadow-xs font-black'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                <Globe className="w-3 h-3" /> Localhost
-              </button>
+              {isCloudHost ? (
+                <div className="w-full py-1 text-center text-emerald-700 bg-emerald-50 rounded-lg font-black flex items-center justify-center gap-1.5 border border-emerald-200">
+                  <Globe className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Cloud URL: {typeof window !== 'undefined' ? window.location.host : 'Vercel'}</span>
+                </div>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setHostMode('NETWORK')}
+                    title="Use Wi-Fi IP address for phone camera / Google Lens scanning on the same network"
+                    className={`flex-1 py-1 rounded-lg transition-all flex items-center justify-center gap-1 ${
+                      hostMode === 'NETWORK'
+                        ? 'bg-indigo-600 text-white shadow-xs font-black'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <Wifi className="w-3 h-3" /> Wi-Fi IP ({networkIp})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setHostMode('LOCAL')}
+                    title="Use localhost for same-device browser testing"
+                    className={`flex-1 py-1 rounded-lg transition-all flex items-center justify-center gap-1 ${
+                      hostMode === 'LOCAL'
+                        ? 'bg-indigo-600 text-white shadow-xs font-black'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    <Globe className="w-3 h-3" /> Localhost
+                  </button>
+                </>
+              )}
             </div>
 
-            {/* 3D Floating QR Display with laser scan line effect */}
-            <div className="relative group w-40 h-40 mx-auto bg-white p-3 border-2 border-indigo-500/30 rounded-2xl shadow-xl flex items-center justify-center overflow-hidden">
-              
-              {/* Laser Scan Line Animation */}
-              {timeLeft > 0 && (
-                <div className="absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-blue-500 to-transparent shadow-lg shadow-blue-500 animate-pulse top-0 animate-ping"></div>
-              )}
+            {/* High-Contrast Scannable 2D QR Display */}
+            <div
+              onClick={() => setShowQrModal(true)}
+              title="Click to Open Fullscreen Projector Mode"
+              className="cursor-pointer relative group w-48 h-48 sm:w-52 sm:h-52 mx-auto bg-white p-3 border-2 border-indigo-500/40 rounded-2xl shadow-xl flex items-center justify-center overflow-hidden hover:scale-105 transition-all duration-300"
+            >
 
               {activeSession && activeSession.qrDataUrl ? (
                 <img
@@ -1155,12 +1170,12 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               </p>
             </div>
 
-            {/* Projected QR Code with Laser Glow */}
-            <div className="relative w-64 h-64 sm:w-72 sm:h-72 mx-auto bg-white p-4 rounded-3xl shadow-2xl border-4 border-indigo-500/50 flex items-center justify-center">
+            {/* Projected QR Code with High Contrast (Optimized for Mobile Camera & Google Lens) */}
+            <div className="relative w-72 h-72 sm:w-84 sm:h-84 md:w-96 md:h-96 mx-auto bg-white p-5 rounded-3xl shadow-2xl border-4 border-indigo-500/50 flex items-center justify-center">
               {activeSession && activeSession.qrDataUrl ? (
                 <img src={activeSession.qrDataUrl} alt="Classroom QR" className="w-full h-full object-contain" />
               ) : (
-                <QrCode className="w-48 h-48 text-blue-600" />
+                <QrCode className="w-56 h-56 text-blue-600" />
               )}
             </div>
 

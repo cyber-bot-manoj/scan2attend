@@ -581,29 +581,37 @@ app.post('/api/teacher/generate-qr', async (req, res) => {
   const expiresAt = createdAt + 5 * 60 * 1000; // Strictly 5 Minutes Validity
 
   // Determine client base URL for phone camera / Google Lens scanning
-  const localIp = getLocalIpAddress();
-  let clientHost = hostUrl;
-  if (!clientHost) {
-    if (req.headers.origin && !req.headers.origin.includes('localhost') && !req.headers.origin.includes('127.0.0.1')) {
+  let clientHost = (hostUrl || '').trim();
+  if (!clientHost || clientHost.includes('169.254') || clientHost.includes('undefined')) {
+    const forwardedHost = req.headers['x-forwarded-host'] || req.headers['host'];
+    const proto = req.headers['x-forwarded-proto'] || (req.secure ? 'https' : 'http');
+    if (forwardedHost && !forwardedHost.includes('localhost') && !forwardedHost.includes('127.0.0.1') && !forwardedHost.includes('169.254')) {
+      clientHost = `${proto}://${forwardedHost}`;
+    } else if (req.headers.origin && !req.headers.origin.includes('localhost') && !req.headers.origin.includes('127.0.0.1') && !req.headers.origin.includes('169.254')) {
       clientHost = req.headers.origin;
     } else {
-      clientHost = `http://${localIp}:3000`;
+      const localIp = getLocalIpAddress();
+      if (localIp && !localIp.startsWith('169.254') && localIp !== '127.0.0.1') {
+        clientHost = `http://${localIp}:3000`;
+      } else {
+        clientHost = 'http://localhost:3000';
+      }
     }
   }
   // Trim trailing slash if present
-  clientHost = clientHost.replace(/\/$/, '');
+  clientHost = clientHost.replace(/\/+$/, '');
 
   // Web URL that standard phone cameras or Google Lens automatically recognize as a website to open!
   const webUrl = `${clientHost}/?action=attend&session=${sessionId}&classId=${targetClass.id}&code=${targetClass.code}&subject=${encodeURIComponent(targetClass.subject)}&expiresAt=${expiresAt}&lat=${lat}&lng=${lng}&radius=50`;
 
   try {
-    // Generate clean high-res 2D QR Code Matrix
+    // Generate clean high-contrast 2D QR Code Matrix with 4-module quiet zone (ISO standard for Google Lens)
     const qrDataUrl = await QRCode.toDataURL(webUrl, {
       errorCorrectionLevel: 'M',
-      margin: 2,
-      width: 450,
+      margin: 4,
+      width: 600,
       color: {
-        dark: '#0f172a',
+        dark: '#000000',
         light: '#ffffff'
       }
     });
