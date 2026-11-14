@@ -454,16 +454,7 @@ export default function StudentPanel({
   const [pipelineResults, setPipelineResults] = useState(null);
   const [liveRecord, setLiveRecord] = useState(null);
 
-  // Duplicate Attendance Prevention Check
-  const isDuplicateAttendance = Boolean(
-    hasMarkedAttendance ||
-    (activeSession && attendanceLogs?.some(log => 
-      (log.sessionId === activeSession.sessionId || log.subject === activeSession.className || log.subject === activeSession.subject) &&
-      log.status === 'PRESENT' &&
-      (log.time?.includes('Today') || log.time?.includes(new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short' })))
-    ))
-  );
-    // Full Semester Attendance History Log (w.e.f. 27 July 2026 Semester Commencement)
+  // Full Semester Attendance History Log (w.e.f. 27 July 2026 Semester Commencement)
   const [semesterFilterSubject, setSemesterFilterSubject] = useState('ALL');
   const [showFullReportModal, setShowFullReportModal] = useState(false);
   const [selectedAuditRecord, setSelectedAuditRecord] = useState(null);
@@ -565,6 +556,16 @@ export default function StudentPanel({
   const [voiceAlertPlaying, setVoiceAlertPlaying] = useState(false);
   const [hasMarkedAttendance, setHasMarkedAttendance] = useState(false);
   const lastVoiceRef = useRef(null);
+
+  // Duplicate Attendance Prevention Check
+  const isDuplicateAttendance = Boolean(
+    hasMarkedAttendance ||
+    (activeSession && attendanceLogs?.some(log => 
+      (log.sessionId === activeSession.sessionId || log.subject === activeSession.className || log.subject === activeSession.subject) &&
+      log.status === 'PRESENT' &&
+      (log.time?.includes('Today') || log.time?.includes(new Date().toLocaleDateString('en-US', { day: '2-digit', month: 'short' })))
+    ))
+  );
 
   // Automatic Voice & Chime Synthesizer Engine for Student Dashboard
   const playVoiceAlertNotification = () => {
@@ -1196,8 +1197,8 @@ export default function StudentPanel({
               </div>
 
               <div className="grid grid-cols-2 gap-2 text-[11px] text-slate-300 font-mono pt-1 border-t border-slate-800">
-                <div>Your Lat: <strong className="text-white block font-sans text-xs">{studentLat.toFixed(4)}° N</strong></div>
-                <div>Your Lng: <strong className="text-white block font-sans text-xs">{studentLng.toFixed(4)}° E</strong></div>
+                <div>Your Lat: <strong className="text-white block font-sans text-xs">{(Number(studentLat) || 26.93035).toFixed(4)}° N</strong></div>
+                <div>Your Lng: <strong className="text-white block font-sans text-xs">{(Number(studentLng) || 80.92790).toFixed(4)}° E</strong></div>
               </div>
 
               <div className={`flex items-center gap-1.5 text-[10px] font-semibold pt-0.5 border-t border-slate-800/80 ${
@@ -1903,14 +1904,14 @@ export default function StudentPanel({
                       <div className="p-3 bg-slate-900 rounded-xl border border-slate-700/60">
                         <span className="text-[10px] text-slate-400 uppercase font-bold block">Student Coordinates</span>
                         <strong className="font-mono text-slate-200 text-xs block mt-0.5">
-                          {studentLat.toFixed(5)}° N, {studentLng.toFixed(5)}° E
+                          {(Number(studentLat) || MUIT_CAMPUS_LAT).toFixed(5)}° N, {(Number(studentLng) || MUIT_CAMPUS_LNG).toFixed(5)}° E
                         </strong>
                       </div>
 
                       <div className="p-3 bg-slate-900 rounded-xl border border-slate-700/60">
                         <span className="text-[10px] text-slate-400 uppercase font-bold block">Classroom Coordinates</span>
                         <strong className="font-mono text-slate-200 text-xs block mt-0.5">
-                          {(activeSession?.latitude || MUIT_CAMPUS_LAT).toFixed(5)}° N, {(activeSession?.longitude || MUIT_CAMPUS_LNG).toFixed(5)}° E
+                          {(Number(activeSession?.latitude) || MUIT_CAMPUS_LAT).toFixed(5)}° N, {(Number(activeSession?.longitude) || MUIT_CAMPUS_LNG).toFixed(5)}° E
                         </strong>
                       </div>
                     </div>
