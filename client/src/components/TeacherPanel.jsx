@@ -31,7 +31,12 @@ import {
   Eye,
   Paperclip,
   AlertCircle,
-  Filter
+  Filter,
+  Copy,
+  ExternalLink,
+  Wifi,
+  Globe,
+  Smartphone
 } from 'lucide-react';
 import { 
   getStoredAssignments, 
@@ -47,6 +52,11 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
   const [loading, setLoading] = useState(false);
   const [showQrModal, setShowQrModal] = useState(false);
   const [showAllFeedModal, setShowAllFeedModal] = useState(false);
+
+  // Network IP & URL Host Mode for Mobile Camera / Google Lens Scanning
+  const [networkIp, setNetworkIp] = useState('192.168.29.180');
+  const [hostMode, setHostMode] = useState('NETWORK'); // 'NETWORK' (Wi-Fi IP for phone camera) or 'LOCAL' (Browser origin)
+  const [copiedUrl, setCopiedUrl] = useState(false);
 
   // Teacher Coursework & Assignments State
   const [assignments, setAssignments] = useState(getStoredAssignments);
@@ -97,10 +107,29 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
     };
   }, []);
 
-  // Initial classes setup
+  // Initial classes setup & network info
   useEffect(() => {
     fetchClasses();
+    fetch('/api/system/network-info')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.localIp) {
+          setNetworkIp(data.localIp);
+        }
+      })
+      .catch(err => console.warn('Could not auto-fetch local IP:', err));
   }, []);
+
+  const handleCopyUrl = (urlToCopy) => {
+    if (!urlToCopy) return;
+    try {
+      navigator.clipboard?.writeText(urlToCopy);
+      setCopiedUrl(true);
+      setTimeout(() => setCopiedUrl(false), 2500);
+    } catch (e) {
+      console.warn('Clipboard write error:', e);
+    }
+  };
 
   const fetchClasses = async () => {
     try {
@@ -135,7 +164,7 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
     return () => clearInterval(interval);
   }, [activeSession]);
 
-  // Generate 5-Minute Class QR Code (Real 2D Matrix Scannable QR)
+  // Generate 5-Minute Class QR Code (Real 2D Matrix Scannable QR for Mobile Camera & Google Lens)
   const generateQrCode = async () => {
     if (!selectedClassId) return;
     setLoading(true);
@@ -152,21 +181,15 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
     };
     const className = classNameMap[selectedClassId] || 'Computer Graphics (BCA501)';
 
-    const payloadObj = {
-      classId: selectedClassId,
-      className,
-      subject: className,
-      latitude: 26.9302879,
-      longitude: 80.9278433,
-      radiusMeters: 50,
-      campus: 'MUIT Lucknow',
-      sessionId: `qr_${generatedAt}`,
-      expiresAt: expiresAt,
-      secretHash: `SEC_${generatedAt}_${selectedClassId.toUpperCase()}`
-    };
+    // Effective client base host URL:
+    // When hostMode is 'NETWORK', use the machine's local Wi-Fi IP (e.g. http://192.168.29.180:3000)
+    // When hostMode is 'LOCAL', use current window.location.origin
+    const effectiveHost = hostMode === 'NETWORK'
+      ? (networkIp ? `http://${networkIp}:3000` : window.location.origin)
+      : window.location.origin;
 
-    const qrJsonString = JSON.stringify(payloadObj);
-    const scannableQrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(qrJsonString)}&size=400&margin=1`;
+    const webUrl = `${effectiveHost}/?action=attend&session=qr_${generatedAt}&classId=${selectedClassId}&code=${selectedClassId.toUpperCase()}&subject=${encodeURIComponent(className)}&expiresAt=${expiresAt}&lat=26.9302879&lng=80.9278433&radius=50`;
+    const fallbackQrUrl = `https://quickchart.io/qr?text=${encodeURIComponent(webUrl)}&size=450&margin=2`;
 
     try {
       const res = await fetch('/api/teacher/generate-qr', {
@@ -174,22 +197,23 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           classId: selectedClassId,
-          teacherId: user ? user.id : 'teacher_1'
+          teacherId: user ? user.id : 'teacher_1',
+          hostUrl: effectiveHost
         })
       });
       const data = await res.json();
 
       const newSession = {
         ...(data.success ? data.qrSession : {}),
-        sessionId: data.qrSession?.sessionId || payloadObj.sessionId,
+        sessionId: data.qrSession?.sessionId || `qr_${generatedAt}`,
         classId: selectedClassId,
         className,
         subject: className,
         code: selectedClassId.toUpperCase(),
         expiresAt,
         generatedAt,
-        qrPayloadString: qrJsonString,
-        qrDataUrl: scannableQrUrl
+        webUrl: data.qrSession?.webUrl || webUrl,
+        qrDataUrl: data.qrSession?.qrDataUrl || fallbackQrUrl
       };
 
       if (setActiveSession) {
@@ -201,15 +225,15 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
     } catch (err) {
       console.error('API call fallback, generating real scannable QR locally:', err);
       const fallbackSession = {
-        sessionId: payloadObj.sessionId,
+        sessionId: `qr_${generatedAt}`,
         classId: selectedClassId,
         className,
         subject: className,
         code: selectedClassId.toUpperCase(),
         expiresAt,
         generatedAt,
-        qrPayloadString: qrJsonString,
-        qrDataUrl: scannableQrUrl
+        webUrl,
+        qrDataUrl: fallbackQrUrl
       };
       if (setActiveSession) {
         setActiveSession(fallbackSession);
@@ -697,6 +721,37 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               <span className="text-xs font-extrabold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
                 <QrCode className="w-4 h-4 text-indigo-600" /> QR Session Engine
               </span>
+              <span className="px-2 py-0.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-[10px] font-extrabold flex items-center gap-1">
+                <Smartphone className="w-3 h-3 text-indigo-600" /> Google Lens Ready
+              </span>
+            </div>
+
+            {/* QR Host Target Mode Selector */}
+            <div className="flex items-center justify-between bg-slate-100 p-1 rounded-xl text-[10px] font-bold border border-slate-200">
+              <button
+                type="button"
+                onClick={() => setHostMode('NETWORK')}
+                title="Use Wi-Fi IP address for phone camera / Google Lens scanning on the same network"
+                className={`flex-1 py-1 rounded-lg transition-all flex items-center justify-center gap-1 ${
+                  hostMode === 'NETWORK'
+                    ? 'bg-indigo-600 text-white shadow-xs font-black'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Wifi className="w-3 h-3" /> Wi-Fi IP ({networkIp})
+              </button>
+              <button
+                type="button"
+                onClick={() => setHostMode('LOCAL')}
+                title="Use localhost for same-device browser testing"
+                className={`flex-1 py-1 rounded-lg transition-all flex items-center justify-center gap-1 ${
+                  hostMode === 'LOCAL'
+                    ? 'bg-indigo-600 text-white shadow-xs font-black'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Globe className="w-3 h-3" /> Localhost
+              </button>
             </div>
 
             {/* 3D Floating QR Display with laser scan line effect */}
@@ -716,17 +771,24 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
               ) : (
                 <div className="w-full h-full bg-slate-50 rounded-xl border border-dashed border-indigo-400 flex flex-col items-center justify-center p-2 text-indigo-600">
                   <QrCode className="w-12 h-12 mb-1" />
-                  <span className="text-[10px] font-extrabold">CS 401 QR Active</span>
+                  <span className="text-[10px] font-extrabold">5-Min QR Active</span>
                 </div>
               )}
             </div>
 
-            <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-[11px] font-extrabold">
+            <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200 text-[11px] font-extrabold space-y-1">
               <span className={timeLeft > 0 ? 'text-emerald-600 block' : 'text-red-600 block'}>
                 {timeLeft > 0 ? `⏱ 5-Min Timer Running (${formattedTime})` : '❌ QR Session Expired'}
               </span>
-              <span className="text-[10px] text-slate-500 font-medium block mt-0.5">
-                Students must scan before timer hits 00:00
+              <span className="text-[10px] text-slate-500 font-medium block">
+                {activeSession?.webUrl ? (
+                  <button
+                    onClick={() => handleCopyUrl(activeSession.webUrl)}
+                    className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 font-bold"
+                  >
+                    <Copy className="w-3 h-3" /> {copiedUrl ? 'Copied Link!' : 'Copy Web Link'}
+                  </button>
+                ) : 'Scan with Camera or Google Lens'}
               </span>
             </div>
           </div>
@@ -1071,9 +1133,9 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
 
       {/* FULLSCREEN SMARTBOARD PROJECTION MODAL FOR CLASSROOMS */}
       {showQrModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-xl flex items-center justify-center p-4 animate-fadeIn">
+        <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-xl flex items-center justify-center p-4 animate-fadeIn overflow-y-auto">
           
-          <div className="max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 text-white relative shadow-2xl text-center space-y-6">
+          <div className="max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-white relative shadow-2xl text-center space-y-5 my-auto">
             
             <button
               onClick={() => setShowQrModal(false)}
@@ -1083,15 +1145,18 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
             </button>
 
             <div>
-              <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 mb-2">
+              <span className="px-3.5 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs font-black uppercase tracking-wider inline-flex items-center gap-1.5 mb-2">
                 <Sparkles className="w-3.5 h-3.5 text-yellow-300" /> Classroom Projection Mode
               </span>
               <h2 className="text-2xl font-black text-white">{activeSession?.className || 'Computer Graphics (BCA501)'} • Room B-302</h2>
-              <p className="text-xs text-slate-400 mt-1">Scan this QR code using student portal on your mobile device</p>
+              <p className="text-xs text-slate-300 mt-1 flex items-center justify-center gap-1.5">
+                <Smartphone className="w-4 h-4 text-emerald-400" /> 
+                <span>Scannable with <strong>Normal Mobile Camera</strong> or <strong>Google Lens</strong></span>
+              </p>
             </div>
 
-            {/* Projected QR Code */}
-            <div className="w-72 h-72 mx-auto bg-white p-4 rounded-3xl shadow-2xl border-4 border-blue-500/40 flex items-center justify-center">
+            {/* Projected QR Code with Laser Glow */}
+            <div className="relative w-64 h-64 sm:w-72 sm:h-72 mx-auto bg-white p-4 rounded-3xl shadow-2xl border-4 border-indigo-500/50 flex items-center justify-center">
               {activeSession && activeSession.qrDataUrl ? (
                 <img src={activeSession.qrDataUrl} alt="Classroom QR" className="w-full h-full object-contain" />
               ) : (
@@ -1100,9 +1165,57 @@ export default function TeacherPanel({ user, activeSession, setActiveSession, gl
             </div>
 
             {/* Floating Timer */}
-            <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-slate-800 border border-slate-700 text-yellow-300 font-mono text-2xl font-black shadow-inner">
+            <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-2xl bg-slate-800/90 border border-slate-700 text-yellow-300 font-mono text-xl sm:text-2xl font-black shadow-inner">
               <Clock className="w-6 h-6 text-yellow-300 animate-spin" style={{ animationDuration: '4s' }} />
               <span>Expires In: {formattedTime}</span>
+            </div>
+
+            {/* Direct Web URL & Action Controls */}
+            {activeSession?.webUrl && (
+              <div className="max-w-md mx-auto p-3 rounded-2xl bg-slate-800/80 border border-slate-700 space-y-2 text-left">
+                <div className="flex items-center justify-between text-[11px] font-bold text-slate-400">
+                  <span className="flex items-center gap-1"><Globe className="w-3 h-3 text-indigo-400" /> Scannable Direct URL:</span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleCopyUrl(activeSession.webUrl)}
+                      className="text-xs font-black text-emerald-400 hover:text-emerald-300 flex items-center gap-1"
+                    >
+                      <Copy className="w-3 h-3" /> {copiedUrl ? 'Copied!' : 'Copy Link'}
+                    </button>
+                    <a
+                      href={activeSession.webUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs font-black text-blue-400 hover:text-blue-300 flex items-center gap-1"
+                    >
+                      <ExternalLink className="w-3 h-3" /> Test
+                    </a>
+                  </div>
+                </div>
+                <div className="p-2 rounded-xl bg-slate-950 font-mono text-[11px] text-slate-300 truncate select-all">
+                  {activeSession.webUrl}
+                </div>
+              </div>
+            )}
+
+            {/* Security Verification Steps Banner */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[10px] text-slate-400 max-w-lg mx-auto pt-1 font-medium">
+              <div className="p-2 rounded-xl bg-slate-800/60 border border-slate-700/60">
+                <span className="text-white font-bold block">1. 5-Min QR</span>
+                <span>Camera / Lens Scan</span>
+              </div>
+              <div className="p-2 rounded-xl bg-slate-800/60 border border-slate-700/60">
+                <span className="text-white font-bold block">2. Student Login</span>
+                <span>Verified Details</span>
+              </div>
+              <div className="p-2 rounded-xl bg-slate-800/60 border border-slate-700/60">
+                <span className="text-white font-bold block">3. 50m Geofence</span>
+                <span>Within Classroom</span>
+              </div>
+              <div className="p-2 rounded-xl bg-slate-800/60 border border-slate-700/60">
+                <span className="text-white font-bold block">4. Live Face Scan</span>
+                <span>Biometric Match</span>
+              </div>
             </div>
 
           </div>

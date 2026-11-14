@@ -22,9 +22,17 @@ import {
   X
 } from 'lucide-react';
 
-export default function LoginModal({ setUser, setActiveTab }) {
+export default function LoginModal({ setUser, setActiveTab, scannedSession }) {
   // Main mode: 'SIGN_IN' or 'SIGN_UP'
   const [authMode, setAuthMode] = useState('SIGN_IN');
+
+  // If a QR session was scanned from Camera or Google Lens, default to student role
+  useEffect(() => {
+    if (scannedSession && scannedSession.expiresAt > Date.now()) {
+      setSelectedRole('STUDENT');
+      setAuthMode('SIGN_IN');
+    }
+  }, [scannedSession]);
 
   // Sign In State - Empty by default for students
   const [email, setEmail] = useState('');
@@ -748,6 +756,31 @@ export default function LoginModal({ setUser, setActiveTab }) {
                   Admin
                 </button>
               </div>
+
+              {/* CAMERA / GOOGLE LENS SCANNED ACTIVE SESSION BANNER */}
+              {scannedSession && scannedSession.expiresAt > Date.now() && (
+                <div className="p-4 bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-purple-500/10 border-2 border-indigo-500/30 rounded-2xl flex items-start gap-3 shadow-md animate-fadeIn">
+                  <div className="p-2.5 bg-indigo-600 text-white rounded-xl shadow-md shrink-0">
+                    <QrCode className="w-5 h-5 animate-pulse" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
+                      <span className="text-[11px] font-black text-indigo-700 uppercase tracking-wider flex items-center gap-1">
+                        <Sparkles className="w-3.5 h-3.5 text-indigo-600" /> QR Code Scanned (Camera / Lens)
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black font-mono">
+                        ⏱ 5-Min Session Active
+                      </span>
+                    </div>
+                    <h4 className="text-xs font-black text-slate-900 truncate">
+                      {scannedSession.subject || scannedSession.className || 'Class Session'}
+                    </h4>
+                    <p className="text-[11px] text-slate-600 font-medium mt-0.5">
+                      Log in with your registered email & password to view student details, complete 50m geofencing & actual face verification, and record attendance.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* LOGIN FORM */}
               <form onSubmit={handleLogin} className="space-y-4">

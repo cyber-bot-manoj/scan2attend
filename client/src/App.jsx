@@ -54,6 +54,62 @@ export default function App() {
     }
   });
 
+  // Track if user arrived via QR Code URL scan (Normal Camera or Google Lens)
+  const [urlDetectedNotice, setUrlDetectedNotice] = useState(null);
+  const [autoOpenVerification, setAutoOpenVerification] = useState(false);
+
+  // Parse Mobile Camera / Google Lens URL Query Parameters
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const action = params.get('action');
+      const sessionId = params.get('session');
+
+      if (action === 'attend' || sessionId) {
+        const expiresAt = parseInt(params.get('expiresAt'), 10) || (Date.now() + 300000);
+        const subject = params.get('subject') ? decodeURIComponent(params.get('subject')) : 'Computer Graphics (BCA501)';
+        const classId = params.get('classId') || 'bca501';
+        const code = params.get('code') || 'BCA501';
+        const lat = parseFloat(params.get('lat')) || 26.9302879;
+        const lng = parseFloat(params.get('lng')) || 80.9278433;
+        const radius = parseInt(params.get('radius'), 10) || 50;
+
+        if (expiresAt < Date.now()) {
+          setUrlDetectedNotice({
+            type: 'EXPIRED',
+            title: 'QR Code Expired',
+            message: 'This 5-minute attendance QR code has expired. Please ask faculty to generate a fresh QR code.'
+          });
+        } else {
+          const detectedSession = {
+            sessionId: sessionId || `qr_${Date.now()}`,
+            classId,
+            code,
+            className: subject,
+            subject,
+            expiresAt,
+            latitude: lat,
+            longitude: lng,
+            radiusMeters: radius,
+            campus: 'MUIT Lucknow',
+            urlScanned: true
+          };
+
+          setActiveSession(detectedSession);
+          localStorage.setItem('activeQrSession', JSON.stringify(detectedSession));
+          setUrlDetectedNotice({
+            type: 'ACTIVE',
+            session: detectedSession,
+            message: `QR code scanned via Mobile Camera / Google Lens for ${subject}.`
+          });
+          setAutoOpenVerification(true);
+        }
+      }
+    } catch (e) {
+      console.warn('URL param parse error:', e);
+    }
+  }, []);
+
   // Anti-Inspect Code Protection (Disable Right-Click, Inspect, DevTools Shortcuts)
   useEffect(() => {
     const handleContextMenu = (e) => e.preventDefault();
@@ -205,8 +261,31 @@ export default function App() {
       {/* Main Content View Container */}
       <ErrorBoundary>
         <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          {/* Expired QR Warning Toast if opened expired QR link */}
+          {urlDetectedNotice && urlDetectedNotice.type === 'EXPIRED' && (
+            <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border-2 border-red-500/40 text-red-700 flex items-center justify-between gap-3 shadow-lg animate-fadeIn">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-red-600 text-white rounded-xl font-bold">⚠️</div>
+                <div>
+                  <h4 className="font-black text-sm text-red-900">{urlDetectedNotice.title}</h4>
+                  <p className="text-xs text-red-700 font-medium">{urlDetectedNotice.message}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setUrlDetectedNotice(null)}
+                className="px-3 py-1 bg-red-600 text-white rounded-lg text-xs font-bold hover:bg-red-700"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+
           {(!user || activeTab === 'LOGIN') && (
-            <LoginModal setUser={setUser} setActiveTab={setActiveTab} />
+            <LoginModal 
+              setUser={setUser} 
+              setActiveTab={setActiveTab} 
+              scannedSession={activeSession}
+            />
           )}
 
           {user && activeTab === 'STUDENT' && (
@@ -216,6 +295,8 @@ export default function App() {
               setActiveSession={setActiveSession}
               setActiveTab={setActiveTab}
               onNewAttendance={addGlobalAttendance}
+              autoOpenVerification={autoOpenVerification}
+              setAutoOpenVerification={setAutoOpenVerification}
             />
           )}
 
